@@ -3,6 +3,7 @@
  */
 package application.controller;
 
+import application.model.SessionInfos;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
@@ -16,9 +17,15 @@ import javafx.stage.Stage;
 public class MainController{
 
 	private Stage stage;
+	private final SessionInfos sessionInfos;
 
 	public MainController(Stage stage){
 		this.stage = stage;
+		this.sessionInfos = new SessionInfos();
+	}
+
+	public SessionInfos getSessionInfos(){
+		return this.sessionInfos;
 	}
 
 	public Stage getStage(){
