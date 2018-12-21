@@ -23,6 +23,8 @@ public class ConfigHandler{
 		this.configFile = new File("./app.cfg");
 		if(!this.configFile.exists()){
 			this.configFile.createNewFile();
+		} else{
+			this.loadProperties();
 		}
 
 	}

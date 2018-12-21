@@ -13,6 +13,8 @@ import java.util.ResourceBundle;
 import application.model.Person;
 import application.processes.LoadBirthdaysFromFileTask;
 import application.processes.SaveLastFileUsedTask;
+import application.util.ConfigFields;
+import application.util.ConfigHandler;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -32,6 +34,9 @@ import javafx.stage.FileChooser.ExtensionFilter;
  */
 public class BirthdaysOverviewController extends Controller{
 	protected final static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+
+	MenuItem recentFilesMenuItem;
+
 	@FXML // ResourceBundle that was given to the FXMLLoader
 	private ResourceBundle resources;
 
@@ -65,7 +70,7 @@ public class BirthdaysOverviewController extends Controller{
 	@FXML // fx:id="date_label"
 	private Label date_label; // Value injected by FXMLLoader
 
-	final EventHandler<ActionEvent> openHandler = new EventHandler<ActionEvent>(){
+	final EventHandler<ActionEvent> openFromFileChooserHandler = new EventHandler<ActionEvent>(){
 		@Override
 		public void handle(ActionEvent event){
 			FileChooser fileChooser = new FileChooser();
@@ -81,7 +86,7 @@ public class BirthdaysOverviewController extends Controller{
 					Boolean result = saveLastFileUsedTask.getValue();
 					if(result){
 						System.out.println("Saved succsesfully");
-						BirthdaysOverviewController.this.openedFile_label.setText(selectedFile.getName());
+						BirthdaysOverviewController.this.recentFilesMenuItem.setText(selectedFile.getName());
 					} else{
 						System.out.println("Saveing  faild");
 					}
@@ -94,11 +99,43 @@ public class BirthdaysOverviewController extends Controller{
 				@Override
 				public void handle(WorkerStateEvent t){
 					List<Person> result = loadBirthdaysFromFileTask.getValue();
-					for(Person person : result){
-						System.out.println(person);
-					}
 					BirthdaysOverviewController.this.getMainController().getSessionInfos().getAllPersons().addAll(result);
-					BirthdaysOverviewController.this.nextBdaysList.refresh();
+					BirthdaysOverviewController.this.openedFile_label.setText(selectedFile.getName());
+				}
+			});
+			new Thread(loadBirthdaysFromFileTask).start();
+		}
+	};
+	final EventHandler<ActionEvent> openFromRecentHandler = new EventHandler<ActionEvent>(){
+		@Override
+		public void handle(ActionEvent event){
+			String lastUsedFilePath = BirthdaysOverviewController.this.getMainController().getSessionInfos().getConfigHandler().getProperties().getProperty(ConfigFields.LAST_OPEND);
+			System.out.println(lastUsedFilePath);
+			File birthdayFile = new File(lastUsedFilePath);
+			BirthdaysOverviewController.this.getMainController().getSessionInfos().setFileToOpen(birthdayFile);
+
+			SaveLastFileUsedTask saveLastFileUsedTask = new SaveLastFileUsedTask(BirthdaysOverviewController.this.getMainController());
+			saveLastFileUsedTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>(){
+				@Override
+				public void handle(WorkerStateEvent t){
+					Boolean result = saveLastFileUsedTask.getValue();
+					if(result){
+						System.out.println("Saved succsesfully");
+						BirthdaysOverviewController.this.recentFilesMenuItem.setText(birthdayFile.getName());
+					} else{
+						System.out.println("Saveing  faild");
+					}
+				}
+			});
+			new Thread(saveLastFileUsedTask).start();
+
+			LoadBirthdaysFromFileTask loadBirthdaysFromFileTask = new LoadBirthdaysFromFileTask(BirthdaysOverviewController.this.getMainController());
+			loadBirthdaysFromFileTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>(){
+				@Override
+				public void handle(WorkerStateEvent t){
+					List<Person> result = loadBirthdaysFromFileTask.getValue();
+					BirthdaysOverviewController.this.getMainController().getSessionInfos().getAllPersons().addAll(result);
+					BirthdaysOverviewController.this.openedFile_label.setText(birthdayFile.getName());
 				}
 			});
 			new Thread(loadBirthdaysFromFileTask).start();
@@ -116,12 +153,19 @@ public class BirthdaysOverviewController extends Controller{
 		assert this.x3 != null : "fx:id=\"x3\" was not injected: check your FXML file 'Kalender.fxml'.";
 		assert this.x4 != null : "fx:id=\"x4\" was not injected: check your FXML file 'Kalender.fxml'.";
 
-		this.openFileMenuItem.addEventHandler(ActionEvent.ANY, this.openHandler);
+		this.openFileMenuItem.addEventHandler(ActionEvent.ANY, this.openFromFileChooserHandler);
 		this.nextBdaysList.setItems(this.getMainController().getSessionInfos().getAllPersons());
 		this.date_label.setText(DATE_FORMATTER.format(LocalDate.now()));
-		String property = this.getMainController().getSessionInfos().getConfigHandler().getProperties().getProperty("last_opend");
-		File file = new File(property);
-		this.openRecent_MenuItem.getItems().add(new MenuItem(file.getName()));
+		String property = null;
+		try{
+			property = new ConfigHandler().getProperties().getProperty(ConfigFields.LAST_OPEND);
+			this.recentFilesMenuItem = new MenuItem(new File(property).getName());
+			this.recentFilesMenuItem.addEventHandler(ActionEvent.ANY, this.openFromRecentHandler);
+			this.openRecent_MenuItem.getItems().add(this.recentFilesMenuItem);
+
+		} catch (Exception e){
+			e.printStackTrace();
+		}
 		;
 
 	}

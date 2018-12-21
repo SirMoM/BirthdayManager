@@ -50,6 +50,7 @@ public class MainController{
 
 		} catch (Exception ex){
 			System.out.println("Login: " + ex.getMessage());
+			ex.printStackTrace();
 		}
 	}
 

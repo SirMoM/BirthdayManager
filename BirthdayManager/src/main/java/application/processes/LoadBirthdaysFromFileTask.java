@@ -21,7 +21,6 @@ public class LoadBirthdaysFromFileTask extends Task<List<Person>>{
 	public LoadBirthdaysFromFileTask(MainController mainController){
 		super();
 		this.mainController = mainController;
-
 	}
 
 	public List<Person> getPersons(){
