@@ -20,43 +20,40 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="819.0" prefWidth="1208.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
-        <Menu mnemonicParsing="false" text="File">
+        <Menu fx:id="file_menu" mnemonicParsing="false" text="File">
           <items>
-            <MenuItem mnemonicParsing="false" text="New" />
-            <MenuItem fx:id="openFileMenuItem" mnemonicParsing="false" text="Open…" />
+            <MenuItem fx:id="openFile_MenuItem" mnemonicParsing="false" text="Open…" />
             <Menu fx:id="openRecent_MenuItem" mnemonicParsing="false" text="Open Recent" />
             <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" text="Close" />
-            <MenuItem mnemonicParsing="false" text="Save" />
-            <MenuItem mnemonicParsing="false" text="Save As…" />
-            <MenuItem mnemonicParsing="false" text="Revert" />
+            <MenuItem fx:id="closeFile_MenuItem" mnemonicParsing="false" text="Close" />
+            <MenuItem fx:id="saveFile_MenuItem" mnemonicParsing="false" text="Save" />
+            <MenuItem fx:id="saveAsFile_MenuItem" mnemonicParsing="false" text="Save As…" />
+                  <MenuItem fx:id="exporteFile_MenuItem" mnemonicParsing="false" text="Export..." />
             <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" text="Preferences…" />
+            <MenuItem fx:id="preferences_MenuItem" mnemonicParsing="false" text="Preferences…" />
             <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" text="Quit" />
+            <MenuItem fx:id="quit_MenuItem" mnemonicParsing="false" text="Quit" />
           </items>
         </Menu>
-        <Menu mnemonicParsing="false" text="Edit">
+        <Menu fx:id="edit_menu" mnemonicParsing="false" text="Edit">
           <items>
-            <MenuItem mnemonicParsing="false" text="Undo" />
-            <MenuItem mnemonicParsing="false" text="Redo" />
+            <MenuItem fx:id="showNextBirthdays_MenuItem" mnemonicParsing="false" text="Zeige nächste Geburtstage" />
+            <MenuItem fx:id="showLastBirthdays_MenuItem" mnemonicParsing="false" text="Zeige die letzten Geburtstage" />
             <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" text="Cut" />
-            <MenuItem mnemonicParsing="false" text="Copy" />
-            <MenuItem mnemonicParsing="false" text="Paste" />
-            <MenuItem mnemonicParsing="false" text="Delete" />
-            <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" text="Select All" />
-            <MenuItem mnemonicParsing="false" text="Unselect All" />
+            <MenuItem fx:id="newBirthday_MenuItem" mnemonicParsing="false" text="New Birthday" />
+            <MenuItem fx:id="importBirthdays_MenuItem" mnemonicParsing="false" text="Import Birthdays" />
+            <MenuItem fx:id="deleteBirthdays_MenuItem" mnemonicParsing="false" text="Delete" />
           </items>
         </Menu>
-        <Menu mnemonicParsing="false" text="Help">
+        <Menu fx:id="help_menu" mnemonicParsing="false" text="Help">
           <items>
-            <MenuItem mnemonicParsing="false" text="About MyHelloApp" />
+            <MenuItem fx:id="debug" mnemonicParsing="false" text="Debug" />
+                  <MenuItem fx:id="refresh_MenuItem" mnemonicParsing="false" text="Refresh" />
+                  <MenuItem fx:id="changeLanguage_MenuItem" mnemonicParsing="false" text="Change Language" />
           </items>
         </Menu>
       </menus>
@@ -65,36 +62,44 @@
          <items>
             <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity">
                <children>
-                  <Label fx:id="nextBirthdayLabel" alignment="CENTER" contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="Die nächsten Geburtstage" textAlignment="CENTER" underline="true">
-                     <font>
-                        <Font size="39.0" />
-                     </font>
-                  </Label>
-                  <ListView fx:id="nextBdaysList" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
-                     <contextMenu>
-                        <ContextMenu>
-                           <items>
-                              <MenuItem fx:id="openBirthday_MenuItem" mnemonicParsing="false" text="Geburtstag öffnen" />
-                           </items>
-                        </ContextMenu>
-                     </contextMenu></ListView>
+                  <VBox>
+                     <children>
+                        <Label fx:id="nextBirthday_Label" alignment="CENTER" contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="Die nächsten Geburtstage" textAlignment="CENTER" underline="true">
+                           <font>
+                              <Font size="39.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets top="2.0" />
+                           </VBox.margin>
+                        </Label>
+                        <ListView fx:id="nextBdaysList" minHeight="-Infinity" prefHeight="715.0" prefWidth="600.0">
+                           <contextMenu>
+                              <ContextMenu>
+                                 <items>
+                                    <MenuItem fx:id="openBirthday_MenuItem" mnemonicParsing="false" text="Geburtstag öffnen" />
+                                 </items>
+                              </ContextMenu>
+                           </contextMenu>
+                        </ListView>
+                     </children>
+                  </VBox>
                </children>
             </VBox>
-            <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
+            <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" tabMaxHeight="1000.0" tabMaxWidth="1000.0">
               <tabs>
-                  <Tab text="Woche">
+                  <Tab fx:id="week_tap" text="Woche">
                     <content>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                      <AnchorPane>
                            <children>
-                              <TableView maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <TableView fx:id="week_tableView" layoutY="4.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="715.0" prefWidth="596.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
                                  <columns>
-                                    <TableColumn prefWidth="75.0" text="Montag" />
-                                    <TableColumn prefWidth="75.0" text="Dienstag" />
-                                    <TableColumn prefWidth="75.0" text="Mitwoch" />
-                                    <TableColumn prefWidth="75.0" text="Donnerstag" />
-                                    <TableColumn prefWidth="75.0" text="Freitag" />
-                                    <TableColumn prefWidth="75.0" text="Sammstag" />
-                                    <TableColumn prefWidth="75.0" text="Sonntag" />
+                                    <TableColumn fx:id="monday_column1" editable="false" prefWidth="75.0" text="Montag" />
+                                    <TableColumn fx:id="tuesday_column1" editable="false" prefWidth="75.0" text="Dienstag" />
+                                    <TableColumn fx:id="wednesday_column1" editable="false" prefWidth="75.0" text="Mitwoch" />
+                                    <TableColumn fx:id="thursday_column1" editable="false" prefWidth="75.0" text="Donnerstag" />
+                                    <TableColumn fx:id="friday_column1" editable="false" minWidth="-1.0" prefWidth="-1.0" sortable="false" text="Freitag" />
+                                    <TableColumn fx:id="saturday_column1" editable="false" prefWidth="75.0" text="Sammstag" />
+                                    <TableColumn fx:id="sunday_column1" editable="false" prefWidth="75.0" text="Sonntag" />
                                  </columns>
                                  <contextMenu>
                                     <ContextMenu>
@@ -111,19 +116,19 @@
                         </AnchorPane>
                     </content>
                   </Tab>
-                  <Tab text="Monat">
+                  <Tab fx:id="month_tap" text="Monat">
                      <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
-                              <TableView maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <TableView maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
                                  <columns>
-                                    <TableColumn prefWidth="75.0" text="Montag" />
-                                    <TableColumn prefWidth="75.0" text="Dienstag" />
-                                    <TableColumn prefWidth="75.0" text="Mitwoch" />
-                                    <TableColumn prefWidth="75.0" text="Donnerstag" />
-                                    <TableColumn prefWidth="75.0" text="Freitag" />
-                                    <TableColumn prefWidth="75.0" text="Sammstag" />
-                                    <TableColumn prefWidth="75.0" text="Sonntag" />
+                                    <TableColumn fx:id="monday_column2" prefWidth="75.0" text="Montag" />
+                                    <TableColumn fx:id="tuesday_column2" prefWidth="75.0" text="Dienstag" />
+                                    <TableColumn fx:id="wednesday_column2" prefWidth="75.0" text="Mitwoch" />
+                                    <TableColumn fx:id="thursday_column2" prefWidth="75.0" text="Donnerstag" />
+                                    <TableColumn fx:id="friday_column2" prefWidth="75.0" text="Freitag" />
+                                    <TableColumn fx:id="saturday_column2" prefWidth="75.0" text="Sammstag" />
+                                    <TableColumn fx:id="sunday_column2" prefWidth="75.0" text="Sonntag" />
                                  </columns>
                                  <contextMenu>
                                     <ContextMenu>
@@ -141,6 +146,9 @@
                      </content>
                   </Tab>
               </tabs>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
             </TabPane>
          </items>
     </SplitPane>
