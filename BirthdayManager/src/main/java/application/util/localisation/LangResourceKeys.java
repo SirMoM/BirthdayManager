@@ -31,6 +31,8 @@ public enum LangResourceKeys{
 
 	help_menu,
 
+	fileChooserCaption,
+
 	// List menu
 	openBirthday_MenuItem,
 
@@ -50,6 +52,16 @@ public enum LangResourceKeys{
 	thursday_column2,
 	friday_column2,
 	saturday_column2,
-	sunday_column2;
+	sunday_column2,
+
+	// Edit Birthday view
+	identifyingPerson_label,
+	name_Label,
+	name_TextField,
+	middleName_Label,
+	surname_Label,
+	surname_TextField,
+	birthday_Label,
+	birthday_DatePicker;
 
 }

@@ -47,6 +47,13 @@ public class ConfigHandler{
 	/**
 	 * @return the properties
 	 */
+	public Object getPropertie(String key){
+		return this.properties.get(key);
+	}
+
+	/**
+	 * @return the properties
+	 */
 	public Properties getProperties(){
 		return this.properties;
 	}
