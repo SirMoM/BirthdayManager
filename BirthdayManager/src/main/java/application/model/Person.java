@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package application.model;
 
@@ -32,16 +32,16 @@ public class Person{
 	}
 
 	/**
-	 * 
+	 *
 	 */
-	public Person(String lineFromFile){
+	public Person(final String lineFromFile){
 		super();
 		this.surname = new SimpleStringProperty();
 		this.name = new SimpleStringProperty();
 		this.misc = new SimpleStringProperty();
 		this.birthday = new SimpleObjectProperty<LocalDate>();
-		String[] splitLine = lineFromFile.split("=");
-		String[] nameSplit = splitLine[0].split(" ");
+		final String[] splitLine = lineFromFile.split("=");
+		final String[] nameSplit = splitLine[0].split(" ");
 		if(nameSplit.length == 3){
 			this.setName(nameSplit[0]);
 			this.setMisc(nameSplit[1]);
@@ -61,72 +61,106 @@ public class Person{
 	 * @param name
 	 * @param birthday
 	 */
-	public Person(String surname, String name, String misc, LocalDate birthday){
+	public Person(final String surname, final String name, final String misc, final LocalDate birthday){
 		super();
-		this.surname = new SimpleStringProperty(surname);
-		this.name = new SimpleStringProperty(name);
-		this.misc = new SimpleStringProperty(misc);
+		if(surname.isEmpty()){
+			this.surname = new SimpleStringProperty(null);
+		} else{
+			this.surname = new SimpleStringProperty(surname);
+		}
+		if(name.isEmpty()){
+			this.name = new SimpleStringProperty(null);
+		} else{
+			this.name = new SimpleStringProperty(name);
+		}
+		if(misc.isEmpty()){
+			this.misc = new SimpleStringProperty(null);
+		} else{
+			this.misc = new SimpleStringProperty(misc);
+		}
 		this.birthday = new SimpleObjectProperty<LocalDate>(birthday);
 	}
 
 	/**
 	 * @return the birthday
 	 */
-	public ObjectProperty<LocalDate> getBirthday(){
-		return this.birthday;
+	public LocalDate getBirthday(){
+		return this.birthday.getValue();
 	}
 
 	/**
 	 * @return the misc
 	 */
-	public StringProperty getMisc(){
-		return this.misc;
+	public String getMisc(){
+		return this.misc.get();
 	}
 
 	/**
 	 * @return the name
 	 */
-	public StringProperty getName(){
-		return this.name;
+	public String getName(){
+		return this.name.get();
 	}
 
 	/**
 	 * @return the surname
 	 */
-	public StringProperty getSurname(){
-		return this.surname;
+	public String getSurname(){
+		return this.surname.get();
 	}
 
 	/**
 	 * @param birthday the birthday to set
 	 */
-	public void setBirthday(LocalDate birthday){
+	public void setBirthday(final LocalDate birthday){
 		this.birthday.set(birthday);
 	}
 
 	/**
 	 * @param misc the misc to set
 	 */
-	public void setMisc(String misc){
+	public void setMisc(final String misc){
 		this.misc.set(misc);
 	}
 
 	/**
 	 * @param name the name to set
 	 */
-	public void setName(String name){
+	public void setName(final String name){
 		this.name.set(name);
 	}
 
 	/**
 	 * @param surname the surname to set
 	 */
-	public void setSurname(String surname){
+	public void setSurname(final String surname){
 		this.surname.set(surname);
 	}
 
+	public String toCSVString(){
+		final StringBuilder builder = new StringBuilder();
+		if(this.getName() != null){
+			builder.append(this.getName());
+			builder.append(";");
+		}
+		if(this.getMisc() != null){
+			builder.append(this.getMisc());
+			builder.append(";");
+		}
+		if(this.getSurname() != null){
+			builder.append(this.getSurname());
+			builder.append(";");
+		}
+		if(this.getBirthday() != null){
+			builder.append(";");
+			builder.append(this.getBirthday());
+		}
+
+		return builder.toString();
+	}
+
 	public String toExtendedString(){
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("Person: ");
 		if(this.getName() != null){
 			builder.append("getName()=");
@@ -153,13 +187,13 @@ public class Person{
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString(){
-		StringBuilder builder = new StringBuilder();
-		if(this.getSurname().get() != null){
+		final StringBuilder builder = new StringBuilder();
+		if(this.getSurname() != null){
 			builder.append(this.surname.get());
 			builder.append(", ");
 		}
@@ -175,6 +209,27 @@ public class Person{
 			builder.append("\n");
 			builder.append(DATE_FORMATTER.format(this.birthday.get()));
 		}
+		return builder.toString();
+	}
+
+	public String toTXTString(){
+		final StringBuilder builder = new StringBuilder();
+		if(this.getName() != null){
+			builder.append(this.getName());
+			builder.append(" ");
+		}
+		if(this.getMisc() != null){
+			builder.append(this.getMisc());
+			builder.append(" ");
+		}
+		if(this.getSurname() != null){
+			builder.append(this.getSurname());
+		}
+		if(this.getBirthday() != null){
+			builder.append("=");
+			builder.append(DATE_FORMATTER.format(this.birthday.get()));
+		}
+
 		return builder.toString();
 	}
 

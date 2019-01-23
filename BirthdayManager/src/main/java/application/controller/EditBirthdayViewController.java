@@ -1,20 +1,20 @@
 /**
- * 
+ *
  */
 package application.controller;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
-import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import application.model.Person;
-import application.processes.LoadBirthdaysFromFileTask;
-import application.processes.SaveLastFileUsedTask;
+import application.model.PersonManager;
 import application.processes.UpdateAllSubBirthdayListsTask;
 import application.util.ConfigFields;
 import application.util.ConfigHandler;
@@ -38,7 +38,7 @@ import javafx.scene.text.Font;
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
 public class EditBirthdayViewController extends Controller{
-	final static Logger LOG = LogManager.getLogger(EditBirthdayViewController.class.getName());
+	final static Logger LOG = LogManager.getLogger();
 
 	final private Person personToEdit;
 
@@ -149,72 +149,68 @@ public class EditBirthdayViewController extends Controller{
 	@FXML
 	private Label date_label;
 
-	final EventHandler<ActionEvent> openFromRecentHandler = new EventHandler<ActionEvent>(){
+	private final EventHandler<ActionEvent> savePersonHandler = new EventHandler<ActionEvent>(){
+
 		@Override
-		public void handle(ActionEvent event){
-			String lastUsedFilePath = EditBirthdayViewController.this.getMainController().getSessionInfos().getConfigHandler().getProperties().getProperty(ConfigFields.LAST_OPEND);
-			System.out.println(lastUsedFilePath);
-			File birthdayFile = new File(lastUsedFilePath);
-			EditBirthdayViewController.this.getMainController().getSessionInfos().setFileToOpen(birthdayFile);
-
-			SaveLastFileUsedTask saveLastFileUsedTask = new SaveLastFileUsedTask(EditBirthdayViewController.this.getMainController());
-			saveLastFileUsedTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>(){
-				@Override
-				public void handle(WorkerStateEvent t){
-					Boolean result = saveLastFileUsedTask.getValue();
-					if(result){
-						System.out.println("Saved recent succsesfully");
-						EditBirthdayViewController.this.recentFiles_MenuItem.setText(birthdayFile.getName());
-					} else{
-						System.out.println("Saveing recent faild");
-					}
+		public void handle(final ActionEvent actionEvent){
+			boolean anyChangeAtAll = false;
+			final String nameFromTextField = EditBirthdayViewController.this.name_TextField.getText();
+			final String middleNameFromTextField = EditBirthdayViewController.this.middleName_TextField.getText();
+			final String surnameFromTextfield = EditBirthdayViewController.this.surname_TextField.getText();
+			try{
+				if(!nameFromTextField.matches(EditBirthdayViewController.this.personToEdit.getName())){
+					anyChangeAtAll = !anyChangeAtAll;
 				}
-			});
-			new Thread(saveLastFileUsedTask).start();
-
-			LoadBirthdaysFromFileTask loadBirthdaysFromFileTask = new LoadBirthdaysFromFileTask(EditBirthdayViewController.this.getMainController());
-			loadBirthdaysFromFileTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>(){
-				@Override
-				public void handle(WorkerStateEvent t){
-					List<Person> result = loadBirthdaysFromFileTask.getValue();
-					EditBirthdayViewController.this.getMainController().getSessionInfos().getAllPersons().addAll(result);
-					EditBirthdayViewController.this.openedFile_label.setText(birthdayFile.getName());
-					if(result.isEmpty()){
-						System.out.println("failed");
-					} else{
-						System.out.println("loaded birthdays from file");
-					}
+				if(!middleNameFromTextField.matches(EditBirthdayViewController.this.personToEdit.getMisc())){
+					anyChangeAtAll = !anyChangeAtAll;
 				}
-			});
-			new Thread(loadBirthdaysFromFileTask).start();
+				if(!surnameFromTextfield.matches(EditBirthdayViewController.this.personToEdit.getSurname())){
+					anyChangeAtAll = !anyChangeAtAll;
+				}
+				if(!(EditBirthdayViewController.this.birthday_DatePicker.getValue() == EditBirthdayViewController.this.personToEdit.getBirthday())){
+					anyChangeAtAll = !anyChangeAtAll;
+				}
+			} catch (final NullPointerException exception){
+				LOG.catching(Level.INFO, exception);
+				anyChangeAtAll = true;
+			}
+
+			if(anyChangeAtAll){
+				final Person updatedPerson = new Person(surnameFromTextfield, nameFromTextField, middleNameFromTextField, EditBirthdayViewController.this.birthday_DatePicker.getValue());
+				PersonManager.getInstance().updatePerson(EditBirthdayViewController.this.personToEdit, updatedPerson);
+				new Thread(new UpdateAllSubBirthdayListsTask(EditBirthdayViewController.this.getMainController().getSessionInfos())).start();
+				EditBirthdayViewController.this.getMainController().goToBirthdaysOverview();
+			}
+
 		}
+
 	};
 
-	private EventHandler<ActionEvent> changeLanguageHandler = new EventHandler<ActionEvent>(){
+	private final EventHandler<ActionEvent> changeLanguageHandler = new EventHandler<ActionEvent>(){
 		// TODO this is shit
 		@Override
-		public void handle(ActionEvent event){
+		public void handle(final ActionEvent event){
 			EditBirthdayViewController.this.getMainController().getSessionInfos().setAppLocale(Locale.getDefault());
 			EditBirthdayViewController.this.getMainController().getSessionInfos().getLangResourceManager().changeLocale(new Locale("de", "DE"));
 			EditBirthdayViewController.this.updateLocalisation();
 		}
 	};
 
-	private EventHandler<ActionEvent> exitHandler = new EventHandler<ActionEvent>(){
+	private final EventHandler<ActionEvent> exitHandler = new EventHandler<ActionEvent>(){
 
 		@Override
-		public void handle(ActionEvent event){
-			BirthdaysOverviewController birthdaysOverviewController = new BirthdaysOverviewController(EditBirthdayViewController.this.getMainController());
-			UpdateAllSubBirthdayListsTask updateAllSubBirthdayListsTask = new UpdateAllSubBirthdayListsTask(EditBirthdayViewController.this.getMainController().getSessionInfos());
+		public void handle(final ActionEvent event){
+			final BirthdaysOverviewController birthdaysOverviewController = new BirthdaysOverviewController(EditBirthdayViewController.this.getMainController());
+			final UpdateAllSubBirthdayListsTask updateAllSubBirthdayListsTask = new UpdateAllSubBirthdayListsTask(EditBirthdayViewController.this.getMainController().getSessionInfos());
 			updateAllSubBirthdayListsTask.addEventFilter(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>(){
 				@Override
-				public void handle(WorkerStateEvent t){
-					Boolean result = updateAllSubBirthdayListsTask.getValue();
+				public void handle(final WorkerStateEvent t){
+					final Boolean result = updateAllSubBirthdayListsTask.getValue();
 					if(result){
-						System.out.println("updateAllSubBirthdayListsTask succsesfully");
+						LOG.info("updateAllSubBirthdayListsTask succsesfully");
 						EditBirthdayViewController.this.getMainController().goToBirthdaysOverview(birthdaysOverviewController);
 					} else{
-						System.out.println("Saveing faild");
+						LOG.info("Saveing faild");
 					}
 				}
 			});
@@ -223,29 +219,23 @@ public class EditBirthdayViewController extends Controller{
 		}
 	};
 
-	public EditBirthdayViewController(MainController mainController){
+	private final EventHandler<ActionEvent> deletePersonHandler = new EventHandler<ActionEvent>(){
+		@Override
+		public void handle(final ActionEvent event){
+			PersonManager.getInstance().deletePerson(EditBirthdayViewController.this.personToEdit);
+			new Thread(new UpdateAllSubBirthdayListsTask(EditBirthdayViewController.this.getMainController().getSessionInfos())).start();
+			EditBirthdayViewController.this.getMainController().goToBirthdaysOverview();
+		}
+	};
+
+	public EditBirthdayViewController(final MainController mainController){
 		super(mainController);
 		this.personToEdit = new Person();
 	}
 
-	public EditBirthdayViewController(MainController mainController, Person person){
+	public EditBirthdayViewController(final MainController mainController, final Person person){
 		super(mainController);
 		this.personToEdit = person;
-	}
-
-	/**
-	 * @return the personToEdit
-	 */
-	public Person getPersonToEdit(){
-		return this.personToEdit;
-	}
-
-	@Override
-	public void initialize(URL arg0, ResourceBundle arg1){
-		this.assertions();
-		this.updateLocalisation();
-		this.bindComponents();
-		this.loadPerson();
 	}
 
 	private void assertions(){
@@ -286,17 +276,34 @@ public class EditBirthdayViewController extends Controller{
 
 	private void bindComponents(){
 		this.cancel_Button.addEventHandler(ActionEvent.ANY, this.exitHandler);
+		this.save_Button.addEventHandler(ActionEvent.ANY, this.savePersonHandler);
+		this.delete_Button.addEventHandler(ActionEvent.ANY, this.deletePersonHandler);
+	}
+
+	/**
+	 * @return the personToEdit
+	 */
+	public Person getPersonToEdit(){
+		return this.personToEdit;
+	}
+
+	@Override
+	public void initialize(final URL arg0, final ResourceBundle arg1){
+		this.assertions();
+		this.updateLocalisation();
+		this.bindComponents();
+		this.loadPerson();
 	}
 
 	private void loadPerson(){
-		this.name_TextField.setText(this.personToEdit.getName().get());
-		this.middleName_TextField.setText(this.personToEdit.getMisc().get());
-		this.surname_TextField.setText(this.personToEdit.getSurname().get());
-		this.birthday_DatePicker.setValue(this.personToEdit.getBirthday().get());
+		this.name_TextField.setText(this.personToEdit.getName());
+		this.surname_TextField.setText(this.personToEdit.getSurname());
+		this.birthday_DatePicker.setValue(this.personToEdit.getBirthday());
+		this.middleName_TextField.setText(this.personToEdit.getMisc());
 	}
 
 	private void updateLocalisation(){
-		LangResourceManager resourceManager = this.getMainController().getSessionInfos().getLangResourceManager();
+		final LangResourceManager resourceManager = this.getMainController().getSessionInfos().getLangResourceManager();
 
 		this.file_menu.setText(resourceManager.getLocaleString(LangResourceKeys.file_menu));
 		this.openFile_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.openFile_MenuItem));
@@ -327,11 +334,10 @@ public class EditBirthdayViewController extends Controller{
 		try{
 			property = new ConfigHandler().getProperties().getProperty(ConfigFields.LAST_OPEND);
 			this.recentFiles_MenuItem = new MenuItem(new File(property).getName());
-			this.recentFiles_MenuItem.addEventHandler(ActionEvent.ANY, this.openFromRecentHandler);
+			this.recentFiles_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromRecentHandler);
 			this.openRecent_MenuItem.getItems().add(this.recentFiles_MenuItem);
-
-		} catch (Exception e){
-			e.printStackTrace();
+		} catch (final IOException ioException){
+			LOG.catching(ioException);
 		}
 
 	}

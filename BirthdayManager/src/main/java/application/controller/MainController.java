@@ -1,18 +1,19 @@
 /**
- * 
+ *
  */
 package application.controller;
 
 import java.io.File;
-import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import application.model.Person;
+import application.model.PersonManager;
 import application.model.SessionInfos;
-import application.processes.LoadBirthdaysFromFileTask;
 import application.processes.SaveLastFileUsedTask;
+import application.processes.UpdateAllSubBirthdayListsTask;
+import application.processes.saveBirthdaysToFileTask;
 import application.util.ConfigFields;
 import application.util.localisation.LangResourceKeys;
 import javafx.concurrent.WorkerStateEvent;
@@ -25,15 +26,14 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.MenuItem;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
 
 /**
  * @author Noah Ruben
  *
  */
 public class MainController{
-
 	private final Logger LOG = LogManager.getLogger(this.getClass().getName());
 	private Stage stage;
 	private final SessionInfos sessionInfos;
@@ -41,10 +41,28 @@ public class MainController{
 	@FXML
 	private MenuItem changeLanguage_MenuItem;
 
+	final EventHandler<ActionEvent> closeFileHandler = new EventHandler<ActionEvent>(){
+
+		@Override
+		public void handle(final ActionEvent event){
+			MainController.this.sessionInfos.setFileToOpen(null);
+			MainController.this.sessionInfos.resetSubLists();
+			PersonManager.getInstance().setSaveFile(null);
+		}
+	};
+
+	final EventHandler<ActionEvent> saveToFileHandler = new EventHandler<ActionEvent>(){
+
+		@Override
+		public void handle(final ActionEvent event){
+			new Thread(new saveBirthdaysToFileTask()).start();
+		}
+	};
+
 	final EventHandler<ActionEvent> openFromFileChooserHandler = new EventHandler<ActionEvent>(){
 		@Override
-		public void handle(ActionEvent event){
-			FileChooser fileChooser = new FileChooser();
+		public void handle(final ActionEvent event){
+			final FileChooser fileChooser = new FileChooser();
 			fileChooser.setTitle(MainController.this.getSessionInfos().getLangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
 
 			fileChooser.setInitialDirectory(new File(MainController.this.getSessionInfos().getConfigHandler().getPropertie(ConfigFields.LAST_OPEND).toString()).getParentFile());
@@ -52,42 +70,56 @@ public class MainController{
 			// TODO Extension Filters with internationalisation
 			fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Text Files", "*.txt"), new ExtensionFilter("CSV Files", "*.csv"), new ExtensionFilter("All Files", "*.*"));
 
-			File selectedFile = fileChooser.showOpenDialog(MainController.this.getStage().getScene().getWindow());
+			final File selectedFile = fileChooser.showOpenDialog(MainController.this.getStage().getScene().getWindow());
 			MainController.this.getSessionInfos().setFileToOpen(selectedFile);
+			PersonManager.getInstance().setSaveFile(selectedFile);
 
-			SaveLastFileUsedTask saveLastFileUsedTask = new SaveLastFileUsedTask(MainController.this);
+			final SaveLastFileUsedTask saveLastFileUsedTask = new SaveLastFileUsedTask(MainController.this);
 			saveLastFileUsedTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>(){
 
 				@Override
-				public void handle(WorkerStateEvent t){
-					Boolean result = saveLastFileUsedTask.getValue();
+				public void handle(final WorkerStateEvent t){
+					final Boolean result = saveLastFileUsedTask.getValue();
 					if(result){
-						MainController.this.LOG.debug("Saved recent succsesfully");
+						MainController.this.LOG.info("Saved recent succsesfully");
 					} else{
-						MainController.this.LOG.debug("Saveing recent faild");
+						MainController.this.LOG.error("Saveing recent faild");
 					}
 				}
 			});
 			new Thread(saveLastFileUsedTask).start();
-
-			LoadBirthdaysFromFileTask loadBirthdaysFromFileTask = new LoadBirthdaysFromFileTask(MainController.this);
-			loadBirthdaysFromFileTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>(){
-				@Override
-				public void handle(WorkerStateEvent t){
-					List<Person> result = loadBirthdaysFromFileTask.getValue();
-					MainController.this.getSessionInfos().getAllPersons().addAll(result);
-					if(result.isEmpty()){
-						MainController.this.LOG.debug("Failed loading birthdays");
-					} else{
-						MainController.this.LOG.debug("Loaded birthdays from file");
-					}
-				}
-			});
-			new Thread(loadBirthdaysFromFileTask).start();
+			new Thread(new UpdateAllSubBirthdayListsTask(MainController.this.sessionInfos)).start();
 		}
 	};
 
-	public MainController(Stage stage){
+	final EventHandler<ActionEvent> openFromRecentHandler = new EventHandler<ActionEvent>(){
+		@Override
+		public void handle(final ActionEvent event){
+			final String lastUsedFilePath = MainController.this.getSessionInfos().getConfigHandler().getPropertie(ConfigFields.LAST_OPEND).toString();
+			MainController.this.LOG.debug(lastUsedFilePath);
+			final File birthdayFile = new File(lastUsedFilePath);
+
+			MainController.this.getSessionInfos().setFileToOpen(birthdayFile);
+			PersonManager.getInstance().setSaveFile(birthdayFile);
+
+			final SaveLastFileUsedTask saveLastFileUsedTask = new SaveLastFileUsedTask(MainController.this);
+			saveLastFileUsedTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>(){
+				@Override
+				public void handle(final WorkerStateEvent t){
+					final Boolean result = saveLastFileUsedTask.getValue();
+					if(result){
+						MainController.this.LOG.info("Saved recent succsesfully");
+					} else{
+						MainController.this.LOG.error("Saveing recent faild");
+					}
+				}
+			});
+			new Thread(saveLastFileUsedTask).start();
+			new Thread(new UpdateAllSubBirthdayListsTask(MainController.this.sessionInfos)).start();
+		}
+	};
+
+	public MainController(final Stage stage){
 		this.stage = stage;
 		this.sessionInfos = new SessionInfos();
 	}
@@ -104,41 +136,55 @@ public class MainController{
 		try{
 			this.replaceSceneContent("/application/view/BirthdaysOverview.fxml", new BirthdaysOverviewController(this));
 
-		} catch (Exception ex){
-			System.out.println("BirthdaysOverview: " + ex.getMessage());
-			ex.printStackTrace();
+		} catch (final Exception ex){
+			this.LOG.error(ex.getMessage());
+			this.LOG.error(ex.getStackTrace().toString());
 		}
 	}
 
-	public void goToBirthdaysOverview(BirthdaysOverviewController birthdaysOverviewController){
+	public void goToBirthdaysOverview(final BirthdaysOverviewController birthdaysOverviewController){
 		try{
 			this.replaceSceneContent("/application/view/BirthdaysOverview.fxml", birthdaysOverviewController);
 
-		} catch (Exception ex){
-			System.out.println("BirthdaysOverview: " + ex.getMessage());
-			ex.printStackTrace();
+		} catch (final Exception ex){
+			this.LOG.error(ex.getMessage());
+			this.LOG.error(ex.getStackTrace().toString());
 		}
 	}
 
-	public void goToEditBirthdayView(Person person){
+	public void goToEditBirthdayView(final Person person){
 		try{
 			this.replaceSceneContent("/application/view/EditBirthdayView.fxml", new EditBirthdayViewController(this, person));
 
-		} catch (Exception ex){
-			System.out.println("EditBirthdayView: " + ex.getMessage());
-			ex.printStackTrace();
+		} catch (final Exception ex){
+			this.LOG.error(ex.getMessage());
+			this.LOG.error(ex.getStackTrace().toString());
 		}
 	}
 
-	public void gotoNextScene(String fxmlPath, Initializable controller){
+	public void gotoNextScene(final String fxmlPath, final Initializable controller){
 		try{
 			this.replaceSceneContent(fxmlPath, controller);
-		} catch (Exception ex){
-			System.out.println(ex.getMessage());
+		} catch (final Exception ex){
+			this.LOG.error(ex.getMessage());
+			this.LOG.error(ex.getStackTrace().toString());
 		}
 	}
 
-	public void setStage(Stage stage){
+	private void replaceSceneContent(final String fxmlPath, final Initializable controller) throws Exception{
+		final FXMLLoader loader = new FXMLLoader();
+		loader.setLocation(this.getClass().getResource(fxmlPath));
+		loader.setController(controller);
+		final Parent root = loader.load();
+		final Scene scene = new Scene(root);
+		scene.getStylesheets().add("test.css");
+		this.stage.setScene(scene);
+
+		// Show the GUI
+		this.stage.show();
+	}
+
+	public void setStage(final Stage stage){
 		this.stage = stage;
 	}
 
@@ -146,23 +192,10 @@ public class MainController{
 		try{
 			this.replaceSceneContent("/application/view/BirthdaysOverview.fxml", new BirthdaysOverviewController(this));
 
-		} catch (Exception ex){
-			System.out.println("BirthdaysOverview: " + ex.getMessage());
-			ex.printStackTrace();
+		} catch (final Exception ex){
+			this.LOG.error(ex.getMessage());
+			this.LOG.error(ex.getStackTrace().toString());
 		}
-	}
-
-	private void replaceSceneContent(String fxmlPath, Initializable controller) throws Exception{
-		FXMLLoader loader = new FXMLLoader();
-		loader.setLocation(this.getClass().getResource(fxmlPath));
-		loader.setController(controller);
-		Parent root = loader.load();
-		Scene scene = new Scene(root);
-		scene.getStylesheets().add("test.css");
-		this.stage.setScene(scene);
-
-		// Show the GUI
-		this.stage.show();
 	}
 
 }

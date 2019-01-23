@@ -1,23 +1,17 @@
 /**
- * 
+ *
  */
 package application.controller;
 
-import java.io.File;
 import java.net.URL;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 import application.model.Person;
-import application.processes.LoadBirthdaysFromFileTask;
-import application.processes.SaveLastFileUsedTask;
 import application.processes.UpdateAllSubBirthdayListsTask;
-import application.util.ConfigFields;
-import application.util.ConfigHandler;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
 import javafx.collections.ObservableList;
@@ -33,10 +27,9 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
 
 /**
  * @author Noah Ruben
@@ -185,8 +178,8 @@ public class BirthdaysOverviewController extends Controller{
 	final EventHandler<ActionEvent> openBirthday = new EventHandler<ActionEvent>(){
 
 		@Override
-		public void handle(ActionEvent arg0){
-			ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
+		public void handle(final ActionEvent arg0){
+			final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
 			if(selectedItems.isEmpty()){
 				return;
 			} else{
@@ -195,107 +188,18 @@ public class BirthdaysOverviewController extends Controller{
 		}
 	};
 
-	final EventHandler<ActionEvent> openFromFileChooserHandler = new EventHandler<ActionEvent>(){
-		@Override
-		public void handle(ActionEvent event){
-			FileChooser fileChooser = new FileChooser();
-			// TODO international
-			fileChooser.setTitle("Open Resource File");
-			// TODO mit dem letzten Dir
-			fileChooser.setInitialDirectory(new File("./src/main/java/application/model/data/Geburtstage.txt").getParentFile());
-			fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Text Files", "*.txt"), new ExtensionFilter("CSV Files", "*.csv"), new ExtensionFilter("All Files", "*.*"));
-
-			File selectedFile = fileChooser.showOpenDialog(BirthdaysOverviewController.this.getMainController().getStage().getScene().getWindow());
-			BirthdaysOverviewController.this.getMainController().getSessionInfos().setFileToOpen(selectedFile);
-			SaveLastFileUsedTask saveLastFileUsedTask = new SaveLastFileUsedTask(BirthdaysOverviewController.this.getMainController());
-			saveLastFileUsedTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>(){
-				@Override
-				public void handle(WorkerStateEvent t){
-					Boolean result = saveLastFileUsedTask.getValue();
-					if(result){
-						System.out.println("Saved recent succsesfully");
-						BirthdaysOverviewController.this.recentFiles_MenuItem.setText(selectedFile.getName());
-					} else{
-						System.out.println("Saveing recent faild");
-					}
-				}
-			});
-			new Thread(saveLastFileUsedTask).start();
-
-			LoadBirthdaysFromFileTask loadBirthdaysFromFileTask = new LoadBirthdaysFromFileTask(BirthdaysOverviewController.this.getMainController());
-			loadBirthdaysFromFileTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>(){
-				@Override
-				public void handle(WorkerStateEvent t){
-					List<Person> result = loadBirthdaysFromFileTask.getValue();
-					BirthdaysOverviewController.this.getMainController().getSessionInfos().setAllPersons(result);
-					BirthdaysOverviewController.this.openedFile_label.setText(selectedFile.getName());
-					if(result.isEmpty()){
-						System.out.println("failed");
-					} else{
-						System.out.println("loaded birthdays from file");
-						UpdateAllSubBirthdayListsTask updateAllSubBirthdayLists = new UpdateAllSubBirthdayListsTask(BirthdaysOverviewController.this.getMainController().getSessionInfos());
-						new Thread(updateAllSubBirthdayLists).start();
-					}
-				}
-			});
-			new Thread(loadBirthdaysFromFileTask).start();
-		}
-	};
-	final EventHandler<ActionEvent> openFromRecentHandler = new EventHandler<ActionEvent>(){
-		@Override
-		public void handle(ActionEvent event){
-			String lastUsedFilePath = BirthdaysOverviewController.this.getMainController().getSessionInfos().getConfigHandler().getProperties().getProperty(ConfigFields.LAST_OPEND);
-			System.out.println(lastUsedFilePath);
-			File birthdayFile = new File(lastUsedFilePath);
-			BirthdaysOverviewController.this.getMainController().getSessionInfos().setFileToOpen(birthdayFile);
-
-			SaveLastFileUsedTask saveLastFileUsedTask = new SaveLastFileUsedTask(BirthdaysOverviewController.this.getMainController());
-			saveLastFileUsedTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>(){
-				@Override
-				public void handle(WorkerStateEvent t){
-					Boolean result = saveLastFileUsedTask.getValue();
-					if(result){
-						System.out.println("Saved recent succsesfully");
-						BirthdaysOverviewController.this.recentFiles_MenuItem.setText(birthdayFile.getName());
-					} else{
-						System.out.println("Saveing recent faild");
-					}
-				}
-			});
-			new Thread(saveLastFileUsedTask).start();
-
-			LoadBirthdaysFromFileTask loadBirthdaysFromFileTask = new LoadBirthdaysFromFileTask(BirthdaysOverviewController.this.getMainController());
-			loadBirthdaysFromFileTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>(){
-				@Override
-				public void handle(WorkerStateEvent t){
-					List<Person> result = loadBirthdaysFromFileTask.getValue();
-					BirthdaysOverviewController.this.getMainController().getSessionInfos().setAllPersons(result);
-					BirthdaysOverviewController.this.openedFile_label.setText(birthdayFile.getName());
-					if(result.isEmpty()){
-						System.out.println("failed");
-					} else{
-						System.out.println("loaded birthdays from file");
-						UpdateAllSubBirthdayListsTask updateAllSubBirthdayLists = new UpdateAllSubBirthdayListsTask(BirthdaysOverviewController.this.getMainController().getSessionInfos());
-						new Thread(updateAllSubBirthdayLists).start();
-					}
-				}
-			});
-			new Thread(loadBirthdaysFromFileTask).start();
-		}
-	};
-
 	final EventHandler<ActionEvent> updateListsHandler = new EventHandler<ActionEvent>(){
 		@Override
-		public void handle(ActionEvent event){
-			UpdateAllSubBirthdayListsTask updateAllSubBirthdayLists = new UpdateAllSubBirthdayListsTask(BirthdaysOverviewController.this.getMainController().getSessionInfos());
+		public void handle(final ActionEvent event){
+			final UpdateAllSubBirthdayListsTask updateAllSubBirthdayLists = new UpdateAllSubBirthdayListsTask(BirthdaysOverviewController.this.getMainController().getSessionInfos());
 			updateAllSubBirthdayLists.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>(){
 				@Override
-				public void handle(WorkerStateEvent t){
-					Boolean result = updateAllSubBirthdayLists.getValue();
+				public void handle(final WorkerStateEvent t){
+					final Boolean result = updateAllSubBirthdayLists.getValue();
 					if(result){
-						System.out.println("Saved succsesfully");
+						LOG.info("Updating all birthday lists succsessfull");
 					} else{
-						System.out.println("Saveing faild");
+						LOG.warn("Updating all birthday lists unsucsessfull");
 					}
 				}
 			});
@@ -306,7 +210,7 @@ public class BirthdaysOverviewController extends Controller{
 	final EventHandler<ActionEvent> showRecentBirthdaysHandler = new EventHandler<ActionEvent>(){
 
 		@Override
-		public void handle(ActionEvent event){
+		public void handle(final ActionEvent event){
 			BirthdaysOverviewController.this.nextBdaysList.setItems(BirthdaysOverviewController.this.getMainController().getSessionInfos().getRecentBirthdays());
 			BirthdaysOverviewController.this.nextBdaysList.refresh();
 			BirthdaysOverviewController.this.nextBirthday_Label.setText(BirthdaysOverviewController.this.getMainController().getSessionInfos().getLangResourceManager().getLocaleString(LangResourceKeys.str_recentBirthday_Label));
@@ -316,29 +220,42 @@ public class BirthdaysOverviewController extends Controller{
 	final EventHandler<ActionEvent> showNextBirthdaysHandler = new EventHandler<ActionEvent>(){
 
 		@Override
-		public void handle(ActionEvent event){
+		public void handle(final ActionEvent event){
 			BirthdaysOverviewController.this.nextBdaysList.setItems(BirthdaysOverviewController.this.getMainController().getSessionInfos().getNextBirthdays());
 			BirthdaysOverviewController.this.nextBdaysList.refresh();
 			BirthdaysOverviewController.this.nextBirthday_Label.setText(BirthdaysOverviewController.this.getMainController().getSessionInfos().getLangResourceManager().getLocaleString(LangResourceKeys.str_nextBirthday_Label));
 		}
 	};
 
-	private EventHandler<ActionEvent> changeLanguageHandler = new EventHandler<ActionEvent>(){
+	private final EventHandler<ActionEvent> changeLanguageHandler = new EventHandler<ActionEvent>(){
 		// TODO this is shit
 		@Override
-		public void handle(ActionEvent event){
+		public void handle(final ActionEvent event){
 			BirthdaysOverviewController.this.getMainController().getSessionInfos().setAppLocale(Locale.getDefault());
 			BirthdaysOverviewController.this.getMainController().getSessionInfos().getLangResourceManager().changeLocale(new Locale("de", "DE"));
 			BirthdaysOverviewController.this.updateLocalisation();
 		}
 	};
 
-	public BirthdaysOverviewController(MainController mainController){
+	private final EventHandler<MouseEvent> birthdayDoubleClickHandler = new EventHandler<MouseEvent>(){
+
+		@Override
+		public void handle(final MouseEvent event){
+			if(event.getClickCount() >= 2){
+				final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
+				BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(selectedItems.get(0));
+			}
+		}
+	};
+
+	public BirthdaysOverviewController(final MainController mainController){
 		super(mainController);
 	}
 
-	@Override
-	public void initialize(URL location, ResourceBundle resources){
+	/**
+	 * all Assertions for the controller
+	 */
+	private void assertion(){
 		assert this.file_menu != null : "fx:id=\"file_menu\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
 		assert this.openFile_MenuItem != null : "fx:id=\"openFile_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
 		assert this.openRecent_MenuItem != null : "fx:id=\"openRecent_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
@@ -380,12 +297,18 @@ public class BirthdaysOverviewController extends Controller{
 		assert this.x3 != null : "fx:id=\"x3\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
 		assert this.x4 != null : "fx:id=\"x4\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
 		assert this.date_label != null : "fx:id=\"date_label\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+	}
+
+	@Override
+	public void initialize(final URL location, final ResourceBundle resources){
+		this.assertion();
 
 		// Localisation
 		this.updateLocalisation();
 
 		// EventHandlers
-
+		this.saveFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().saveToFileHandler);
+		this.closeFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().closeFileHandler);
 		this.openBirthday_MenuItem.addEventHandler(ActionEvent.ANY, this.openBirthday);
 		this.debug.addEventHandler(ActionEvent.ACTION, this.updateListsHandler);
 		this.refresh_MenuItem.addEventHandler(ActionEvent.ANY, this.updateListsHandler);
@@ -393,28 +316,28 @@ public class BirthdaysOverviewController extends Controller{
 		this.showNextBirthdays_MenuItem.addEventHandler(ActionEvent.ANY, this.showNextBirthdaysHandler);
 		this.showLastBirthdays_MenuItem.addEventHandler(ActionEvent.ANY, this.showRecentBirthdaysHandler);
 
-		this.nextBdaysList.setItems(this.getMainController().getSessionInfos().getNextBirthdays());
-
-		this.date_label.setText(DATE_FORMATTER.format(LocalDate.now()));
-		this.nextBdaysList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-
 		this.openFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromFileChooserHandler);
-		this.changeLanguage_MenuItem.addEventHandler(ActionEvent.ANY, this.changeLanguageHandler);
-		String property = null;
-		try{
-			property = new ConfigHandler().getProperties().getProperty(ConfigFields.LAST_OPEND);
-			this.recentFiles_MenuItem = new MenuItem(new File(property).getName());
-			this.recentFiles_MenuItem.addEventHandler(ActionEvent.ANY, this.openFromRecentHandler);
-			this.openRecent_MenuItem.getItems().add(this.recentFiles_MenuItem);
 
-		} catch (Exception e){
-			e.printStackTrace();
-		}
+		this.changeLanguage_MenuItem.addEventHandler(ActionEvent.ANY, this.changeLanguageHandler);
+
+		this.nextBdaysList.setItems(this.getMainController().getSessionInfos().getNextBirthdays());
+		this.nextBdaysList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+		this.nextBdaysList.addEventHandler(MouseEvent.MOUSE_CLICKED, this.birthdayDoubleClickHandler);
+
+		// set Texts
+		this.date_label.setText(DATE_FORMATTER.format(LocalDate.now()));
+		this.openedFile_label.textProperty().bind(this.getMainController().getSessionInfos().getFileToOpenName());
+
+		// create Menue Items and adding them
+		this.recentFiles_MenuItem = new MenuItem();
+		this.recentFiles_MenuItem.textProperty().bind(this.getMainController().getSessionInfos().getRecentFileName());
+		this.recentFiles_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromRecentHandler);
+		this.openRecent_MenuItem.getItems().add(this.recentFiles_MenuItem);
 
 	}
 
 	private void updateLocalisation(){
-		LangResourceManager resourceManager = this.getMainController().getSessionInfos().getLangResourceManager();
+		final LangResourceManager resourceManager = this.getMainController().getSessionInfos().getLangResourceManager();
 
 		this.nextBirthday_Label.setText(resourceManager.getLocaleString(LangResourceKeys.str_nextBirthday_Label));
 
