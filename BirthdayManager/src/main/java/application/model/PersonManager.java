@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -150,17 +149,18 @@ public class PersonManager{
 	 */
 	public void setSaveFile(final File saveFile){
 		this.saveFile = saveFile;
-		try{
-			this.populateList();
-		} catch (final FileNotFoundException fileNotFoundException){
-			LOG.catching(fileNotFoundException);
-			this.checkSaveFile();
-		} catch (final IOException ioException){
-			LOG.catching(ioException);
-			this.checkSaveFile();
-		} catch (final NullPointerException nullPointerException){
-			LOG.catching(Level.INFO, nullPointerException);
-			LOG.info("Don't worry this is normal!");
+		if(saveFile.exists()){
+			try{
+				this.populateList();
+			} catch (final IOException ioException){
+				LOG.catching(ioException);
+			}
+		} else{
+			try{
+				saveFile.createNewFile();
+			} catch (final IOException ioException){
+				LOG.catching(ioException);
+			}
 		}
 	}
 

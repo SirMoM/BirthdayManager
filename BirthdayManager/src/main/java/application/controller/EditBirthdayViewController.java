@@ -331,7 +331,7 @@ public class EditBirthdayViewController extends Controller{
 		this.openFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromFileChooserHandler);
 		this.changeLanguage_MenuItem.addEventHandler(ActionEvent.ANY, this.changeLanguageHandler);
 		String property = null;
-		property = this.getMainController().getSessionInfos().getConfigHandler().getProperty(PropertieFields.LAST_OPEND);
+		property = this.getMainController().getSessionInfos().getConfigHandler().getPropertie(PropertieFields.LAST_OPEND);
 		this.recentFiles_MenuItem = new MenuItem(new File(property).getName());
 		this.recentFiles_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromRecentHandler);
 		this.openRecent_MenuItem.getItems().add(this.recentFiles_MenuItem);

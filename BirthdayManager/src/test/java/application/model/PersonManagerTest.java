@@ -5,7 +5,6 @@ package application.model;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -26,8 +25,7 @@ import junitx.framework.FileAssert;
  */
 public class PersonManagerTest{
 
-	private File output;
-	private File actual;
+	private File fileToTest;
 
 	final private Person person = new Person("Noah", "Ruben", "Michael", LocalDate.of(1999, 3, 25));
 
@@ -67,25 +65,27 @@ public class PersonManagerTest{
 	 */
 	@Test
 	public void testSaveCSV() throws IOException{
-		this.output = new File("output.csv");
-		this.output.createNewFile();
-
-		this.actual = new File("output2.csv");
-		this.actual.createNewFile();
-
 		// arrange
-		final FileWriter fileWriter = new FileWriter(this.actual);
-		fileWriter.write("Ruben Michael Noah=25.03.1999");
+		final File tempFile = File.createTempFile("output", ".csv");
+//		tempFile.deleteOnExit();
+		this.fileToTest = File.createTempFile("output", ".csv");
+		this.fileToTest.deleteOnExit();
+
+		final FileWriter fileWriter = new FileWriter(tempFile);
+		fileWriter.write(this.person.toCSVString());
 		fileWriter.flush();
 		fileWriter.close();
-		PersonManager.getInstance().setSaveFile(this.output);
-		PersonManager.getInstance().setPersonDB(this.personDB);
+
+		final ArrayList<Person> tempList = new ArrayList<Person>();
+		tempList.add(this.person);
+		PersonManager.getInstance().setSaveFile(this.fileToTest);
+		PersonManager.getInstance().setPersonDB(tempList);
 
 		// act
 		PersonManager.getInstance().save();
 
 		// assert
-		FileAssert.assertEquals(this.output, this.actual);
+		FileAssert.assertEquals(tempFile, this.fileToTest);
 	}
 
 	/**
@@ -95,25 +95,27 @@ public class PersonManagerTest{
 	 */
 	@Test
 	public void testSaveTXT() throws IOException{
-		this.output = new File("output.txt");
-		this.output.createNewFile();
-
-		this.actual = new File("output2.txt");
-		this.actual.createNewFile();
-
 		// arrange
-		final FileWriter fileWriter = new FileWriter(this.actual);
-		fileWriter.write("Ruben Michael Noah=25.03.1999");
+		final File tempFile = File.createTempFile("output", ".csv");
+		tempFile.deleteOnExit();
+		this.fileToTest = File.createTempFile("output", ".csv");
+		this.fileToTest.deleteOnExit();
+
+		final FileWriter fileWriter = new FileWriter(tempFile);
+		fileWriter.write(this.person.toCSVString());
 		fileWriter.flush();
 		fileWriter.close();
-		PersonManager.getInstance().setSaveFile(this.output);
-		PersonManager.getInstance().setPersonDB(this.personDB);
+
+		final ArrayList<Person> tempList = new ArrayList<Person>();
+		tempList.add(this.person);
+		PersonManager.getInstance().setSaveFile(this.fileToTest);
+		PersonManager.getInstance().setPersonDB(tempList);
 
 		// act
 		PersonManager.getInstance().save();
 
 		// assert
-		FileAssert.assertEquals(this.output, this.actual);
+		FileAssert.assertEquals(tempFile, this.fileToTest);
 	}
 
 	/**
@@ -122,6 +124,8 @@ public class PersonManagerTest{
 	 */
 	@Test
 	public void testUpdatePerson(){
-		fail("Not yet implemented"); // TODO
+		PersonManager.getInstance().getPersonDB().get(0).setName("TEST");
+		this.personDB.get(0).setName("TEST");
+		assertThat(this.personDB, is(PersonManager.getInstance().getPersonDB()));
 	}
 }

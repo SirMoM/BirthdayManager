@@ -11,9 +11,9 @@ import org.apache.logging.log4j.Logger;
 import application.model.Person;
 import application.model.PersonManager;
 import application.model.SessionInfos;
+import application.processes.SaveBirthdaysToFileTask;
 import application.processes.SaveLastFileUsedTask;
 import application.processes.UpdateAllSubBirthdayListsTask;
-import application.processes.SaveBirthdaysToFileTask;
 import application.util.PropertieFields;
 import application.util.localisation.LangResourceKeys;
 import javafx.concurrent.WorkerStateEvent;
@@ -66,7 +66,7 @@ public class MainController{
 			final FileChooser fileChooser = new FileChooser();
 			fileChooser.setTitle(MainController.this.getSessionInfos().getLangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
 
-			fileChooser.setInitialDirectory(new File(MainController.this.getSessionInfos().getConfigHandler().getProperty(PropertieFields.LAST_OPEND).toString()).getParentFile());
+			fileChooser.setInitialDirectory(new File(MainController.this.getSessionInfos().getConfigHandler().getPropertie(PropertieFields.LAST_OPEND).toString()).getParentFile());
 			// TODO Extension Filters with internationalisation
 			fileChooser.setInitialFileName("Birthdays");
 			fileChooser.getExtensionFilters().addAll(new ExtensionFilter("CSV Files", "*.csv"), new ExtensionFilter("All Files", "*.*"));
@@ -83,7 +83,11 @@ public class MainController{
 			final FileChooser fileChooser = new FileChooser();
 			fileChooser.setTitle(MainController.this.getSessionInfos().getLangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
 
-			fileChooser.setInitialDirectory(new File(MainController.this.getSessionInfos().getConfigHandler().getProperty(PropertieFields.LAST_OPEND).toString()).getParentFile());
+			try{
+				fileChooser.setInitialDirectory(new File(MainController.this.getSessionInfos().getConfigHandler().getPropertie(PropertieFields.LAST_OPEND).toString()).getParentFile());
+			} catch (final NullPointerException nullPointerException){
+				fileChooser.setInitialDirectory(new File("C:\\Users\\Admin"));
+			}
 
 			// TODO Extension Filters with internationalisation
 			fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Text Files", "*.txt"), new ExtensionFilter("CSV Files", "*.csv"), new ExtensionFilter("All Files", "*.*"));
@@ -113,7 +117,7 @@ public class MainController{
 	final EventHandler<ActionEvent> openFromRecentHandler = new EventHandler<ActionEvent>(){
 		@Override
 		public void handle(final ActionEvent event){
-			final String lastUsedFilePath = MainController.this.getSessionInfos().getConfigHandler().getProperty(PropertieFields.LAST_OPEND).toString();
+			final String lastUsedFilePath = MainController.this.getSessionInfos().getConfigHandler().getPropertie(PropertieFields.LAST_OPEND).toString();
 			MainController.this.LOG.debug(lastUsedFilePath);
 			final File birthdayFile = new File(lastUsedFilePath);
 
