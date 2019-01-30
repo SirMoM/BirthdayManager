@@ -66,6 +66,34 @@ public class PersonManagerTest{
 	 * @throws IOException
 	 */
 	@Test
+	public void testSaveCSV() throws IOException{
+		this.output = new File("output.csv");
+		this.output.createNewFile();
+
+		this.actual = new File("output2.csv");
+		this.actual.createNewFile();
+
+		// arrange
+		final FileWriter fileWriter = new FileWriter(this.actual);
+		fileWriter.write("Ruben Michael Noah=25.03.1999");
+		fileWriter.flush();
+		fileWriter.close();
+		PersonManager.getInstance().setSaveFile(this.output);
+		PersonManager.getInstance().setPersonDB(this.personDB);
+
+		// act
+		PersonManager.getInstance().save();
+
+		// assert
+		FileAssert.assertEquals(this.output, this.actual);
+	}
+
+	/**
+	 * Test method for {@link application.model.PersonManager#save()}.
+	 *
+	 * @throws IOException
+	 */
+	@Test
 	public void testSaveTXT() throws IOException{
 		this.output = new File("output.txt");
 		this.output.createNewFile();
@@ -75,11 +103,11 @@ public class PersonManagerTest{
 
 		// arrange
 		final FileWriter fileWriter = new FileWriter(this.actual);
-		fileWriter.write("asd");
+		fileWriter.write("Ruben Michael Noah=25.03.1999");
 		fileWriter.flush();
 		fileWriter.close();
-
 		PersonManager.getInstance().setSaveFile(this.output);
+		PersonManager.getInstance().setPersonDB(this.personDB);
 
 		// act
 		PersonManager.getInstance().save();

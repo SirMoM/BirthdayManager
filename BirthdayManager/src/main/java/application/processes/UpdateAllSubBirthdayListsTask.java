@@ -8,11 +8,14 @@ import java.time.temporal.IsoFields;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import application.model.Person;
 import application.model.PersonManager;
 import application.model.SessionInfos;
 import application.util.BirthdayComparator;
-import application.util.ConfigFields;
+import application.util.PropertieFields;
 import javafx.concurrent.Task;
 
 /**
@@ -23,6 +26,7 @@ public class UpdateAllSubBirthdayListsTask extends Task<Boolean>{
 
 	final int NEXT_BIRTHDAYS_COUNT;
 	private final SessionInfos sessionInfos;
+	private final Logger LOG = LogManager.getLogger(this.getClass().getName());
 
 	/**
 	 * @param birthdaysOverviewController
@@ -30,7 +34,7 @@ public class UpdateAllSubBirthdayListsTask extends Task<Boolean>{
 	public UpdateAllSubBirthdayListsTask(final SessionInfos sessionInfos){
 		super();
 		this.sessionInfos = sessionInfos;
-		this.NEXT_BIRTHDAYS_COUNT = Integer.parseInt(sessionInfos.getConfigHandler().getProperties().getProperty(ConfigFields.NEXT_BIRTHDAYS_COUNT));
+		this.NEXT_BIRTHDAYS_COUNT = Integer.parseInt(sessionInfos.getConfigHandler().getProperties().getProperty(PropertieFields.NEXT_BIRTHDAYS_COUNT));
 	}
 
 	@Override
@@ -94,17 +98,17 @@ public class UpdateAllSubBirthdayListsTask extends Task<Boolean>{
 	private void updateRecentBirthdays(final List<Person> temp){
 		// TODO Jahres übergreifend XD
 		this.sessionInfos.getRecentBirthdays().clear();
-		int i = 10;
-		for(; i == 0; i++){
+
+		final int birthdaysSize = temp.size() - 1;
+		int i = birthdaysSize - this.NEXT_BIRTHDAYS_COUNT;
+
+		for(; i > this.NEXT_BIRTHDAYS_COUNT; i++){
 			final Person tempPerson = temp.get(i);
-			if(tempPerson.getBirthday().getDayOfYear() > LocalDate.now().getDayOfYear()){
-				break;
+			if(tempPerson.getBirthday().getDayOfYear() < LocalDate.now().getDayOfYear()){
+				this.sessionInfos.getRecentBirthdays().add(tempPerson);
+			} else{
+				this.LOG.warn(tempPerson.toExtendedString() + "not added!");
 			}
-		}
-		final int x = temp.size() - (this.NEXT_BIRTHDAYS_COUNT - i);
-		for(; i < this.NEXT_BIRTHDAYS_COUNT; i++){
-			final Person tempPerson = temp.get(i);
-			this.sessionInfos.getRecentBirthdays().add(tempPerson);
 		}
 
 	}

@@ -7,48 +7,35 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Properties;
 
-public class ConfigHandler{
-	private final Properties properties;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-	private final File configFile;
+public class PropertyManager{
+
+	private final Logger LOG = LogManager.getLogger(this.getClass().getName());
+
+	private final Properties properties;
+	private final File propertiesFile;
+	private final String PROPERTIE_FILE_NAME = "BirthdayManager.properties";
 
 	/**
 	 * Basis ConfigHandler uses the a app.cfg file generates it if necessary
-	 * 
+	 *
 	 * @throws IOException
 	 */
-	public ConfigHandler() throws IOException{
-		super();
+	public PropertyManager() throws IOException{
 		this.properties = new Properties();
-		this.configFile = new File("./app.cfg");
-		if(!this.configFile.exists()){
-			this.configFile.createNewFile();
-		} else{
-			this.loadProperties();
-		}
+		this.propertiesFile = new File(System.getProperty("java.io.tmpdir") + this.PROPERTIE_FILE_NAME);
+		this.LOG.info("Propertie File" + this.propertiesFile.getAbsolutePath());
 
-	}
-
-	/**
-	 * Basis ConfigHandler uses the file and generates it if necessary
-	 * 
-	 * @param file the config File
-	 * @throws IOException
-	 */
-	public ConfigHandler(File file) throws IOException{
-		super();
-		this.properties = new Properties();
-		this.configFile = file;
-		if(!this.configFile.exists()){
-			this.configFile.createNewFile();
+		if(this.propertiesFile.createNewFile()){
+			this.LOG.info("Created new properties File");
+			this.fillWithStandartProperties();
 		}
 	}
 
-	/**
-	 * @return the properties
-	 */
-	public String getPropertie(String key){
-		return this.properties.get(key).toString();
+	private void fillWithStandartProperties(){
+		this.properties.setProperty(arg0, arg1)
 	}
 
 	/**
@@ -58,11 +45,18 @@ public class ConfigHandler{
 		return this.properties;
 	}
 
-	public void loadProperties() throws FileNotFoundException, IOException{
-		this.properties.load(new FileInputStream(this.configFile));
+	/**
+	 * @return the properties
+	 */
+	public String getProperty(final String key){
+		return this.properties.get(key).toString();
 	}
 
-	public void storeProperties(String comments) throws FileNotFoundException, IOException{
-		this.properties.store(new FileWriter(this.configFile), comments);
+	public void loadProperties() throws FileNotFoundException, IOException{
+		this.properties.load(new FileInputStream(this.propertiesFile));
+	}
+
+	public void storeProperties(final String comments) throws FileNotFoundException, IOException{
+		this.properties.store(new FileWriter(this.propertiesFile), comments);
 	}
 }
