@@ -4,7 +4,9 @@
 package application.controller;
 
 import java.io.File;
+import java.io.IOException;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -50,6 +52,13 @@ public class MainController{
 			PersonManager.getInstance().setSaveFile(null);
 		}
 	};
+	final EventHandler<ActionEvent> openPreferencesHander = new EventHandler<ActionEvent>(){
+
+		@Override
+		public void handle(final ActionEvent event){
+			MainController.this.openPreferences();
+		}
+	};
 
 	final EventHandler<ActionEvent> saveToFileHandler = new EventHandler<ActionEvent>(){
 
@@ -66,7 +75,7 @@ public class MainController{
 			final FileChooser fileChooser = new FileChooser();
 			fileChooser.setTitle(MainController.this.getSessionInfos().getLangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
 
-			fileChooser.setInitialDirectory(new File(MainController.this.getSessionInfos().getConfigHandler().getPropertie(PropertieFields.LAST_OPEND).toString()).getParentFile());
+			fileChooser.setInitialDirectory(new File(MainController.this.getSessionInfos().getPropertiesHandler().getPropertie(PropertieFields.LAST_OPEND).toString()).getParentFile());
 			// TODO Extension Filters with internationalisation
 			fileChooser.setInitialFileName("Birthdays");
 			fileChooser.getExtensionFilters().addAll(new ExtensionFilter("CSV Files", "*.csv"), new ExtensionFilter("All Files", "*.*"));
@@ -84,7 +93,7 @@ public class MainController{
 			fileChooser.setTitle(MainController.this.getSessionInfos().getLangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
 
 			try{
-				fileChooser.setInitialDirectory(new File(MainController.this.getSessionInfos().getConfigHandler().getPropertie(PropertieFields.LAST_OPEND).toString()).getParentFile());
+				fileChooser.setInitialDirectory(new File(MainController.this.getSessionInfos().getPropertiesHandler().getPropertie(PropertieFields.LAST_OPEND).toString()).getParentFile());
 			} catch (final NullPointerException nullPointerException){
 				fileChooser.setInitialDirectory(new File("C:\\Users\\Admin"));
 			}
@@ -117,7 +126,7 @@ public class MainController{
 	final EventHandler<ActionEvent> openFromRecentHandler = new EventHandler<ActionEvent>(){
 		@Override
 		public void handle(final ActionEvent event){
-			final String lastUsedFilePath = MainController.this.getSessionInfos().getConfigHandler().getPropertie(PropertieFields.LAST_OPEND).toString();
+			final String lastUsedFilePath = MainController.this.getSessionInfos().getPropertiesHandler().getPropertie(PropertieFields.LAST_OPEND).toString();
 			MainController.this.LOG.debug(lastUsedFilePath);
 			final File birthdayFile = new File(lastUsedFilePath);
 
@@ -190,6 +199,21 @@ public class MainController{
 		} catch (final Exception ex){
 			this.LOG.error(ex.getMessage());
 			this.LOG.error(ex.getStackTrace().toString());
+		}
+	}
+
+	public void openPreferences(){
+		try{
+			final FXMLLoader fxmlLoader = new FXMLLoader();
+			fxmlLoader.setLocation(this.getClass().getResource("/application/view/PreferencesView.fxml"));
+			fxmlLoader.setController(new PreferencesViewController(this));
+			final Scene scene = new Scene(fxmlLoader.load());
+			final Stage stage = new Stage();
+			stage.setTitle("Preferences");
+			stage.setScene(scene);
+			stage.show();
+		} catch (final IOException ioException){
+			this.LOG.log(Level.ERROR, "Failed to create new Window.", ioException);
 		}
 	}
 

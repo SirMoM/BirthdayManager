@@ -24,8 +24,8 @@ public class SaveLastFileUsedTask extends Task<Boolean>{
 
 	@Override
 	protected Boolean call() throws Exception{
-		this.mainController.getSessionInfos().getConfigHandler().getProperties().setProperty("last_opend", this.mainController.getSessionInfos().getFileToOpen().getAbsolutePath());
-		this.mainController.getSessionInfos().getConfigHandler().storeProperties("saveRecentfile");
+		this.mainController.getSessionInfos().getPropertiesHandler().getProperties().setProperty("last_opend", this.mainController.getSessionInfos().getFileToOpen().getAbsolutePath());
+		this.mainController.getSessionInfos().getPropertiesHandler().storeProperties("saveRecentfile");
 		return true;
 	}
 
