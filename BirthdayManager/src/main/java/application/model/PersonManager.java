@@ -71,14 +71,14 @@ public class PersonManager{
 	}
 
 	/**
-	 * @return the personDB ==> the {@link ArrayList} which contains the Persons
+	 * @return the personDB == the {@link ArrayList} which contains the Persons
 	 */
 	public List<Person> getPersonDB(){
 		return this.personDB;
 	}
 
 	/**
-	 * Populates the {@link ArrayList} which contains the Persons ==>
+	 * Populates the {@link ArrayList} which contains the Persons ==
 	 * {@link #personDB}
 	 *
 	 * @throws FileNotFoundException if the File is not found
