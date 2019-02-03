@@ -32,12 +32,16 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
 /**
- * @author Noah Ruben
- *
+ * @author Admin
+ * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
+ */
+/**
+ * @author Admin
+ * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
 public class MainController{
 	private final Logger LOG = LogManager.getLogger(this.getClass().getName());
-	private Stage stage;
+	private final Stage stage;
 	private final SessionInfos sessionInfos;
 
 	@FXML
@@ -59,7 +63,6 @@ public class MainController{
 			MainController.this.openPreferences();
 		}
 	};
-
 	final EventHandler<ActionEvent> saveToFileHandler = new EventHandler<ActionEvent>(){
 
 		@Override
@@ -67,7 +70,6 @@ public class MainController{
 			new Thread(new SaveBirthdaysToFileTask()).start();
 		}
 	};
-
 	final EventHandler<ActionEvent> exportToFileHandler = new EventHandler<ActionEvent>(){
 
 		@Override
@@ -85,7 +87,6 @@ public class MainController{
 			new Thread(new SaveBirthdaysToFileTask(saveFile)).start();
 		}
 	};
-
 	final EventHandler<ActionEvent> openFromFileChooserHandler = new EventHandler<ActionEvent>(){
 		@Override
 		public void handle(final ActionEvent event){
@@ -122,7 +123,6 @@ public class MainController{
 			new Thread(new UpdateAllSubBirthdayListsTask(MainController.this.sessionInfos)).start();
 		}
 	};
-
 	final EventHandler<ActionEvent> openFromRecentHandler = new EventHandler<ActionEvent>(){
 		@Override
 		public void handle(final ActionEvent event){
@@ -150,58 +150,93 @@ public class MainController{
 		}
 	};
 
+	/**
+	 * @param stage the mainstage for the application
+	 */
 	public MainController(final Stage stage){
 		this.stage = stage;
 		this.sessionInfos = new SessionInfos();
 	}
 
+	/**
+	 * @return the session infos for the spezific App-Instance
+	 */
 	public SessionInfos getSessionInfos(){
 		return this.sessionInfos;
 	}
 
+	/**
+	 * @return the main stage of this app
+	 */
 	public Stage getStage(){
 		return this.stage;
 	}
 
+	/**
+	 * Swiches scenes to the BirthdayOverview. Generates a new Controller.
+	 *
+	 * @see BirthdaysOverviewController
+	 */
 	public void goToBirthdaysOverview(){
 		try{
 			this.replaceSceneContent("/application/view/BirthdaysOverview.fxml", new BirthdaysOverviewController(this));
 
-		} catch (final Exception ex){
-			this.LOG.error(ex.getMessage());
-			this.LOG.error(ex.getStackTrace().toString());
+		} catch (final Exception exception){
+			this.LOG.catching(Level.ERROR, exception);
 		}
 	}
 
+	/**
+	 * Swiches scenes to the BirthdayOverview.
+	 *
+	 * @param birthdaysOverviewController
+	 */
 	public void goToBirthdaysOverview(final BirthdaysOverviewController birthdaysOverviewController){
 		try{
 			this.replaceSceneContent("/application/view/BirthdaysOverview.fxml", birthdaysOverviewController);
 
-		} catch (final Exception ex){
-			this.LOG.error(ex.getMessage());
-			this.LOG.error(ex.getStackTrace().toString());
+		} catch (final Exception exception){
+			this.LOG.catching(Level.ERROR, exception);
 		}
 	}
 
+	/**
+	 * Swiches scenes to the BirthdayOverview. Generates a new Controller.
+	 *
+	 * @param person The person to edit.
+	 *
+	 * @see EditBirthdayViewController
+	 */
 	public void goToEditBirthdayView(final Person person){
 		try{
 			this.replaceSceneContent("/application/view/EditBirthdayView.fxml", new EditBirthdayViewController(this, person));
 
-		} catch (final Exception ex){
-			this.LOG.error(ex.getMessage());
-			this.LOG.error(ex.getStackTrace().toString());
+		} catch (final Exception exception){
+			this.LOG.catching(Level.ERROR, exception);
 		}
 	}
 
+	/**
+	 * @param fxmlPath   the path of the FXML-File representing the view
+	 * @param controller the associated Controller
+	 */
 	public void gotoNextScene(final String fxmlPath, final Initializable controller){
 		try{
 			this.replaceSceneContent(fxmlPath, controller);
-		} catch (final Exception ex){
-			this.LOG.error(ex.getMessage());
-			this.LOG.error(ex.getStackTrace().toString());
+		} catch (final Exception exception){
+			this.LOG.catching(Level.ERROR, exception);
 		}
 	}
 
+	/**
+	 * Opens the preferences Window.
+	 * <ul>
+	 * <li>Creates a new {@link Stage}</li>
+	 * <li>Create a new {@link Scene}</li>
+	 * <li>Create a new {@link PreferencesViewController}</li>
+	 * </ul>
+	 *
+	 */
 	public void openPreferences(){
 		try{
 			final FXMLLoader fxmlLoader = new FXMLLoader();
@@ -217,7 +252,12 @@ public class MainController{
 		}
 	}
 
-	private void replaceSceneContent(final String fxmlPath, final Initializable controller) throws Exception{
+	/**
+	 * @param fxmlPath   the path of the FXML-File representing the view
+	 * @param controller the associated Controller
+	 * @throws IOException if the FXML-File could not be loaded
+	 */
+	private void replaceSceneContent(final String fxmlPath, final Initializable controller) throws IOException{
 		final FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(this.getClass().getResource(fxmlPath));
 		loader.setController(controller);
@@ -230,17 +270,15 @@ public class MainController{
 		this.stage.show();
 	}
 
-	public void setStage(final Stage stage){
-		this.stage = stage;
-	}
-
+	/**
+	 * Starts the application with the BirthdaysOverview
+	 */
 	public void start(){
 		try{
 			this.replaceSceneContent("/application/view/BirthdaysOverview.fxml", new BirthdaysOverviewController(this));
 
-		} catch (final Exception ex){
-			this.LOG.error(ex.getMessage());
-			this.LOG.error(ex.getStackTrace().toString());
+		} catch (final Exception exception){
+			this.LOG.catching(Level.ERROR, exception);
 		}
 	}
 

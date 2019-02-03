@@ -15,10 +15,15 @@ import javafx.concurrent.Task;
 public class SaveBirthdaysToFileTask extends Task<Boolean>{
 	File selectedFile;
 
+	/**
+	 * Base constructor
+	 */
 	public SaveBirthdaysToFileTask(){
-		this.selectedFile = null;
 	}
 
+	/**
+	 * @param selectedFile the File
+	 */
 	public SaveBirthdaysToFileTask(final File selectedFile){
 		this.selectedFile = selectedFile;
 	}

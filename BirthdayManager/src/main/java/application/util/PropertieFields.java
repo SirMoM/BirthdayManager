@@ -4,6 +4,8 @@
 package application.util;
 
 /**
+ * All propertie keys
+ * 
  * @author Noah Ruben
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */

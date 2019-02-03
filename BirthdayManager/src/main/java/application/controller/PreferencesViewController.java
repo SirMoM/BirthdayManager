@@ -9,6 +9,7 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 
 import application.util.PropertieFields;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -71,12 +72,17 @@ public class PreferencesViewController extends Controller{
 	private Button save_button;
 
 	/**
-	 * @param mainController
+	 *
+	 * @see application.controller.Controller#Controller(MainController)
 	 */
 	public PreferencesViewController(final MainController mainController){
 		super(mainController);
 	}
 
+	/**
+	 * All assertions for the controller. Checks if all FXML-Components have been
+	 * loaded properly.
+	 */
 	private void assertions(){
 		assert this.languageOptions_label != null : "fx:id=\"languageOptions_label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
 		assert this.chooseLanguage_label != null : "fx:id=\"chooseLanguage_label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
@@ -92,11 +98,17 @@ public class PreferencesViewController extends Controller{
 		assert this.save_button != null : "fx:id=\"save_button\" was not injected: check your FXML file 'PreferencesView.fxml'.";
 	}
 
+	/**
+	 * Binds the JavaFX Components to their {@link EventHandler}.
+	 */
 	private void bindComponents(){
 		this.fillComboBoxLanguages();
 
 	}
 
+	/**
+	 * Fills the {@link ComboBox} with the available languages.
+	 */
 	private void fillComboBoxLanguages(){
 		this.language_CompoBox.getItems().addAll(Locale.GERMAN, Locale.ENGLISH);
 
@@ -137,6 +149,12 @@ public class PreferencesViewController extends Controller{
 		this.language_CompoBox.setConverter(converter);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see javafx.fxml.Initializable#initialize(java.net.URL,
+	 * java.util.ResourceBundle)
+	 */
 	@Override
 	public void initialize(final URL location, final ResourceBundle resources){
 		this.assertions();
@@ -145,13 +163,22 @@ public class PreferencesViewController extends Controller{
 		this.updateLocalisation();
 	}
 
+	/**
+	 * Loads the preferences of this application-
+	 */
 	private void loadPreferences(){
 		this.propertiesToEdit = this.getMainController().getSessionInfos().getPropertiesHandler().getProperties();
 		this.language_CompoBox.setValue(new Locale(this.propertiesToEdit.getProperty(PropertieFields.SAVED_LOCALE)));
 	}
 
-	private void updateLocalisation(){
-		// TODO Auto-generated method stub
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see application.controller.Controller#updateLocalisation()
+	 */
+	@Override
+	public void updateLocalisation(){
+		// TODO updateLocalisation()
 
 	}
 }

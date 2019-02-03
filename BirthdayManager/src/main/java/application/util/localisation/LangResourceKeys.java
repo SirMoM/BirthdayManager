@@ -1,11 +1,12 @@
 /**
- * 
+ *
  */
 package application.util.localisation;
 
 /**
  * @author Noah Ruben
- * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
+ * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a> All keys
+ *      for adressing the right string
  */
 public enum LangResourceKeys{
 

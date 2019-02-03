@@ -11,6 +11,10 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * @author Admin
+ * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
+ */
 public class PropertieManager{
 
 	private final Logger LOG = LogManager.getLogger(this.getClass().getName());
@@ -22,7 +26,7 @@ public class PropertieManager{
 	/**
 	 * Basis ConfigHandler uses the a app.cfg file generates it if necessary
 	 *
-	 * @throws IOException
+	 * @throws IOException if the File could not be read
 	 */
 	public PropertieManager() throws IOException{
 		this.properties = new Properties();
@@ -39,6 +43,15 @@ public class PropertieManager{
 		}
 	}
 
+	/**
+	 * Fills the properties with default values
+	 * <ul>
+	 * <li>SHOW_BIRTHDAYS_COUNT == 10</li>
+	 * <li>SAVED_LOCALE == en_EN</li>
+	 * <li>AUTOSAVE == false</li>
+	 * <li>WRITE_THRU == false</li>
+	 * </ul>
+	 */
 	private void fillWithStandartProperties(){
 		this.properties.setProperty(PropertieFields.SHOW_BIRTHDAYS_COUNT, "10");
 		this.properties.setProperty(PropertieFields.SAVED_LOCALE, "en_EN");
@@ -52,7 +65,7 @@ public class PropertieManager{
 	}
 
 	/**
-	 * @return the properties
+	 * @return the a propertie
 	 */
 	public String getPropertie(final String key){
 		return this.properties.get(key).toString();
@@ -65,10 +78,22 @@ public class PropertieManager{
 		return this.properties;
 	}
 
+	/**
+	 * @see Properties
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
 	public void loadProperties() throws FileNotFoundException, IOException{
 		this.properties.load(new FileInputStream(this.propertiesFile));
 	}
 
+	/**
+	 * @see Properties
+	 *
+	 * @param comments
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
 	public void storeProperties(final String comments) throws FileNotFoundException, IOException{
 		this.properties.store(new FileWriter(this.propertiesFile), comments);
 	}

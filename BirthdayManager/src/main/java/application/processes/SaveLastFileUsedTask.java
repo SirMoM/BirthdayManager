@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package application.processes;
 
@@ -12,16 +12,21 @@ import javafx.concurrent.Task;
  */
 public class SaveLastFileUsedTask extends Task<Boolean>{
 
-	private MainController mainController;
+	private final MainController mainController;
 
 	/**
-	 * @param mainController
+	 * @param mainController the MainController of this application
 	 */
-	public SaveLastFileUsedTask(MainController mainController){
+	public SaveLastFileUsedTask(final MainController mainController){
 		super();
 		this.mainController = mainController;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see javafx.concurrent.Task#call()
+	 */
 	@Override
 	protected Boolean call() throws Exception{
 		this.mainController.getSessionInfos().getPropertiesHandler().getProperties().setProperty("last_opend", this.mainController.getSessionInfos().getFileToOpen().getAbsolutePath());
