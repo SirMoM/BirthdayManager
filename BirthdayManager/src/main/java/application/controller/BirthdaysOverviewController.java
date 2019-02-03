@@ -35,7 +35,12 @@ import javafx.scene.text.Font;
  * @author Noah Ruben
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
+/**
+ * @author Admin
+ * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
+ */
 public class BirthdaysOverviewController extends Controller{
+
 	protected final static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
 	private MenuItem recentFiles_MenuItem;
@@ -176,7 +181,6 @@ public class BirthdaysOverviewController extends Controller{
 	private Label date_label;
 
 	final EventHandler<ActionEvent> openBirthday = new EventHandler<ActionEvent>(){
-
 		@Override
 		public void handle(final ActionEvent arg0){
 			final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
