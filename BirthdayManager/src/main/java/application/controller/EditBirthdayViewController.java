@@ -18,7 +18,6 @@ import application.processes.UpdateAllSubBirthdayListsTask;
 import application.util.PropertieFields;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
-import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -65,9 +64,6 @@ public class EditBirthdayViewController extends Controller{
 
 	@FXML
 	private MenuItem saveAsFile_MenuItem;
-
-	@FXML
-	private MenuItem exporteFile_MenuItem;
 
 	@FXML
 	private MenuItem preferences_MenuItem;
@@ -200,22 +196,7 @@ public class EditBirthdayViewController extends Controller{
 
 		@Override
 		public void handle(final ActionEvent event){
-			final BirthdaysOverviewController birthdaysOverviewController = new BirthdaysOverviewController(EditBirthdayViewController.this.getMainController());
-			final UpdateAllSubBirthdayListsTask updateAllSubBirthdayListsTask = new UpdateAllSubBirthdayListsTask(EditBirthdayViewController.this.getMainController().getSessionInfos());
-			updateAllSubBirthdayListsTask.addEventFilter(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>(){
-				@Override
-				public void handle(final WorkerStateEvent t){
-					final Boolean result = updateAllSubBirthdayListsTask.getValue();
-					if(result){
-						LOG.info("updateAllSubBirthdayListsTask succsesfully");
-						EditBirthdayViewController.this.getMainController().goToBirthdaysOverview(birthdaysOverviewController);
-					} else{
-						LOG.info("Saveing faild");
-					}
-				}
-			});
-			new Thread(updateAllSubBirthdayListsTask).start();
-
+			EditBirthdayViewController.this.getMainController().goToBirthdaysOverview(new BirthdaysOverviewController(EditBirthdayViewController.this.getMainController()));
 		}
 	};
 
@@ -258,7 +239,6 @@ public class EditBirthdayViewController extends Controller{
 		assert this.closeFile_MenuItem != null : "fx:id=\"closeFile_MenuItem\" was not injected: check your FXML file 'EditBirthdayView.fxml'.";
 		assert this.saveFile_MenuItem != null : "fx:id=\"saveFile_MenuItem\" was not injected: check your FXML file 'EditBirthdayView.fxml'.";
 		assert this.saveAsFile_MenuItem != null : "fx:id=\"saveAsFile_MenuItem\" was not injected: check your FXML file 'EditBirthdayView.fxml'.";
-		assert this.exporteFile_MenuItem != null : "fx:id=\"exporteFile_MenuItem\" was not injected: check your FXML file 'EditBirthdayView.fxml'.";
 		assert this.preferences_MenuItem != null : "fx:id=\"preferences_MenuItem\" was not injected: check your FXML file 'EditBirthdayView.fxml'.";
 		assert this.quit_MenuItem != null : "fx:id=\"quit_MenuItem\" was not injected: check your FXML file 'EditBirthdayView.fxml'.";
 		assert this.edit_menu != null : "fx:id=\"edit_menu\" was not injected: check your FXML file 'EditBirthdayView.fxml'.";
@@ -294,6 +274,8 @@ public class EditBirthdayViewController extends Controller{
 		this.cancel_Button.addEventHandler(ActionEvent.ANY, this.exitHandler);
 		this.save_Button.addEventHandler(ActionEvent.ANY, this.savePersonHandler);
 		this.delete_Button.addEventHandler(ActionEvent.ANY, this.deletePersonHandler);
+
+		this.quit_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().closeAppHandler);
 	}
 
 	/**
@@ -342,7 +324,6 @@ public class EditBirthdayViewController extends Controller{
 		this.closeFile_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.closeFile_MenuItem));
 		this.saveFile_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.saveFile_MenuItem));
 		this.saveAsFile_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.saveAsFile_MenuItem));
-		this.exporteFile_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.exporteFile_MenuItem));
 		this.preferences_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.preferences_MenuItem));
 		this.quit_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.quit_MenuItem));
 

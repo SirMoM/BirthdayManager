@@ -185,7 +185,9 @@ public class PersonManager{
 	 */
 	public void setSaveFile(final File saveFile){
 		this.saveFile = saveFile;
-		if(saveFile.exists()){
+		if(saveFile == null){
+			LOG.info("Warn saveFile is null");
+		} else if(saveFile.exists()){
 			try{
 				this.populateList();
 			} catch (final IOException ioException){

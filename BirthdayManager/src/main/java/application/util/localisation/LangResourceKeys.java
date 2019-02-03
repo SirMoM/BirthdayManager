@@ -19,7 +19,6 @@ public enum LangResourceKeys{
 	closeFile_MenuItem,
 	saveFile_MenuItem,
 	saveAsFile_MenuItem,
-	exporteFile_MenuItem,
 	preferences_MenuItem,
 	quit_MenuItem,
 
