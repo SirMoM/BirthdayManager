@@ -36,8 +36,8 @@
                </font>
             </Label>
             <CheckBox fx:id="openFileOnStart_Checkbox" layoutX="50.0" layoutY="257.0" mnemonicParsing="false" text="Open file on startup" AnchorPane.leftAnchor="75.0" AnchorPane.topAnchor="250.0" />
-            <TextField fx:id="startupFile_textField" layoutX="51.0" layoutY="325.0" AnchorPane.leftAnchor="75.0" AnchorPane.rightAnchor="300.0" AnchorPane.topAnchor="290.0" />
-            <Button fx:id="chooseFile_button" layoutX="363.0" layoutY="310.0" mnemonicParsing="false" text="Choose" AnchorPane.rightAnchor="220.0" AnchorPane.topAnchor="290.0" />
+            <TextField fx:id="startupFile_textField" layoutX="51.0" layoutY="325.0" AnchorPane.leftAnchor="75.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="290.0" />
+            <Button fx:id="chooseFile_button" layoutX="363.0" layoutY="310.0" mnemonicParsing="false" text="Choose" AnchorPane.rightAnchor="120.0" AnchorPane.topAnchor="290.0" />
             <Separator layoutX="10.0" layoutY="210.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="0.0" prefWidth="600.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="330.0" />
             <Button fx:id="cancel_button" layoutX="149.0" layoutY="361.0" minWidth="100.0" mnemonicParsing="false" prefWidth="100.0" text="Cancel" AnchorPane.leftAnchor="175.0" AnchorPane.topAnchor="355.0" />
             <Button fx:id="save_button" layoutX="350.0" layoutY="361.0" minWidth="100.0" mnemonicParsing="false" prefWidth="100.0" text="Save" AnchorPane.rightAnchor="175.0" AnchorPane.topAnchor="355.0" />

@@ -63,8 +63,9 @@ public class PropertieManager{
 	private void fillWithStandartProperties(){
 		this.properties.setProperty(PropertieFields.SHOW_BIRTHDAYS_COUNT, "10");
 		this.properties.setProperty(PropertieFields.SAVED_LOCALE, "en_GB");
-		this.properties.setProperty(PropertieFields.AUTOSAVE, "false");
+		this.properties.setProperty(PropertieFields.AUTOSAVE, "true");
 		this.properties.setProperty(PropertieFields.WRITE_THRU, "false");
+		this.properties.setProperty(PropertieFields.OPEN_FILE_ON_START, "false");
 		try{
 			this.storeProperties("Default properties stored");
 		} catch (final IOException ioException){

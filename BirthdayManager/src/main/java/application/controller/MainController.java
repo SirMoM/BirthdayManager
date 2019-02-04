@@ -41,7 +41,7 @@ import javafx.stage.Stage;
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
 public class MainController{
-	private Logger LOG;
+	private final Logger LOG;
 	private final Stage stage;
 	private final SessionInfos sessionInfos;
 
@@ -70,7 +70,7 @@ public class MainController{
 		@Override
 		public void handle(final ActionEvent event){
 			MainController.this.openPreferences();
-			MainController.this.LOG = LogManager.getLogger(this.getClass().getName());
+			MainController.this.LOG.trace("Open Preferences");
 		}
 	};
 	final EventHandler<ActionEvent> saveToFileHandler = new EventHandler<ActionEvent>(){
@@ -87,7 +87,11 @@ public class MainController{
 			final FileChooser fileChooser = new FileChooser();
 			fileChooser.setTitle(MainController.this.getSessionInfos().getLangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
 
-			fileChooser.setInitialDirectory(new File(MainController.this.getSessionInfos().getPropertiesHandler().getPropertie(PropertieFields.LAST_OPEND).toString()).getParentFile());
+			try{
+				fileChooser.setInitialDirectory(new File(MainController.this.getSessionInfos().getPropertiesHandler().getPropertie(PropertieFields.LAST_OPEND).toString()).getParentFile());
+			} catch (final NullPointerException nullPointerException){
+				fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+			}
 			// TODO Extension Filters with internationalisation
 			fileChooser.setInitialFileName("Birthdays");
 			fileChooser.getExtensionFilters().addAll(new ExtensionFilter("CSV Files", "*.csv"), new ExtensionFilter("All Files", "*.*"));
@@ -113,6 +117,7 @@ public class MainController{
 			fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Text Files", "*.txt"), new ExtensionFilter("CSV Files", "*.csv"), new ExtensionFilter("All Files", "*.*"));
 
 			final File selectedFile = fileChooser.showOpenDialog(MainController.this.getStage().getScene().getWindow());
+			MainController.this.LOG.debug("Opend file:" + selectedFile.getAbsolutePath());
 			MainController.this.getSessionInfos().setFileToOpen(selectedFile);
 			PersonManager.getInstance().setSaveFile(selectedFile);
 
