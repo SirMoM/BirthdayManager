@@ -15,7 +15,7 @@ import javafx.fxml.Initializable;
  */
 public abstract class Controller implements Initializable{
 
-	final static Logger LOG = LogManager.getLogger();
+	final Logger LOG;
 
 	private final MainController mainController;
 
@@ -24,6 +24,7 @@ public abstract class Controller implements Initializable{
 	 */
 	public Controller(final MainController mainController){
 		this.mainController = mainController;
+		this.LOG = LogManager.getLogger(this.getClass().getName());
 	}
 
 	/**

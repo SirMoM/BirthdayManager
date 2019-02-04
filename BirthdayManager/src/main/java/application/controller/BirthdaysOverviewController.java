@@ -245,7 +245,7 @@ public class BirthdaysOverviewController extends Controller{
 
 		@Override
 		public void handle(final Event event){
-			if(event.getEventType().equals(MouseEvent.ANY)){
+			if(event.getEventType().equals(MouseEvent.MOUSE_CLICKED)){
 				if(((MouseEvent) event).getClickCount() >= 2){
 					final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
 					BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(selectedItems.get(0));

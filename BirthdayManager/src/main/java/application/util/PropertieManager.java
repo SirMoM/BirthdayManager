@@ -26,20 +26,28 @@ public class PropertieManager{
 	/**
 	 * Basis ConfigHandler uses the a app.cfg file generates it if necessary
 	 *
-	 * @throws IOException if the File could not be read
 	 */
-	public PropertieManager() throws IOException{
+	public PropertieManager(){
 		this.properties = new Properties();
-		this.propertiesFile = new File(System.getProperty("java.io.tmpdir") + this.PROPERTIE_FILE_NAME);
+//		this.propertiesFile = new File(System.getProperty("java.io.tmpdir") + this.PROPERTIE_FILE_NAME);
+		this.propertiesFile = new File(this.PROPERTIE_FILE_NAME);
 		this.LOG.info("Propertie File " + this.propertiesFile.getAbsolutePath());
 
-		if(this.propertiesFile.createNewFile()){
-			this.LOG.info("Created new properties File");
-			this.fillWithStandartProperties();
-			this.LOG.info("Loaded default properties");
-		} else{
-			this.loadProperties();
-			this.LOG.info("Loaded properties");
+		try{
+			if(this.propertiesFile.createNewFile()){
+				this.LOG.info("Created new properties File");
+				this.fillWithStandartProperties();
+				this.LOG.info("Loaded default properties");
+			} else{
+				this.loadProperties();
+				this.LOG.info("Loaded properties");
+			}
+		} catch (final FileNotFoundException fileNotFoundException){
+			this.LOG.catching(Level.FATAL, fileNotFoundException);
+			// TODO Dialog FATAL
+		} catch (final IOException ioException){
+			this.LOG.catching(Level.FATAL, ioException);
+			// TODO Dialog FATAL
 		}
 	}
 
@@ -54,7 +62,7 @@ public class PropertieManager{
 	 */
 	private void fillWithStandartProperties(){
 		this.properties.setProperty(PropertieFields.SHOW_BIRTHDAYS_COUNT, "10");
-		this.properties.setProperty(PropertieFields.SAVED_LOCALE, "en_EN");
+		this.properties.setProperty(PropertieFields.SAVED_LOCALE, "en_GB");
 		this.properties.setProperty(PropertieFields.AUTOSAVE, "false");
 		this.properties.setProperty(PropertieFields.WRITE_THRU, "false");
 		try{
