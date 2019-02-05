@@ -4,6 +4,8 @@
 package application.processes;
 
 import application.controller.MainController;
+import application.model.PersonManager;
+import application.util.PropertieFields;
 import javafx.concurrent.Task;
 
 /**
@@ -24,13 +26,13 @@ public class SaveLastFileUsedTask extends Task<Boolean>{
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javafx.concurrent.Task#call()
 	 */
 	@Override
 	protected Boolean call() throws Exception{
-		this.mainController.getSessionInfos().getPropertiesHandler().getProperties().setProperty("last_opend", this.mainController.getSessionInfos().getFileToOpen().getAbsolutePath());
-		this.mainController.getSessionInfos().getPropertiesHandler().storeProperties("saveRecentfile");
+		this.mainController.getSessionInfos().getPropertiesHandler().getProperties().setProperty(PropertieFields.LAST_OPEND, PersonManager.getInstance().getSaveFile().getAbsolutePath());
+		this.mainController.getSessionInfos().getPropertiesHandler().storeProperties("Saved recent file.");
 		return true;
 	}
 

@@ -26,7 +26,6 @@ import javafx.collections.ObservableMap;
 public class SessionInfos{
 	final static Logger LOG = LogManager.getLogger();
 
-	private File fileToOpen;
 	final private PropertieManager propertieManager;
 	final private LangResourceManager langResources;
 	private Locale appLocale;
@@ -38,35 +37,6 @@ public class SessionInfos{
 
 	private final ObservableMap<Object, Object> birthdaysThisWeek = FXCollections.observableHashMap();
 	private final ObservableMap<Integer, Person> birthdaysThisMonat = FXCollections.observableHashMap();
-
-//	private SessionInfos(){
-//		try{
-//			// load locale or set Germany as default
-//			final String savedLocaleProperty = this.propertieManager.getPropertie(PropertieFields.SAVED_LOCALE).replace(" ", "");
-//			if(!savedLocaleProperty.isEmpty()){
-//				final String[] savedLocalePropertySplit = savedLocaleProperty.split("_");
-//				this.appLocale = new Locale(savedLocalePropertySplit[0], savedLocalePropertySplit[1]);
-//			} else{
-//				LOG.error("could not load saved_locale_property");
-//			}
-//		} catch (final IOException ioException){
-//			LOG.catching(ioException);
-//		} finally{
-//			if(this.appLocale == null){
-//				this.appLocale = Locale.GERMANY;
-//			}
-//			LOG.debug("Started in: " + this.appLocale);
-//
-//		}
-//		this.langResources = new LangResourceManager(this.appLocale);
-//		this.fileToOpenName = new SimpleStringProperty();
-//		try{
-//			this.getRecentFileName().set(new File(this.propertieManager.getPropertie(PropertieFields.LAST_OPEND)).getName());
-//		} catch (final NullPointerException nullPointerException){
-//			LOG.catching(Level.INFO, nullPointerException);
-//			LOG.info("Don't worry just could not load recent File");
-//		}
-//	}
 
 	/**
 	 * Loads the saved properties or gets the default values
@@ -104,13 +74,6 @@ public class SessionInfos{
 	 */
 	public ObservableMap<Object, Object> getBirthdaysThisWeek(){
 		return this.birthdaysThisWeek;
-	}
-
-	/**
-	 * @return fileToOpen
-	 */
-	public File getFileToOpen(){
-		return this.fileToOpen;
 	}
 
 	/**
@@ -172,18 +135,6 @@ public class SessionInfos{
 	 */
 	public void setAppLocale(final Locale appLocale){
 		this.appLocale = appLocale;
-	}
-
-	/**
-	 * @param fileToOpen the File to open aka the save file
-	 */
-	public void setFileToOpen(final File fileToOpen){
-		this.fileToOpen = fileToOpen;
-		if(fileToOpen != null){
-			this.getFileToOpenName().set(fileToOpen.getName());
-		} else{
-			this.getFileToOpenName().set(null);
-		}
 	}
 
 	/**
