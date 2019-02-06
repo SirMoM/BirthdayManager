@@ -285,11 +285,15 @@ public class MainController{
 	}
 
 	/**
-	 * Starts the application with the BirthdaysOverview
+	 * Starts the application with the BirthdaysOverview and possibly loaded file
 	 */
 	public void start(){
 		try{
 			this.replaceSceneContent("/application/view/BirthdaysOverview.fxml", new BirthdaysOverviewController(this));
+			if(new Boolean(this.sessionInfos.getPropertiesHandler().getPropertie(PropertieFields.OPEN_FILE_ON_START))){
+				PersonManager.getInstance().setSaveFile(new File(this.sessionInfos.getPropertiesHandler().getPropertie(PropertieFields.FILE_ON_START)));
+				new Thread(new UpdateAllSubBirthdayListsTask(this.sessionInfos)).start();
+			}
 		} catch (final Exception exception){
 			this.LOG.catching(Level.ERROR, exception);
 		}
