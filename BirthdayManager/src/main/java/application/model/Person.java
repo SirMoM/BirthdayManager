@@ -7,6 +7,7 @@ import static java.time.LocalDate.parse;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -86,7 +87,16 @@ public class Person{
 				throw new IndexOutOfBoundsException("Could not split line");
 			}
 			final String[] nameSplit = splitLine[0].split(" ");
-			birthday = parse(splitLine[1], Person.DATE_FORMATTER);
+			try{
+				birthday = parse(splitLine[1], Person.DATE_FORMATTER);
+			} catch (final DateTimeParseException e){
+				final Alert alert = new Alert(AlertType.WARNING);
+				alert.setTitle("Could not parse this birthday");
+				alert.setHeaderText("Birthday which could not be parsed: ");
+				alert.setContentText(splitLine[1]);
+				alert.showAndWait();
+				return null;
+			}
 
 			if(nameSplit.length == 3){
 				name = nameSplit[0];
