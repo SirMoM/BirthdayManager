@@ -17,6 +17,7 @@ import application.processes.SaveBirthdaysToFileTask;
 import application.processes.SaveLastFileUsedTask;
 import application.util.PropertieFields;
 import application.util.localisation.LangResourceKeys;
+import application.util.localisation.LangResourceManager;
 import javafx.application.Platform;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
@@ -43,6 +44,7 @@ public class MainController{
 	private final Logger LOG;
 	private final Stage stage;
 	private final SessionInfos sessionInfos;
+	private Controller activeController = null;
 
 	@FXML
 	private MenuItem changeLanguage_MenuItem;
@@ -83,7 +85,7 @@ public class MainController{
 		@Override
 		public void handle(final ActionEvent event){
 			final FileChooser fileChooser = new FileChooser();
-			fileChooser.setTitle(MainController.this.getSessionInfos().getLangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
+			fileChooser.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
 
 			try{
 				fileChooser.setInitialDirectory(new File(MainController.this.getSessionInfos().getPropertiesHandler().getPropertie(PropertieFields.LAST_OPEND).toString()).getParentFile());
@@ -103,7 +105,7 @@ public class MainController{
 		@Override
 		public void handle(final ActionEvent event){
 			final FileChooser fileChooser = new FileChooser();
-			fileChooser.setTitle(MainController.this.getSessionInfos().getLangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
+			fileChooser.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
 
 			try{
 				fileChooser.setInitialDirectory(new File(MainController.this.getSessionInfos().getPropertiesHandler().getPropertie(PropertieFields.LAST_OPEND).toString()).getParentFile());
@@ -191,8 +193,9 @@ public class MainController{
 	 * @see BirthdaysOverviewController
 	 */
 	public void goToBirthdaysOverview(){
+		this.activeController = new BirthdaysOverviewController(this);
 		try{
-			this.replaceSceneContent("/application/view/BirthdaysOverview.fxml", new BirthdaysOverviewController(this));
+			this.replaceSceneContent("/application/view/BirthdaysOverview.fxml", this.activeController);
 
 		} catch (final Exception exception){
 			this.LOG.catching(Level.ERROR, exception);
@@ -205,8 +208,9 @@ public class MainController{
 	 * @see EditBirthdayViewController
 	 */
 	public void goToEditBirthdayView(){
+		this.activeController = new NewBirthdayViewController(this);
 		try{
-			this.replaceSceneContent("/application/view/EditBirthdayView.fxml", new NewBirthdayViewController(this));
+			this.replaceSceneContent("/application/view/EditBirthdayView.fxml", this.activeController);
 		} catch (final Exception exception){
 			this.LOG.catching(Level.ERROR, exception);
 		}
@@ -220,8 +224,9 @@ public class MainController{
 	 * @see EditBirthdayViewController
 	 */
 	public void goToEditBirthdayView(final Person person){
+		this.activeController = new EditBirthdayViewController(this, person);
 		try{
-			this.replaceSceneContent("/application/view/EditBirthdayView.fxml", new EditBirthdayViewController(this, person));
+			this.replaceSceneContent("/application/view/EditBirthdayView.fxml", this.activeController);
 
 		} catch (final Exception exception){
 			this.LOG.catching(Level.ERROR, exception);
@@ -282,12 +287,17 @@ public class MainController{
 		this.stage.show();
 	}
 
+	public void settingsChanged(){
+		this.activeController.updateLocalisation();
+	}
+
 	/**
 	 * Starts the application with the BirthdaysOverview and possibly loaded file
 	 */
 	public void start(){
+		this.activeController = new BirthdaysOverviewController(this);
 		try{
-			this.replaceSceneContent("/application/view/BirthdaysOverview.fxml", new BirthdaysOverviewController(this));
+			this.replaceSceneContent("/application/view/BirthdaysOverview.fxml", this.activeController);
 			if(new Boolean(this.sessionInfos.getPropertiesHandler().getPropertie(PropertieFields.OPEN_FILE_ON_START))){
 				PersonManager.getInstance().setSaveFile(new File(this.sessionInfos.getPropertiesHandler().getPropertie(PropertieFields.FILE_ON_START)));
 			}

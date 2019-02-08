@@ -16,7 +16,6 @@ import org.apache.logging.log4j.Logger;
 import application.util.BirthdayComparator;
 import application.util.PropertieFields;
 import application.util.PropertieManager;
-import application.util.localisation.LangResourceManager;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -32,7 +31,6 @@ public class SessionInfos{
 	final static Logger LOG = LogManager.getLogger();
 
 	final private PropertieManager propertieManager;
-	final private LangResourceManager langResources;
 	private Locale appLocale;
 	private final StringProperty fileToOpenName = new SimpleStringProperty();
 	private StringProperty recentFileName = new SimpleStringProperty();
@@ -50,7 +48,6 @@ public class SessionInfos{
 		this.propertieManager = new PropertieManager();
 		final String localePropertieString = this.propertieManager.getPropertie(PropertieFields.SAVED_LOCALE);
 		LOG.debug("Loaded locale propertie " + localePropertieString);
-		this.langResources = new LangResourceManager(new Locale(localePropertieString));
 
 		try{
 			this.getRecentFileName().set(new File(this.propertieManager.getPropertie(PropertieFields.LAST_OPEND)).getName());
@@ -86,20 +83,6 @@ public class SessionInfos{
 	 */
 	public StringProperty getFileToOpenName(){
 		return this.fileToOpenName;
-	}
-
-	/**
-	 * @return the langResources
-	 */
-	public LangResourceManager getLangResourceManager(){
-		return this.langResources;
-	}
-
-	/**
-	 * @return the langResources
-	 */
-	public LangResourceManager getLangResources(){
-		return this.langResources;
 	}
 
 	/**

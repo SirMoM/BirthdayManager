@@ -7,7 +7,6 @@ import java.net.URL;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import java.util.ResourceBundle;
 
 import application.model.Person;
@@ -27,6 +26,8 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -48,9 +49,6 @@ public class BirthdaysOverviewController extends Controller{
 
 	@FXML
 	private TableView<Person> week_tableView;
-
-	@FXML
-	private MenuItem changeLanguage_MenuItem;
 
 	@FXML
 	private ResourceBundle resources;
@@ -202,7 +200,7 @@ public class BirthdaysOverviewController extends Controller{
 		public void handle(final ActionEvent event){
 			BirthdaysOverviewController.this.nextBdaysList.setItems(BirthdaysOverviewController.this.getMainController().getSessionInfos().getRecentBirthdays());
 			BirthdaysOverviewController.this.nextBdaysList.refresh();
-			BirthdaysOverviewController.this.nextBirthday_Label.setText(BirthdaysOverviewController.this.getMainController().getSessionInfos().getLangResourceManager().getLocaleString(LangResourceKeys.str_recentBirthday_Label));
+			BirthdaysOverviewController.this.nextBirthday_Label.setText(new LangResourceManager().getLocaleString(LangResourceKeys.str_recentBirthday_Label));
 		}
 	};
 
@@ -212,17 +210,7 @@ public class BirthdaysOverviewController extends Controller{
 		public void handle(final ActionEvent event){
 			BirthdaysOverviewController.this.nextBdaysList.setItems(BirthdaysOverviewController.this.getMainController().getSessionInfos().getNextBirthdays());
 			BirthdaysOverviewController.this.nextBdaysList.refresh();
-			BirthdaysOverviewController.this.nextBirthday_Label.setText(BirthdaysOverviewController.this.getMainController().getSessionInfos().getLangResourceManager().getLocaleString(LangResourceKeys.str_nextBirthday_Label));
-		}
-	};
-
-	private final EventHandler<ActionEvent> changeLanguageHandler = new EventHandler<ActionEvent>(){
-		// TODO this is shit
-		@Override
-		public void handle(final ActionEvent event){
-			BirthdaysOverviewController.this.getMainController().getSessionInfos().setAppLocale(Locale.getDefault());
-			BirthdaysOverviewController.this.getMainController().getSessionInfos().getLangResourceManager().changeLocale(new Locale("en", "GB"));
-			BirthdaysOverviewController.this.updateLocalisation();
+			BirthdaysOverviewController.this.nextBirthday_Label.setText(new LangResourceManager().getLocaleString(LangResourceKeys.str_nextBirthday_Label));
 		}
 	};
 
@@ -306,6 +294,8 @@ public class BirthdaysOverviewController extends Controller{
 		// Menu items
 		// File
 		this.openFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromFileChooserHandler);
+		this.openFile_MenuItem.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN));
+
 		this.createRecentFilesMenueItems();
 
 		this.closeFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().closeFileHandler);
@@ -318,11 +308,10 @@ public class BirthdaysOverviewController extends Controller{
 
 		this.openBirthday_MenuItem.addEventHandler(ActionEvent.ANY, this.openBirthday);
 		this.newBirthday_MenuItem.addEventHandler(ActionEvent.ANY, this.newBirthdayHandler);
+		this.newBirthday_MenuItem.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
 
 		this.showNextBirthdays_MenuItem.addEventHandler(ActionEvent.ANY, this.showNextBirthdaysHandler);
 		this.showLastBirthdays_MenuItem.addEventHandler(ActionEvent.ANY, this.showRecentBirthdaysHandler);
-
-		this.changeLanguage_MenuItem.addEventHandler(ActionEvent.ANY, this.changeLanguageHandler);
 
 		// configure the List
 		this.nextBdaysList.setItems(this.getMainController().getSessionInfos().getNextBirthdays());
@@ -371,7 +360,7 @@ public class BirthdaysOverviewController extends Controller{
 	 */
 	@Override
 	public void updateLocalisation(){
-		final LangResourceManager resourceManager = this.getMainController().getSessionInfos().getLangResourceManager();
+		final LangResourceManager resourceManager = new LangResourceManager();
 
 		this.nextBirthday_Label.setText(resourceManager.getLocaleString(LangResourceKeys.str_nextBirthday_Label));
 

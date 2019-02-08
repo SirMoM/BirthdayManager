@@ -5,7 +5,6 @@ package application.controller;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Locale;
 import java.util.ResourceBundle;
 
 import org.apache.logging.log4j.Level;
@@ -90,9 +89,6 @@ public class EditBirthdayViewController extends Controller{
 
 	@FXML
 	private MenuItem refresh_MenuItem;
-
-	@FXML
-	private MenuItem changeLanguage_MenuItem;
 
 	@FXML
 	private Button cancel_Button;
@@ -181,16 +177,6 @@ public class EditBirthdayViewController extends Controller{
 
 	};
 
-	private final EventHandler<ActionEvent> changeLanguageHandler = new EventHandler<ActionEvent>(){
-		// TODO this is shit
-		@Override
-		public void handle(final ActionEvent event){
-			EditBirthdayViewController.this.getMainController().getSessionInfos().setAppLocale(Locale.getDefault());
-			EditBirthdayViewController.this.getMainController().getSessionInfos().getLangResourceManager().changeLocale(new Locale("de", "DE"));
-			EditBirthdayViewController.this.updateLocalisation();
-		}
-	};
-
 	private final EventHandler<ActionEvent> exitHandler = new EventHandler<ActionEvent>(){
 
 		@Override
@@ -239,7 +225,6 @@ public class EditBirthdayViewController extends Controller{
 		assert this.help_menu != null : "fx:id=\"help_menu\" was not injected: check your FXML file 'EditBirthdayView.fxml'.";
 		assert this.debug != null : "fx:id=\"debug\" was not injected: check your FXML file 'EditBirthdayView.fxml'.";
 		assert this.refresh_MenuItem != null : "fx:id=\"refresh_MenuItem\" was not injected: check your FXML file 'EditBirthdayView.fxml'.";
-		assert this.changeLanguage_MenuItem != null : "fx:id=\"changeLanguage_MenuItem\" was not injected: check your FXML file 'EditBirthdayView.fxml'.";
 		assert this.cancel_Button != null : "fx:id=\"cancel_Button\" was not injected: check your FXML file 'EditBirthdayView.fxml'.";
 		assert this.delete_Button != null : "fx:id=\"delete_Button\" was not injected: check your FXML file 'EditBirthdayView.fxml'.";
 		assert this.save_Button != null : "fx:id=\"save_Button\" was not injected: check your FXML file 'EditBirthdayView.fxml'.";
@@ -312,7 +297,7 @@ public class EditBirthdayViewController extends Controller{
 	 */
 	@Override
 	public void updateLocalisation(){
-		final LangResourceManager resourceManager = this.getMainController().getSessionInfos().getLangResourceManager();
+		final LangResourceManager resourceManager = new LangResourceManager();
 
 		this.file_menu.setText(resourceManager.getLocaleString(LangResourceKeys.file_menu));
 		this.openFile_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.openFile_MenuItem));
@@ -337,7 +322,6 @@ public class EditBirthdayViewController extends Controller{
 		this.birthday_Label.setText(resourceManager.getLocaleString(LangResourceKeys.birthday_Label));
 
 		this.openFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromFileChooserHandler);
-		this.changeLanguage_MenuItem.addEventHandler(ActionEvent.ANY, this.changeLanguageHandler);
 		String property = null;
 		property = this.getMainController().getSessionInfos().getPropertiesHandler().getPropertie(PropertieFields.LAST_OPEND);
 		this.recentFiles_MenuItem = new MenuItem(new File(property).getName());

@@ -47,7 +47,6 @@
           <items>
             <MenuItem fx:id="debug" mnemonicParsing="false" text="Debug" />
                   <MenuItem fx:id="refresh_MenuItem" mnemonicParsing="false" text="Refresh" />
-                  <MenuItem fx:id="changeLanguage_MenuItem" mnemonicParsing="false" text="Change Language" />
           </items>
         </Menu>
       </menus>

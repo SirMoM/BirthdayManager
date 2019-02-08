@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Level;
 
 import application.util.PropertieFields;
 import application.util.localisation.LangResourceKeys;
+import application.util.localisation.LangResourceManager;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -29,6 +30,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
@@ -64,13 +66,22 @@ public class PreferencesViewController extends Controller{
 	private CheckBox writeThru_CheckBox;
 
 	@FXML
+	private Tooltip writeThru_Tooltip;
+
+	@FXML
 	private CheckBox autoSave_CheckBox;
+
+	@FXML
+	private Tooltip autsave_Tooltipp;
 
 	@FXML
 	private Label miscellaneous_label;
 
 	@FXML
 	private CheckBox openFileOnStart_Checkbox;
+
+	@FXML
+	private Tooltip openFileOnStartUp_ToolTipp;
 
 	@FXML
 	private TextField startupFile_textField;
@@ -83,7 +94,6 @@ public class PreferencesViewController extends Controller{
 
 	@FXML
 	private Button save_button;
-
 	ChangeListener<Boolean> openFileOnStartCheckboxChangeListener = new ChangeListener<Boolean>(){
 
 		@Override
@@ -106,12 +116,12 @@ public class PreferencesViewController extends Controller{
 
 			try{
 				PreferencesViewController.this.getMainController().getSessionInfos().getPropertiesHandler().storeProperties("Saved properies" + LocalDateTime.now().toString());
-			} catch (final FileNotFoundException e){
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (final IOException e){
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				PreferencesViewController.this.updateLocalisation();
+				PreferencesViewController.this.getMainController().settingsChanged();
+			} catch (final FileNotFoundException fileNotFoundException){
+				PreferencesViewController.this.LOG.catching(fileNotFoundException);
+			} catch (final IOException ioException){
+				PreferencesViewController.this.LOG.catching(ioException);
 			}
 		}
 	};
@@ -131,7 +141,7 @@ public class PreferencesViewController extends Controller{
 		@Override
 		public void handle(final ActionEvent event){
 			final FileChooser fileChooser = new FileChooser();
-			fileChooser.setTitle(PreferencesViewController.this.getMainController().getSessionInfos().getLangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
+			fileChooser.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
 
 			try{
 				fileChooser.setInitialDirectory(new File(PreferencesViewController.this.getMainController().getSessionInfos().getPropertiesHandler().getPropertie(PropertieFields.LAST_OPEND).toString()).getParentFile());
@@ -278,7 +288,20 @@ public class PreferencesViewController extends Controller{
 	 */
 	@Override
 	public void updateLocalisation(){
-		// TODO updateLocalisation()
+		final LangResourceManager resourceManager = new LangResourceManager();
 
+		this.languageOptions_label.setText(resourceManager.getLocaleString(LangResourceKeys.languageOptions_label));
+		this.chooseLanguage_label.setText(resourceManager.getLocaleString(LangResourceKeys.chooseLanguage_label));
+		this.autoSave_CheckBox.setText(resourceManager.getLocaleString(LangResourceKeys.autoSave_CheckBox));
+		this.saveOptions_label.setText(resourceManager.getLocaleString(LangResourceKeys.saveOptions_label));
+		this.writeThru_CheckBox.setText(resourceManager.getLocaleString(LangResourceKeys.writeThru_CheckBox));
+		this.miscellaneous_label.setText(resourceManager.getLocaleString(LangResourceKeys.miscellaneous_label));
+		this.openFileOnStart_Checkbox.setText(resourceManager.getLocaleString(LangResourceKeys.openFileOnStart_Checkbox));
+		this.chooseFile_button.setText(resourceManager.getLocaleString(LangResourceKeys.chooseFile_button));
+		this.cancel_button.setText(resourceManager.getLocaleString(LangResourceKeys.cancel_button));
+
+		this.autsave_Tooltipp.setText(resourceManager.getLocaleString(LangResourceKeys.autsave_Tooltipp));
+		this.writeThru_Tooltip.setText(resourceManager.getLocaleString(LangResourceKeys.writeThru_Tooltip));
+		this.openFileOnStartUp_ToolTipp.setText(resourceManager.getLocaleString(LangResourceKeys.openFileOnStartUp_ToolTipp));
 	}
 }
