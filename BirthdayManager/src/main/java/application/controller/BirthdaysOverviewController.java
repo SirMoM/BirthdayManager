@@ -11,11 +11,9 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 import application.model.Person;
-import application.processes.UpdateAllSubBirthdayListsTask;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
 import javafx.collections.ObservableList;
-import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -198,25 +196,6 @@ public class BirthdaysOverviewController extends Controller{
 		}
 	};
 
-	final EventHandler<ActionEvent> updateListsHandler = new EventHandler<ActionEvent>(){
-		@Override
-		public void handle(final ActionEvent event){
-			final UpdateAllSubBirthdayListsTask updateAllSubBirthdayLists = new UpdateAllSubBirthdayListsTask(BirthdaysOverviewController.this.getMainController().getSessionInfos());
-			updateAllSubBirthdayLists.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>(){
-				@Override
-				public void handle(final WorkerStateEvent t){
-					final Boolean result = updateAllSubBirthdayLists.getValue();
-					if(result){
-						BirthdaysOverviewController.this.LOG.info("Updating all birthday lists succsessfull");
-					} else{
-						BirthdaysOverviewController.this.LOG.warn("Updating all birthday lists unsucsessfull");
-					}
-				}
-			});
-			new Thread(updateAllSubBirthdayLists).start();
-		}
-	};
-
 	final EventHandler<ActionEvent> showRecentBirthdaysHandler = new EventHandler<ActionEvent>(){
 
 		@Override
@@ -342,9 +321,6 @@ public class BirthdaysOverviewController extends Controller{
 
 		this.showNextBirthdays_MenuItem.addEventHandler(ActionEvent.ANY, this.showNextBirthdaysHandler);
 		this.showLastBirthdays_MenuItem.addEventHandler(ActionEvent.ANY, this.showRecentBirthdaysHandler);
-
-		this.debug.addEventHandler(ActionEvent.ACTION, this.updateListsHandler);
-		this.refresh_MenuItem.addEventHandler(ActionEvent.ANY, this.updateListsHandler);
 
 		this.changeLanguage_MenuItem.addEventHandler(ActionEvent.ANY, this.changeLanguageHandler);
 

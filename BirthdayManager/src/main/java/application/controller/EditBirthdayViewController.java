@@ -14,7 +14,6 @@ import org.apache.logging.log4j.Logger;
 
 import application.model.Person;
 import application.model.PersonManager;
-import application.processes.UpdateAllSubBirthdayListsTask;
 import application.util.PropertieFields;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
@@ -175,7 +174,6 @@ public class EditBirthdayViewController extends Controller{
 			if(anyChangeAtAll){
 				final Person updatedPerson = new Person(surnameFromTextfield, nameFromTextField, middleNameFromTextField, EditBirthdayViewController.this.birthday_DatePicker.getValue());
 				PersonManager.getInstance().updatePerson(EditBirthdayViewController.this.personToEdit, updatedPerson);
-				new Thread(new UpdateAllSubBirthdayListsTask(EditBirthdayViewController.this.getMainController().getSessionInfos())).start();
 				EditBirthdayViewController.this.getMainController().goToBirthdaysOverview();
 			}
 
@@ -197,7 +195,7 @@ public class EditBirthdayViewController extends Controller{
 
 		@Override
 		public void handle(final ActionEvent event){
-			EditBirthdayViewController.this.getMainController().goToBirthdaysOverview(new BirthdaysOverviewController(EditBirthdayViewController.this.getMainController()));
+			EditBirthdayViewController.this.getMainController().goToBirthdaysOverview();
 		}
 	};
 
@@ -205,8 +203,9 @@ public class EditBirthdayViewController extends Controller{
 		@Override
 		public void handle(final ActionEvent event){
 			PersonManager.getInstance().deletePerson(EditBirthdayViewController.this.personToEdit);
-			new Thread(new UpdateAllSubBirthdayListsTask(EditBirthdayViewController.this.getMainController().getSessionInfos())).start();
+			EditBirthdayViewController.this.getMainController().getSessionInfos().updateSubLists();
 			EditBirthdayViewController.this.getMainController().goToBirthdaysOverview();
+
 		}
 	};
 

@@ -11,7 +11,6 @@ import java.util.ResourceBundle;
 
 import application.model.Person;
 import application.model.PersonManager;
-import application.processes.UpdateAllSubBirthdayListsTask;
 import application.util.PropertieFields;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
@@ -162,9 +161,9 @@ public class NewBirthdayViewController extends Controller{
 			}
 
 			PersonManager.getInstance().addNewPerson(NewBirthdayViewController.this.newPerson);
-
-			new Thread(new UpdateAllSubBirthdayListsTask(NewBirthdayViewController.this.getMainController().getSessionInfos())).start();
 			NewBirthdayViewController.this.getMainController().goToBirthdaysOverview();
+
+			NewBirthdayViewController.this.getMainController().getSessionInfos().updateSubLists();
 		}
 	};
 
@@ -182,7 +181,7 @@ public class NewBirthdayViewController extends Controller{
 
 		@Override
 		public void handle(final ActionEvent event){
-			NewBirthdayViewController.this.getMainController().goToBirthdaysOverview(new BirthdaysOverviewController(NewBirthdayViewController.this.getMainController()));
+			NewBirthdayViewController.this.getMainController().goToBirthdaysOverview();
 		}
 	};
 
