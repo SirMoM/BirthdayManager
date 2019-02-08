@@ -236,6 +236,18 @@ public class SessionInfos{
 		}
 	}
 
+	/**
+	 * Resets and updates all sublists
+	 * <p>
+	 *
+	 * <b>Sublists</b>
+	 * <ul>
+	 * <li>{@link #updateNextBirthdays}
+	 * <li>{@link #recentBirthdays}
+	 * <li>{@link #birthdaysThisWeek}
+	 * <li>{@link #birthdaysThisMonat}
+	 * </ul>
+	 */
 	public void updateSubLists(){
 		this.resetSubLists();
 		try{
