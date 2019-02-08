@@ -16,7 +16,6 @@ import org.apache.logging.log4j.Logger;
 import application.util.BirthdayComparator;
 import application.util.PropertieFields;
 import application.util.PropertieManager;
-import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -183,17 +182,13 @@ public class SessionInfos{
 				break;
 			} else{
 				// Avoid throwing IllegalStateException by running from a non-JavaFX thread.
-				Platform.runLater(() -> {
-					this.getNextBirthdays().add(tempPerson);
-				});
+				this.getNextBirthdays().add(tempPerson);
 			}
 		}
 		for(; i < NEXT_BIRTHDAYS_COUNT; i++){
 			final Person tempPerson = temp.get(birthdaysSize - i);
 			// Avoid throwing IllegalStateException by running from a non-JavaFX thread.
-			Platform.runLater(() -> {
-				this.getNextBirthdays().add(tempPerson);
-			});
+			this.getNextBirthdays().add(tempPerson);
 		}
 
 	}
@@ -207,16 +202,14 @@ public class SessionInfos{
 		final int NEXT_BIRTHDAYS_COUNT = Integer.parseInt(this.getPropertiesHandler().getPropertie(PropertieFields.SHOW_BIRTHDAYS_COUNT));
 		final List<Person> temp = PersonManager.getInstance().getPersonDB();
 		temp.sort(new BirthdayComparator(true));
-		int i = 0;
 
-		for(; i > NEXT_BIRTHDAYS_COUNT; i++){
-			final Person tempPerson = temp.get(i);
-			if(tempPerson.getBirthday().getDayOfYear() < LocalDate.now().getDayOfYear()){
-				this.getRecentBirthdays().add(tempPerson);
-			} else{
-				LOG.warn(tempPerson.toExtendedString() + "not added to recent! ");
-			}
+		for(int i = 1; i < NEXT_BIRTHDAYS_COUNT + 1; i++){
+			final Person tempPerson = temp.get(temp.size() - i);
+			this.getRecentBirthdays().add(tempPerson);
+			LOG.info(tempPerson);
+			LOG.warn(tempPerson.toExtendedString() + "not added to recent! ");
 		}
+		System.out.println("SessionInfos.updateRecentBirthdays()");
 	}
 
 	/**

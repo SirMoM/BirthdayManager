@@ -7,7 +7,7 @@ import application.model.Person;
 
 public class BirthdayComparator implements Comparator<Person>{
 	private final boolean compareToToday;
-	private final LocalDate today = LocalDate.now();
+	private final LocalDate today = LocalDate.of(2019, 1, 6);
 
 	/**
 	 * @param compareToToday compare the birthday to today
@@ -18,7 +18,7 @@ public class BirthdayComparator implements Comparator<Person>{
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 	 */
 	@Override
