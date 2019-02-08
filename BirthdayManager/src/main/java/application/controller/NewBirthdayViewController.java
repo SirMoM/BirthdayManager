@@ -5,12 +5,9 @@ package application.controller;
 
 import java.io.File;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.Locale;
 import java.util.ResourceBundle;
-
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import application.model.Person;
 import application.model.PersonManager;
@@ -34,10 +31,9 @@ import javafx.scene.text.Font;
  * @author Noah Ruben
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
-public class EditBirthdayViewController extends Controller{
-	final static Logger LOG = LogManager.getLogger();
+public class NewBirthdayViewController extends Controller{
 
-	final private Person personToEdit;
+	final private Person newPerson;
 
 	private MenuItem recentFiles_MenuItem;
 
@@ -147,49 +143,38 @@ public class EditBirthdayViewController extends Controller{
 
 		@Override
 		public void handle(final ActionEvent actionEvent){
-			boolean anyChangeAtAll = false;
-			final String nameFromTextField = EditBirthdayViewController.this.name_TextField.getText();
-			final String middleNameFromTextField = EditBirthdayViewController.this.middleName_TextField.getText();
-			final String surnameFromTextfield = EditBirthdayViewController.this.surname_TextField.getText();
+			final String nameFromTextField = NewBirthdayViewController.this.name_TextField.getText();
+			final String middleNameFromTextField = NewBirthdayViewController.this.middleName_TextField.getText();
+			final String surnameFromTextfield = NewBirthdayViewController.this.surname_TextField.getText();
+			final LocalDate birthdayFromDatePicker = NewBirthdayViewController.this.birthday_DatePicker.getValue();
 
-			try{
-				if(!nameFromTextField.matches(EditBirthdayViewController.this.personToEdit.getName())){
-					anyChangeAtAll = !anyChangeAtAll;
-				}
-				if(!middleNameFromTextField.matches(EditBirthdayViewController.this.personToEdit.getMisc())){
-					anyChangeAtAll = !anyChangeAtAll;
-				}
-				if(!surnameFromTextfield.matches(EditBirthdayViewController.this.personToEdit.getSurname())){
-					anyChangeAtAll = !anyChangeAtAll;
-				}
-				if(!(EditBirthdayViewController.this.birthday_DatePicker.getValue() == EditBirthdayViewController.this.personToEdit.getBirthday())){
-					anyChangeAtAll = !anyChangeAtAll;
-				}
-			} catch (final NullPointerException exception){
-				LOG.catching(Level.INFO, exception);
-				if(EditBirthdayViewController.this.personToEdit != null){
-					LOG.info(EditBirthdayViewController.this.personToEdit.toExtendedString());
-				}
-				anyChangeAtAll = true;
+			if(nameFromTextField != null){
+				NewBirthdayViewController.this.newPerson.setName(nameFromTextField);
 			}
-			if(anyChangeAtAll){
-				final Person updatedPerson = new Person(surnameFromTextfield, nameFromTextField, middleNameFromTextField, EditBirthdayViewController.this.birthday_DatePicker.getValue());
-				PersonManager.getInstance().updatePerson(EditBirthdayViewController.this.personToEdit, updatedPerson);
-				new Thread(new UpdateAllSubBirthdayListsTask(EditBirthdayViewController.this.getMainController().getSessionInfos())).start();
-				EditBirthdayViewController.this.getMainController().goToBirthdaysOverview();
+			if(middleNameFromTextField != null){
+				NewBirthdayViewController.this.newPerson.setMisc(middleNameFromTextField);
+			}
+			if(surnameFromTextfield != null){
+				NewBirthdayViewController.this.newPerson.setSurname(surnameFromTextfield);
+			}
+			if(birthdayFromDatePicker != null){
+				NewBirthdayViewController.this.newPerson.setBirthday(birthdayFromDatePicker);
 			}
 
+			PersonManager.getInstance().addNewPerson(NewBirthdayViewController.this.newPerson);
+
+			new Thread(new UpdateAllSubBirthdayListsTask(NewBirthdayViewController.this.getMainController().getSessionInfos())).start();
+			NewBirthdayViewController.this.getMainController().goToBirthdaysOverview();
 		}
-
 	};
 
 	private final EventHandler<ActionEvent> changeLanguageHandler = new EventHandler<ActionEvent>(){
 		// TODO this is shit
 		@Override
 		public void handle(final ActionEvent event){
-			EditBirthdayViewController.this.getMainController().getSessionInfos().setAppLocale(Locale.getDefault());
-			EditBirthdayViewController.this.getMainController().getSessionInfos().getLangResourceManager().changeLocale(new Locale("de", "DE"));
-			EditBirthdayViewController.this.updateLocalisation();
+			NewBirthdayViewController.this.getMainController().getSessionInfos().setAppLocale(Locale.getDefault());
+			NewBirthdayViewController.this.getMainController().getSessionInfos().getLangResourceManager().changeLocale(new Locale("de", "DE"));
+			NewBirthdayViewController.this.updateLocalisation();
 		}
 	};
 
@@ -197,16 +182,7 @@ public class EditBirthdayViewController extends Controller{
 
 		@Override
 		public void handle(final ActionEvent event){
-			EditBirthdayViewController.this.getMainController().goToBirthdaysOverview(new BirthdaysOverviewController(EditBirthdayViewController.this.getMainController()));
-		}
-	};
-
-	private final EventHandler<ActionEvent> deletePersonHandler = new EventHandler<ActionEvent>(){
-		@Override
-		public void handle(final ActionEvent event){
-			PersonManager.getInstance().deletePerson(EditBirthdayViewController.this.personToEdit);
-			new Thread(new UpdateAllSubBirthdayListsTask(EditBirthdayViewController.this.getMainController().getSessionInfos())).start();
-			EditBirthdayViewController.this.getMainController().goToBirthdaysOverview();
+			NewBirthdayViewController.this.getMainController().goToBirthdaysOverview(new BirthdaysOverviewController(NewBirthdayViewController.this.getMainController()));
 		}
 	};
 
@@ -215,9 +191,9 @@ public class EditBirthdayViewController extends Controller{
 	 *
 	 * @see application.controller.Controller#Controller(MainController)
 	 */
-	public EditBirthdayViewController(final MainController mainController, final Person person){
+	public NewBirthdayViewController(final MainController mainController){
 		super(mainController);
-		this.personToEdit = person;
+		this.newPerson = new Person();
 	}
 
 	/**
@@ -265,16 +241,9 @@ public class EditBirthdayViewController extends Controller{
 	private void bindComponents(){
 		this.cancel_Button.addEventHandler(ActionEvent.ANY, this.exitHandler);
 		this.save_Button.addEventHandler(ActionEvent.ANY, this.savePersonHandler);
-		this.delete_Button.addEventHandler(ActionEvent.ANY, this.deletePersonHandler);
+		this.delete_Button.setVisible(false);
 
 		this.quit_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().closeAppHandler);
-	}
-
-	/**
-	 * @return the personToEdit
-	 */
-	public Person getPersonToEdit(){
-		return this.personToEdit;
 	}
 
 	/*
@@ -288,22 +257,6 @@ public class EditBirthdayViewController extends Controller{
 		this.assertions();
 		this.updateLocalisation();
 		this.bindComponents();
-		this.loadPerson();
-	}
-
-	/**
-	 * Loads the person data in the view.
-	 */
-	private void loadPerson(){
-		this.name_TextField.setText(this.personToEdit.getName());
-		this.surname_TextField.setText(this.personToEdit.getSurname());
-		this.middleName_TextField.setText(this.personToEdit.getMisc());
-		try{
-			this.birthday_DatePicker.setValue(this.personToEdit.getBirthday());
-		} catch (final NullPointerException nullPointerException){
-			LOG.catching(Level.DEBUG, nullPointerException);
-			LOG.debug("New Person creating ? IF not we have a problem!");
-		}
 	}
 
 	/*
@@ -345,5 +298,4 @@ public class EditBirthdayViewController extends Controller{
 		this.recentFiles_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromRecentHandler);
 		this.openRecent_MenuItem.getItems().add(this.recentFiles_MenuItem);
 	}
-
 }

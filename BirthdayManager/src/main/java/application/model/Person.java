@@ -126,7 +126,7 @@ public class Person{
 
 	private StringProperty misc;
 
-	private ObjectProperty<LocalDate> birthday;
+	private final ObjectProperty<LocalDate> birthday;
 
 	/**
 	 * Create an empty person
@@ -135,6 +135,7 @@ public class Person{
 		this.surname = new SimpleStringProperty();
 		this.name = new SimpleStringProperty();
 		this.misc = new SimpleStringProperty();
+		this.birthday = new SimpleObjectProperty<LocalDate>();
 	}
 
 	/**

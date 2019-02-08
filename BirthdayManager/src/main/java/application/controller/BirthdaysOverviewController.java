@@ -191,6 +191,12 @@ public class BirthdaysOverviewController extends Controller{
 			}
 		}
 	};
+	final EventHandler<ActionEvent> newBirthdayHandler = new EventHandler<ActionEvent>(){
+		@Override
+		public void handle(final ActionEvent arg0){
+			BirthdaysOverviewController.this.getMainController().goToEditBirthdayView();
+		}
+	};
 
 	final EventHandler<ActionEvent> updateListsHandler = new EventHandler<ActionEvent>(){
 		@Override
@@ -201,9 +207,9 @@ public class BirthdaysOverviewController extends Controller{
 				public void handle(final WorkerStateEvent t){
 					final Boolean result = updateAllSubBirthdayLists.getValue();
 					if(result){
-						LOG.info("Updating all birthday lists succsessfull");
+						BirthdaysOverviewController.this.LOG.info("Updating all birthday lists succsessfull");
 					} else{
-						LOG.warn("Updating all birthday lists unsucsessfull");
+						BirthdaysOverviewController.this.LOG.warn("Updating all birthday lists unsucsessfull");
 					}
 				}
 			});
@@ -332,6 +338,7 @@ public class BirthdaysOverviewController extends Controller{
 		this.quit_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().closeAppHandler);
 
 		this.openBirthday_MenuItem.addEventHandler(ActionEvent.ANY, this.openBirthday);
+		this.newBirthday_MenuItem.addEventHandler(ActionEvent.ANY, this.newBirthdayHandler);
 
 		this.showNextBirthdays_MenuItem.addEventHandler(ActionEvent.ANY, this.showNextBirthdaysHandler);
 		this.showLastBirthdays_MenuItem.addEventHandler(ActionEvent.ANY, this.showRecentBirthdaysHandler);
