@@ -30,6 +30,7 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
@@ -111,6 +112,9 @@ public class BirthdaysOverviewController extends Controller{
 
 	@FXML
 	private MenuItem openBirthday_MenuItem;
+
+	@FXML
+	private AnchorPane deleteButtons_Pane;
 
 	@FXML
 	private Tab week_tap;
@@ -258,10 +262,12 @@ public class BirthdaysOverviewController extends Controller{
 		assert this.help_menu != null : "fx:id=\"help_menu\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
 		assert this.debug != null : "fx:id=\"debug\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
 		assert this.refresh_MenuItem != null : "fx:id=\"refresh_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert this.nextBirthday_Label != null : "fx:id=\"nextBirthdayLabel\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.nextBirthday_Label != null : "fx:id=\"nextBirthday_Label\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
 		assert this.nextBdaysList != null : "fx:id=\"nextBdaysList\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
 		assert this.openBirthday_MenuItem != null : "fx:id=\"openBirthday_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.deleteButtons_Pane != null : "fx:id=\"deleteButtons_Pane\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
 		assert this.week_tap != null : "fx:id=\"week_tap\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.week_tableView != null : "fx:id=\"week_tableView\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
 		assert this.monday_column1 != null : "fx:id=\"monday_column1\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
 		assert this.tuesday_column1 != null : "fx:id=\"tuesday_column1\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
 		assert this.wednesday_column1 != null : "fx:id=\"wednesday_column1\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
@@ -314,6 +320,11 @@ public class BirthdaysOverviewController extends Controller{
 		this.nextBdaysList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 		this.nextBdaysList.addEventHandler(MouseEvent.MOUSE_CLICKED, this.birthdayDoubleClickHandler);
 		this.nextBdaysList.addEventHandler(KeyEvent.KEY_PRESSED, this.birthdayDoubleClickHandler);
+
+		this.deleteButtons_Pane.setDisable(true);
+//		this.deleteButtons_Pane.setVisible(false);
+//
+//		this.nextBdaysList.resize(this.nextBdaysList.getWidth(), 800);
 
 		// set Texts
 		this.date_label.setText(DATE_FORMATTER.format(LocalDate.now()));
