@@ -27,6 +27,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.MenuItem;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -52,6 +55,24 @@ public class MainController{
 	final EventHandler<ActionEvent> closeAppHandler = new EventHandler<ActionEvent>(){
 		@Override
 		public void handle(final ActionEvent event){
+			if(new Boolean(MainController.this.sessionInfos.getPropertiesHandler().getPropertie(PropertieFields.AUTOSAVE))){
+				new Thread(new SaveBirthdaysToFileTask()).start();
+			} else{
+				final Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+				// TODO Localistion
+				alert.setTitle("EXIT");
+				alert.setContentText("Save changes?");
+				final ButtonType okButton = new ButtonType("Yes", ButtonBar.ButtonData.YES);
+				final ButtonType noButton = new ButtonType("No", ButtonBar.ButtonData.NO);
+				alert.getButtonTypes().setAll(okButton, noButton);
+				alert.showAndWait().ifPresent(type -> {
+					if(type == ButtonType.OK){
+						new Thread(new SaveBirthdaysToFileTask()).start();
+					} else{
+						return;
+					}
+				});
+			}
 			Platform.exit();
 		}
 

@@ -9,6 +9,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
+import application.util.localisation.LangResourceKeys;
+import application.util.localisation.LangResourceManager;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -299,7 +301,7 @@ public class Person{
 		if(this.birthday.get() != null){
 			builder.append("\n");
 			builder.append(DATE_FORMATTER.format(this.birthday.get()));
-			builder.append("\t \t \t Alter: \t" + (LocalDate.now().getYear() - this.birthday.getValue().getYear()));
+			builder.append("\t \t \t " + (new LangResourceManager().getLocaleString(LangResourceKeys.age)) + ":\t" + (LocalDate.now().getYear() - this.birthday.getValue().getYear()));
 		}
 		return builder.toString();
 	}
