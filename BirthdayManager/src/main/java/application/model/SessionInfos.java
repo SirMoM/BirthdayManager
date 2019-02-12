@@ -6,6 +6,8 @@ package application.model;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.temporal.IsoFields;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -173,24 +175,38 @@ public class SessionInfos{
 	private void updateNextBirthdays(){
 		final int NEXT_BIRTHDAYS_COUNT = Integer.parseInt(this.getPropertiesHandler().getPropertie(PropertieFields.SHOW_BIRTHDAYS_COUNT));
 		final List<Person> temp = PersonManager.getInstance().getPersonDB();
-		temp.sort(new BirthdayComparator(true));
-		final int birthdaysSize = temp.size() - 1;
+		final List<Person> upcomming = new ArrayList<Person>();
+		final List<Person> after = new ArrayList<Person>();
+		
+		for (Person person : temp) {
+			if (person.getBirthday().getDayOfYear() >= LocalDate.now().getDayOfYear() ) {
+				upcomming.add(person);
+			}else {
+				after.add(person);
+			}
+			
+		}
+		
+		upcomming.sort(new BirthdayComparator(false));
+		after.sort(new BirthdayComparator(false));
 		int i = 0;
 		for(; i < NEXT_BIRTHDAYS_COUNT; i++){
-			final Person tempPerson = temp.get(i);
-			if(tempPerson.getBirthday().getDayOfYear() < LocalDate.now().getDayOfYear()){
+			try {
+				this.getNextBirthdays().add(upcomming.get(i));
+			} catch (IndexOutOfBoundsException indexOutOfBoundsException) {
+				LOG.debug("Probably not enought Persons to geather the 10 birthdays for next", indexOutOfBoundsException);
 				break;
-			} else{
-				// Avoid throwing IllegalStateException by running from a non-JavaFX thread.
-				this.getNextBirthdays().add(tempPerson);
 			}
 		}
-		for(; i < NEXT_BIRTHDAYS_COUNT; i++){
-			final Person tempPerson = temp.get(birthdaysSize - i);
-			// Avoid throwing IllegalStateException by running from a non-JavaFX thread.
-			this.getNextBirthdays().add(tempPerson);
+		int j = 0;
+		for(; j < NEXT_BIRTHDAYS_COUNT - i; j++){
+			try {
+				this.getNextBirthdays().add(after.get(j));
+			} catch (IndexOutOfBoundsException indexOutOfBoundsException) {
+				LOG.debug("Probably not enought Persons to geather the 10 birthdays for next", indexOutOfBoundsException);
+				break;
+			}
 		}
-
 	}
 
 	/**
@@ -201,15 +217,39 @@ public class SessionInfos{
 	private void updateRecentBirthdays(){
 		final int NEXT_BIRTHDAYS_COUNT = Integer.parseInt(this.getPropertiesHandler().getPropertie(PropertieFields.SHOW_BIRTHDAYS_COUNT));
 		final List<Person> temp = PersonManager.getInstance().getPersonDB();
-		temp.sort(new BirthdayComparator(true));
-
-		for(int i = 1; i < NEXT_BIRTHDAYS_COUNT + 1; i++){
-			final Person tempPerson = temp.get(temp.size() - i);
-			this.getRecentBirthdays().add(tempPerson);
-			LOG.info(tempPerson);
-			LOG.warn(tempPerson.toExtendedString() + "not added to recent! ");
+		final List<Person> upcomming = new ArrayList<Person>();
+		final List<Person> after = new ArrayList<Person>();
+		
+		for (Person person : temp) {
+//			if (person.getBirthday().getDayOfYear() >= LocalDate.now().getDayOfYear() ) {
+			if (person.getBirthday().getDayOfYear() >= LocalDate.now().getDayOfYear() ) {
+				upcomming.add(person);
+			}else {
+				after.add(person);
+			}
+			
 		}
-		System.out.println("SessionInfos.updateRecentBirthdays()");
+		
+		upcomming.sort(new BirthdayComparator(false));
+		after.sort(new BirthdayComparator(false));
+		int i = 0;
+		for(; i < NEXT_BIRTHDAYS_COUNT; i++){
+			try {
+				this.getRecentBirthdays().add(after.get((after.size() -1) - i ));
+			} catch (IndexOutOfBoundsException indexOutOfBoundsException) {
+				LOG.debug("Probably not enought Persons to geather the 10 birthdays for recent", indexOutOfBoundsException);
+				break;
+			}
+		}
+		int j = 0;
+		for(; j < NEXT_BIRTHDAYS_COUNT - i; j++){
+			try {
+				this.getRecentBirthdays().add(after.get((upcomming.size() -1) - j ));
+			} catch (IndexOutOfBoundsException indexOutOfBoundsException) {
+				LOG.debug("Probably not enought Persons to geather the 10 birthdays for recent", indexOutOfBoundsException);
+				break;
+			}
+		}
 	}
 
 	/**
