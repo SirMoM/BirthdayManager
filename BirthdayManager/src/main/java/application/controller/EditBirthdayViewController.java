@@ -16,6 +16,8 @@ import application.model.PersonManager;
 import application.util.PropertieFields;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -36,6 +38,8 @@ public class EditBirthdayViewController extends Controller{
 	final static Logger LOG = LogManager.getLogger();
 
 	final private Person personToEdit;
+
+	boolean hasChange = true;
 
 	private MenuItem recentFiles_MenuItem;
 
@@ -169,10 +173,10 @@ public class EditBirthdayViewController extends Controller{
 			}
 			if(anyChangeAtAll){
 				final Person updatedPerson = new Person(surnameFromTextfield, nameFromTextField, middleNameFromTextField, EditBirthdayViewController.this.birthday_DatePicker.getValue());
-				PersonManager.getInstance().updatePerson(EditBirthdayViewController.this.personToEdit, updatedPerson);
+				PersonManager.getInstance().updatePerson(EditBirthdayViewController.this.indexPerson, updatedPerson);
 				EditBirthdayViewController.this.getMainController().goToBirthdaysOverview();
 			}
-
+			LOG.debug(EditBirthdayViewController.this.hasChange);
 		}
 
 	};
@@ -195,14 +199,17 @@ public class EditBirthdayViewController extends Controller{
 		}
 	};
 
+	private int indexPerson = -1;
+
 	/**
-	 * @param person the person to edit
+	 * @param indexPerson the index of Person to edit
 	 *
 	 * @see application.controller.Controller#Controller(MainController)
 	 */
-	public EditBirthdayViewController(final MainController mainController, final Person person){
+	public EditBirthdayViewController(final MainController mainController, final int indexPerson){
 		super(mainController);
-		this.personToEdit = person;
+		this.personToEdit = PersonManager.getInstance().get(indexPerson);
+		this.indexPerson = indexPerson;
 	}
 
 	/**
@@ -252,6 +259,19 @@ public class EditBirthdayViewController extends Controller{
 		this.delete_Button.addEventHandler(ActionEvent.ANY, this.deletePersonHandler);
 
 		this.quit_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().closeAppHandler);
+
+		final ChangeListener<String> textFieldChangeListener = new ChangeListener<String>(){
+
+			@Override
+			public void changed(final ObservableValue<? extends String> observable, final String oldValue, final String newValue){
+				if(newValue.matches(oldValue)){
+					EditBirthdayViewController.this.hasChange = true;
+				}
+
+			}
+		};
+
+		this.name_TextField.textProperty().addListener(textFieldChangeListener);
 	}
 
 	/**

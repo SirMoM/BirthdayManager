@@ -10,7 +10,6 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import application.model.Person;
 import application.model.PersonManager;
 import application.model.SessionInfos;
 import application.processes.SaveBirthdaysToFileTask;
@@ -240,12 +239,12 @@ public class MainController{
 	/**
 	 * Switches scenes to the BirthdayOverview. Generates a new Controller.
 	 *
-	 * @param person The person to edit.
+	 * @param indexPerson The index of the person to edit.
 	 *
 	 * @see EditBirthdayViewController
 	 */
-	public void goToEditBirthdayView(final Person person){
-		this.activeController = new EditBirthdayViewController(this, person);
+	public void goToEditBirthdayView(final int indexPerson){
+		this.activeController = new EditBirthdayViewController(this, indexPerson);
 		try{
 			this.replaceSceneContent("/application/view/EditBirthdayView.fxml", this.activeController);
 
