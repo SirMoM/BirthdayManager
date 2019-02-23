@@ -21,7 +21,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="819.0" prefWidth="1208.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="819.0" prefWidth="611.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -57,7 +57,7 @@
         </Menu>
       </menus>
     </MenuBar>
-    <SplitPane dividerPositions="0.5" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+    <SplitPane dividerPositions="0.5140961857379768" focusTraversable="true" prefHeight="772.0" prefWidth="1113.0" VBox.vgrow="ALWAYS">
          <items>
             <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity">
                <children>
@@ -82,7 +82,7 @@
                         </ListView>
                      </children>
                   </VBox>
-                  <AnchorPane fx:id="deleteButtons_Pane">
+                  <AnchorPane fx:id="deleteButtons_Pane" visible="false">
                      <children>
                         <Button defaultButton="true" mnemonicParsing="false" prefHeight="50.0" prefWidth="150.0" text="Delete" textFill="RED" AnchorPane.leftAnchor="100.0" AnchorPane.topAnchor="50.0" />
                         <Button cancelButton="true" mnemonicParsing="false" prefHeight="50.0" prefWidth="150.0" text="Cancle" AnchorPane.rightAnchor="100.0" AnchorPane.topAnchor="50.0" />
@@ -90,7 +90,7 @@
                   </AnchorPane>
                </children>
             </VBox>
-            <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" tabMaxHeight="1000.0" tabMaxWidth="1000.0">
+            <TabPane prefHeight="770.0" prefWidth="188.0" tabClosingPolicy="UNAVAILABLE" tabMaxHeight="1000.0" tabMaxWidth="1000.0" visible="false">
               <tabs>
                   <Tab fx:id="week_tap" text="Woche">
                     <content>
