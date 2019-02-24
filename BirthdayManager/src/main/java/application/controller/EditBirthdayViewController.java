@@ -5,6 +5,7 @@ package application.controller;
 
 import java.io.File;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.ResourceBundle;
 
 import org.apache.logging.log4j.Level;
@@ -21,6 +22,8 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -150,6 +153,7 @@ public class EditBirthdayViewController extends Controller{
 			final String nameFromTextField = EditBirthdayViewController.this.name_TextField.getText();
 			final String middleNameFromTextField = EditBirthdayViewController.this.middleName_TextField.getText();
 			final String surnameFromTextfield = EditBirthdayViewController.this.surname_TextField.getText();
+			final LocalDate birthdayFromDatePicker = EditBirthdayViewController.this.birthday_DatePicker.getValue();
 
 			try{
 				if(!nameFromTextField.matches(EditBirthdayViewController.this.personToEdit.getName())){
@@ -172,7 +176,15 @@ public class EditBirthdayViewController extends Controller{
 				anyChangeAtAll = true;
 			}
 			if(anyChangeAtAll){
-				final Person updatedPerson = new Person(surnameFromTextfield, nameFromTextField, middleNameFromTextField, EditBirthdayViewController.this.birthday_DatePicker.getValue());
+				if(birthdayFromDatePicker == null || (surnameFromTextfield.isEmpty() && nameFromTextField.isEmpty() && middleNameFromTextField.isEmpty())){
+					final LangResourceManager langResourceManager = new LangResourceManager();
+					final Alert alert = new Alert(AlertType.WARNING);
+					alert.setTitle(langResourceManager.getLocaleString(LangResourceKeys.person_not_valid_warning));
+					alert.setHeaderText(langResourceManager.getLocaleString(LangResourceKeys.person_not_valid_warning));
+					alert.showAndWait();
+					return;
+				}
+				final Person updatedPerson = new Person(surnameFromTextfield, nameFromTextField, middleNameFromTextField, birthdayFromDatePicker);
 				PersonManager.getInstance().updatePerson(EditBirthdayViewController.this.indexPerson, updatedPerson);
 				EditBirthdayViewController.this.getMainController().goToBirthdaysOverview();
 			}
