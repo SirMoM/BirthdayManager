@@ -137,6 +137,9 @@ public class MainController{
 			fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Text Files", "*.txt"), new ExtensionFilter("CSV Files", "*.csv"), new ExtensionFilter("All Files", "*.*"));
 
 			final File selectedFile = fileChooser.showOpenDialog(MainController.this.getStage().getScene().getWindow());
+			if(selectedFile == null){
+				return;
+			}
 			MainController.this.LOG.debug("Opend file:" + selectedFile.getAbsolutePath());
 			PersonManager.getInstance().setSaveFile(selectedFile);
 			MainController.this.sessionInfos.getRecentFileName().set(selectedFile.getName());
