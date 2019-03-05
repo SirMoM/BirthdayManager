@@ -10,6 +10,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import javax.swing.event.ChangeEvent;
+
 import application.model.Person;
 import application.model.PersonManager;
 import application.util.PropertieFields;
@@ -22,6 +24,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -191,7 +194,11 @@ public class BirthdaysOverviewController extends Controller {
 				final int indexOf = PersonManager.getInstance().getPersonDB().indexOf(selectedItems.get(0));
 				PersonManager.getInstance().deletePerson(PersonManager.getInstance().get(indexOf));
 				BirthdaysOverviewController.this.getMainController().getSessionInfos().updateSubLists();
-				BirthdaysOverviewController.this.nextBdaysList.refresh();
+				
+				ObservableList<Person> list = BirthdaysOverviewController.this.nextBdaysList.getItems(); 
+				BirthdaysOverviewController.this.nextBdaysList.setItems(null);
+				BirthdaysOverviewController.this.nextBdaysList.setItems(list);
+				BirthdaysOverviewController.this.nextBdaysList.refresh(); 
 			}
 
 		}
