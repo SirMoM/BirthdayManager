@@ -66,6 +66,7 @@ public class PropertieManager{
 		this.properties.setProperty(PropertieFields.AUTOSAVE, "true");
 		this.properties.setProperty(PropertieFields.WRITE_THRU, "false");
 		this.properties.setProperty(PropertieFields.OPEN_FILE_ON_START, "false");
+		this.properties.setProperty(PropertieFields.HIGHLIGHT_TODAY_COLOR, "mediumseagreen");
 		try{
 			this.storeProperties("Default properties stored");
 		} catch (final IOException ioException){

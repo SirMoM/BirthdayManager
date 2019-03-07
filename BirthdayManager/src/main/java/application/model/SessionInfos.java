@@ -53,7 +53,7 @@ public class SessionInfos{
 		try{
 			this.getRecentFileName().set(new File(this.propertieManager.getPropertie(PropertieFields.LAST_OPEND)).getName());
 		} catch (final NullPointerException nullPointerException){
-			LOG.catching(Level.INFO, nullPointerException);
+			LOG.catching(Level.TRACE, nullPointerException);
 			LOG.info("Don't worry just could not load recent File");
 		}
 	}
