@@ -12,10 +12,12 @@ import java.util.ResourceBundle;
 import application.model.Person;
 import application.model.PersonManager;
 import application.model.PersonsInAWeek;
+import application.model.SessionInfos;
 import application.util.WeekTableCallback;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -31,6 +33,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -126,22 +129,22 @@ public class BirthdaysOverviewController extends Controller{
 	private TableColumn<PersonsInAWeek, String> monday_column1;
 
 	@FXML
-	private TableColumn<Person, String> tuesday_column1;
+	private TableColumn<PersonsInAWeek, String> tuesday_column1;
 
 	@FXML
-	private TableColumn<DayOfWeek, Person> wednesday_column1;
+	private TableColumn<PersonsInAWeek, String> wednesday_column1;
 
 	@FXML
-	private TableColumn<DayOfWeek, Person> thursday_column1;
+	private TableColumn<PersonsInAWeek, String> thursday_column1;
 
 	@FXML
-	private TableColumn<DayOfWeek, Person> friday_column1;
+	private TableColumn<PersonsInAWeek, Person> friday_column1;
 
 	@FXML
-	private TableColumn<DayOfWeek, Person> saturday_column1;
+	private TableColumn<PersonsInAWeek, String> saturday_column1;
 
 	@FXML
-	private TableColumn<PersonsInAWeek, Person> sunday_column1;
+	private TableColumn<PersonsInAWeek, String> sunday_column1;
 
 	@FXML
 	private Tab month_tap;
@@ -313,6 +316,8 @@ public class BirthdaysOverviewController extends Controller{
 	 * Bind EventHandlers an JavaFX-Components
 	 */
 	private void bindComponents(){
+		this.month_tap.setDisable(true);
+		
 		// Menu items
 		// File
 		this.openFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromFileChooserHandler);
@@ -349,20 +354,33 @@ public class BirthdaysOverviewController extends Controller{
 		this.deleteBirthdays_MenuItem.addEventHandler(ActionEvent.ANY, this.deletePersonHandler);
 		this.deleteBirthdays_MenuItem.setAccelerator(new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN));
 
+		System.out.println(this.getMainController().getSessionInfos().getPersonsInAWeekList());
+
 		this.week_tableView.setItems(this.getMainController().getSessionInfos().getPersonsInAWeekList());
 		this.monday_column1.setCellValueFactory(new WeekTableCallback(DayOfWeek.MONDAY));
-		this.monday_column1.setCellValueFactory(new WeekTableCallback(DayOfWeek.MONDAY));
-
-		this.sunday_column1.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<PersonsInAWeek, Person>, ObservableValue<Person>>(){
-
-			@Override
-			public ObservableValue<Person> call(final CellDataFeatures<PersonsInAWeek, Person> param){
-				final PersonsInAWeek personsInAWeek = param.getValue();
-				return new SimpleObjectProperty<Person>(personsInAWeek.getSundayPerson());
+		this.tuesday_column1.setCellValueFactory(new WeekTableCallback(DayOfWeek.TUESDAY));
+		
+		this.thursday_column1.setCellValueFactory((p) -> {
+			PersonsInAWeek personsInAWeek = p.getValue();
+			
+			
+			if (personsInAWeek.getThursdayPerson() != null) {
+				return new SimpleStringProperty(personsInAWeek.getThursdayPerson().getName() + personsInAWeek.getThursdayPerson().getSurname());
+			}else {
+				return null;
 			}
+			
 		});
-
+		
+		this.friday_column1.setCellValueFactory(
+			    new PropertyValueFactory<PersonsInAWeek,Person>("fridayPerson")
+				);
 		this.week_tableView.refresh();
+		
+		refresh_MenuItem.setOnAction((p) -> {
+			getMainController().getSessionInfos().updateSubLists();
+			System.out.println(this.getMainController().getSessionInfos().getPersonsInAWeekList());
+			});
 	}
 
 	/**
