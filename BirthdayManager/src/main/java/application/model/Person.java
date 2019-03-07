@@ -9,8 +9,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
-import application.util.localisation.LangResourceKeys;
-import application.util.localisation.LangResourceManager;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -180,21 +178,33 @@ public class Person{
 	 * @return the middle name / everything of the person
 	 */
 	public String getMisc(){
-		return this.misc.get();
+		try {
+			return this.misc.getValue();
+		} catch (NullPointerException NullPointerException) {
+			return null;
+		}
 	}
 
 	/**
 	 * @return the name of the person
 	 */
 	public String getName(){
-		return this.name.get();
+		try {
+			return this.name.getValue();
+		} catch (NullPointerException NullPointerException) {
+			return null;
+		}
 	}
 
 	/**
 	 * @return the surname of the person
 	 */
 	public String getSurname(){
-		return this.surname.get();
+		try {
+			return this.surname.getValue();
+		} catch (NullPointerException NullPointerException) {
+			return null;
+		}
 	}
 
 	/**
@@ -301,7 +311,6 @@ public class Person{
 		if(this.birthday.get() != null){
 			builder.append("\n");
 			builder.append(DATE_FORMATTER.format(this.birthday.get()));
-			builder.append("\t \t \t " + (new LangResourceManager().getLocaleString(LangResourceKeys.age)) + ":\t" + (LocalDate.now().getYear() - this.birthday.getValue().getYear()));
 		}
 		return builder.toString();
 	}

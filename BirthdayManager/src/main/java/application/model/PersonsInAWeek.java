@@ -7,9 +7,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-
 /**
  * @author Admin
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
@@ -87,13 +84,13 @@ public class PersonsInAWeek{
 	}
 
 
-	final private ObjectProperty<Person> mondayPerson;
-	final private ObjectProperty<Person> tuesdayPerson;
-	final private ObjectProperty<Person> wednesdayPerson;
-	final private ObjectProperty<Person> thursdayPerson;
-	final private ObjectProperty<Person> fridayPerson;
-	final private ObjectProperty<Person> saturdayPerson;
-	final private ObjectProperty<Person> sundayPerson;
+	private Person mondayPerson;
+	private Person tuesdayPerson;
+	private Person wednesdayPerson;
+	private Person thursdayPerson;
+	private Person saturdayPerson;
+	private Person sundayPerson;
+	private Person fridayPerson;
 
 	/**
 	 * @param mondayPerson
@@ -105,62 +102,13 @@ public class PersonsInAWeek{
 	 * @param sundayPerson
 	 */
 	public PersonsInAWeek(final Person mondayPerson, final Person tuesdayPerson, final Person wednesdayPerson, final Person thursdayPerson, final Person fridayPerson, final Person saturdayPerson, final Person sundayPerson){
-		this.mondayPerson = new SimpleObjectProperty<Person>(mondayPerson);
-		this.tuesdayPerson = new SimpleObjectProperty<Person>(tuesdayPerson);
-		this.wednesdayPerson = new SimpleObjectProperty<Person>(wednesdayPerson);
-		this.thursdayPerson = new SimpleObjectProperty<Person>(thursdayPerson);
-		this.fridayPerson = new SimpleObjectProperty<Person>(fridayPerson);
-		this.saturdayPerson = new SimpleObjectProperty<Person>(saturdayPerson);
-		this.sundayPerson = new SimpleObjectProperty<Person>(sundayPerson);
-	}
-
-	/**
-	 * @return the fridayPerson
-	 */
-	public Person getFridayPerson(){
-		return this.fridayPerson.getValue();
-	}
-
-	/**
-	 * @return the mondayPerson
-	 */
-	public Person getMondayPerson(){
-		return this.mondayPerson.getValue();
-	}
-
-	/**
-	 * @return the saturdayPerson
-	 */
-	public Person getSaturdayPerson(){
-		return this.saturdayPerson.getValue();
-	}
-
-	/**
-	 * @return the sundayPerson
-	 */
-	public Person getSundayPerson(){
-		return this.sundayPerson.getValue();
-	}
-
-	/**
-	 * @return the thursdayPerson
-	 */
-	public Person getThursdayPerson(){
-		return this.thursdayPerson.getValue();
-	}
-
-	/**
-	 * @return the tuesdayPerson
-	 */
-	public Person getTuesdayPerson(){
-		return this.tuesdayPerson.getValue();
-	}
-
-	/**
-	 * @return the wednesdayPerson
-	 */
-	public Person getWednesdayPerson(){
-		return this.wednesdayPerson.getValue();
+		this.mondayPerson = mondayPerson;
+		this.tuesdayPerson = tuesdayPerson;
+		this.wednesdayPerson = wednesdayPerson;
+		this.thursdayPerson = thursdayPerson;
+		this.fridayPerson = fridayPerson;
+		this.saturdayPerson = saturdayPerson;
+		this.sundayPerson = sundayPerson;
 	}
 
 	/*
@@ -208,4 +156,101 @@ public class PersonsInAWeek{
 		return builder.toString();
 	}
 
+	/**
+	 * @return the mondayPerson
+	 */
+	public Person getMondayPerson() {
+		return mondayPerson;
+	}
+
+	/**
+	 * @return the tuesdayPerson
+	 */
+	public Person getTuesdayPerson() {
+		return tuesdayPerson;
+	}
+
+	/**
+	 * @return the wednesdayPerson
+	 */
+	public Person getWednesdayPerson() {
+		return wednesdayPerson;
+	}
+
+	/**
+	 * @return the thursdayPerson
+	 */
+	public Person getThursdayPerson() {
+		return thursdayPerson;
+	}
+
+	/**
+	 * @return the saturdayPerson
+	 */
+	public Person getSaturdayPerson() {
+		return saturdayPerson;
+	}
+
+	/**
+	 * @return the sundayPerson
+	 */
+	public Person getSundayPerson() {
+		return sundayPerson;
+	}
+
+	/**
+	 * @return the fridayPerson
+	 */
+	public Person getFridayPerson() {
+		return fridayPerson;
+	}
+
+	/**
+	 * @param mondayPerson the mondayPerson to set
+	 */
+	public void setMondayPerson(Person mondayPerson) {
+		this.mondayPerson = mondayPerson;
+	}
+
+	/**
+	 * @param tuesdayPerson the tuesdayPerson to set
+	 */
+	public void setTuesdayPerson(Person tuesdayPerson) {
+		this.tuesdayPerson = tuesdayPerson;
+	}
+
+	/**
+	 * @param wednesdayPerson the wednesdayPerson to set
+	 */
+	public void setWednesdayPerson(Person wednesdayPerson) {
+		this.wednesdayPerson = wednesdayPerson;
+	}
+
+	/**
+	 * @param thursdayPerson the thursdayPerson to set
+	 */
+	public void setThursdayPerson(Person thursdayPerson) {
+		this.thursdayPerson = thursdayPerson;
+	}
+
+	/**
+	 * @param saturdayPerson the saturdayPerson to set
+	 */
+	public void setSaturdayPerson(Person saturdayPerson) {
+		this.saturdayPerson = saturdayPerson;
+	}
+
+	/**
+	 * @param sundayPerson the sundayPerson to set
+	 */
+	public void setSundayPerson(Person sundayPerson) {
+		this.sundayPerson = sundayPerson;
+	}
+
+	/**
+	 * @param fridayPerson the fridayPerson to set
+	 */
+	public void setFridayPerson(Person fridayPerson) {
+		this.fridayPerson = fridayPerson;
+	}
 }

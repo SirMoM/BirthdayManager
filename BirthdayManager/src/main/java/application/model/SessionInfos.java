@@ -186,7 +186,6 @@ public class SessionInfos{
 		}
 
 		final List<PersonsInAWeek> parseAList = PersonsInAWeek.parseAList(this.getBirthdaysThisWeek());
-		this.personsInAWeekList = FXCollections.observableArrayList();
 		for(final PersonsInAWeek personsInAWeek : parseAList){
 			this.personsInAWeekList.add(personsInAWeek);
 		}
