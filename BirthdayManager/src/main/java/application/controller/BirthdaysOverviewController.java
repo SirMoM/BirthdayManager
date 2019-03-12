@@ -474,8 +474,9 @@ public class BirthdaysOverviewController extends Controller {
 	 */
 	@Override
 	public void initialize(final URL location, final ResourceBundle resources) {
+		getMainController().getStage().setWidth(550);
+		
 		this.assertion();
-
 		// Localisation
 		this.updateLocalisation();
 
