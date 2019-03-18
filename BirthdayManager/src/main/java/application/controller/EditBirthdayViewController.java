@@ -15,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 import application.model.Person;
 import application.model.PersonManager;
 import application.util.PropertieFields;
+import application.util.PropertieManager;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
 import javafx.beans.value.ChangeListener;
@@ -37,7 +38,7 @@ import javafx.scene.text.Font;
  * @author Noah Ruben
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
-public class EditBirthdayViewController extends Controller{
+public class EditBirthdayViewController extends Controller {
 	final static Logger LOG = LogManager.getLogger();
 
 	final private Person personToEdit;
@@ -145,38 +146,40 @@ public class EditBirthdayViewController extends Controller{
 	@FXML
 	private Label date_label;
 
-	private final EventHandler<ActionEvent> savePersonHandler = new EventHandler<ActionEvent>(){
+	private final EventHandler<ActionEvent> savePersonHandler = new EventHandler<ActionEvent>() {
 
 		@Override
-		public void handle(final ActionEvent actionEvent){
+		public void handle(final ActionEvent actionEvent) {
 			boolean anyChangeAtAll = false;
 			final String nameFromTextField = EditBirthdayViewController.this.name_TextField.getText();
 			final String middleNameFromTextField = EditBirthdayViewController.this.middleName_TextField.getText();
 			final String surnameFromTextfield = EditBirthdayViewController.this.surname_TextField.getText();
 			final LocalDate birthdayFromDatePicker = EditBirthdayViewController.this.birthday_DatePicker.getValue();
 
-			try{
-				if(!nameFromTextField.matches(EditBirthdayViewController.this.personToEdit.getName())){
+			try {
+				if (!nameFromTextField.matches(EditBirthdayViewController.this.personToEdit.getName())) {
 					anyChangeAtAll = !anyChangeAtAll;
 				}
-				if(!middleNameFromTextField.matches(EditBirthdayViewController.this.personToEdit.getMisc())){
+				if (!middleNameFromTextField.matches(EditBirthdayViewController.this.personToEdit.getMisc())) {
 					anyChangeAtAll = !anyChangeAtAll;
 				}
-				if(!surnameFromTextfield.matches(EditBirthdayViewController.this.personToEdit.getSurname())){
+				if (!surnameFromTextfield.matches(EditBirthdayViewController.this.personToEdit.getSurname())) {
 					anyChangeAtAll = !anyChangeAtAll;
 				}
-				if(!(EditBirthdayViewController.this.birthday_DatePicker.getValue() == EditBirthdayViewController.this.personToEdit.getBirthday())){
+				if (!(EditBirthdayViewController.this.birthday_DatePicker
+						.getValue() == EditBirthdayViewController.this.personToEdit.getBirthday())) {
 					anyChangeAtAll = !anyChangeAtAll;
 				}
-			} catch (final NullPointerException exception){
+			} catch (final NullPointerException exception) {
 				LOG.catching(Level.INFO, exception);
-				if(EditBirthdayViewController.this.personToEdit != null){
+				if (EditBirthdayViewController.this.personToEdit != null) {
 					LOG.info(EditBirthdayViewController.this.personToEdit.toExtendedString());
 				}
 				anyChangeAtAll = true;
 			}
-			if(anyChangeAtAll){
-				if(birthdayFromDatePicker == null || (surnameFromTextfield.isEmpty() && nameFromTextField.isEmpty() && middleNameFromTextField.isEmpty())){
+			if (anyChangeAtAll) {
+				if (birthdayFromDatePicker == null || (surnameFromTextfield.isEmpty() && nameFromTextField.isEmpty()
+						&& middleNameFromTextField.isEmpty())) {
 					final LangResourceManager langResourceManager = new LangResourceManager();
 					final Alert alert = new Alert(AlertType.WARNING);
 					alert.setTitle(langResourceManager.getLocaleString(LangResourceKeys.person_not_valid_warning));
@@ -184,7 +187,8 @@ public class EditBirthdayViewController extends Controller{
 					alert.showAndWait();
 					return;
 				}
-				final Person updatedPerson = new Person(surnameFromTextfield, nameFromTextField, middleNameFromTextField, birthdayFromDatePicker);
+				final Person updatedPerson = new Person(surnameFromTextfield, nameFromTextField,
+						middleNameFromTextField, birthdayFromDatePicker);
 				PersonManager.getInstance().updatePerson(EditBirthdayViewController.this.indexPerson, updatedPerson);
 				EditBirthdayViewController.this.getMainController().goToBirthdaysOverview();
 			}
@@ -193,17 +197,17 @@ public class EditBirthdayViewController extends Controller{
 
 	};
 
-	private final EventHandler<ActionEvent> exitHandler = new EventHandler<ActionEvent>(){
+	private final EventHandler<ActionEvent> exitHandler = new EventHandler<ActionEvent>() {
 
 		@Override
-		public void handle(final ActionEvent event){
+		public void handle(final ActionEvent event) {
 			EditBirthdayViewController.this.getMainController().goToBirthdaysOverview();
 		}
 	};
 
-	private final EventHandler<ActionEvent> deletePersonHandler = new EventHandler<ActionEvent>(){
+	private final EventHandler<ActionEvent> deletePersonHandler = new EventHandler<ActionEvent>() {
 		@Override
-		public void handle(final ActionEvent event){
+		public void handle(final ActionEvent event) {
 			PersonManager.getInstance().deletePerson(EditBirthdayViewController.this.personToEdit);
 			EditBirthdayViewController.this.getMainController().getSessionInfos().updateSubLists();
 			EditBirthdayViewController.this.getMainController().goToBirthdaysOverview();
@@ -218,7 +222,7 @@ public class EditBirthdayViewController extends Controller{
 	 *
 	 * @see application.controller.Controller#Controller(MainController)
 	 */
-	public EditBirthdayViewController(final MainController mainController, final int indexPerson){
+	public EditBirthdayViewController(final MainController mainController, final int indexPerson) {
 		super(mainController);
 		this.personToEdit = PersonManager.getInstance().get(indexPerson);
 		this.indexPerson = indexPerson;
@@ -228,7 +232,7 @@ public class EditBirthdayViewController extends Controller{
 	 * All assertions for the controller. Checks if all FXML-Components have been
 	 * loaded properly.
 	 */
-	private void assertions(){
+	private void assertions() {
 		assert this.file_menu != null : "fx:id=\"file_menu\" was not injected: check your FXML file 'EditBirthdayView.fxml'.";
 		assert this.openFile_MenuItem != null : "fx:id=\"openFile_MenuItem\" was not injected: check your FXML file 'EditBirthdayView.fxml'.";
 		assert this.openRecent_MenuItem != null : "fx:id=\"openRecent_MenuItem\" was not injected: check your FXML file 'EditBirthdayView.fxml'.";
@@ -265,18 +269,19 @@ public class EditBirthdayViewController extends Controller{
 	/**
 	 * Binds the JavaFX Components to their {@link EventHandler}.
 	 */
-	private void bindComponents(){
+	private void bindComponents() {
 		this.cancel_Button.addEventHandler(ActionEvent.ANY, this.exitHandler);
 		this.save_Button.addEventHandler(ActionEvent.ANY, this.savePersonHandler);
 		this.delete_Button.addEventHandler(ActionEvent.ANY, this.deletePersonHandler);
 
 		this.quit_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().closeAppHandler);
 
-		final ChangeListener<String> textFieldChangeListener = new ChangeListener<String>(){
+		final ChangeListener<String> textFieldChangeListener = new ChangeListener<String>() {
 
 			@Override
-			public void changed(final ObservableValue<? extends String> observable, final String oldValue, final String newValue){
-				if(newValue.matches(oldValue)){
+			public void changed(final ObservableValue<? extends String> observable, final String oldValue,
+					final String newValue) {
+				if (newValue.matches(oldValue)) {
 					EditBirthdayViewController.this.hasChange = true;
 				}
 
@@ -289,7 +294,7 @@ public class EditBirthdayViewController extends Controller{
 	/**
 	 * @return the personToEdit
 	 */
-	public Person getPersonToEdit(){
+	public Person getPersonToEdit() {
 		return this.personToEdit;
 	}
 
@@ -300,9 +305,9 @@ public class EditBirthdayViewController extends Controller{
 	 * java.util.ResourceBundle)
 	 */
 	@Override
-	public void initialize(final URL arg0, final ResourceBundle arg1){
+	public void initialize(final URL arg0, final ResourceBundle arg1) {
 		getMainController().getStage().setWidth(1200);
-		
+
 		this.assertions();
 		this.updateLocalisation();
 		this.bindComponents();
@@ -312,13 +317,13 @@ public class EditBirthdayViewController extends Controller{
 	/**
 	 * Loads the person data in the view.
 	 */
-	private void loadPerson(){
+	private void loadPerson() {
 		this.name_TextField.setText(this.personToEdit.getName());
 		this.surname_TextField.setText(this.personToEdit.getSurname());
 		this.middleName_TextField.setText(this.personToEdit.getMisc());
-		try{
+		try {
 			this.birthday_DatePicker.setValue(this.personToEdit.getBirthday());
-		} catch (final NullPointerException nullPointerException){
+		} catch (final NullPointerException nullPointerException) {
 			LOG.catching(Level.DEBUG, nullPointerException);
 			LOG.debug("New Person creating ? IF not we have a problem!");
 		}
@@ -330,7 +335,7 @@ public class EditBirthdayViewController extends Controller{
 	 * @see application.controller.Controller#updateLocalisation()
 	 */
 	@Override
-	public void updateLocalisation(){
+	public void updateLocalisation() {
 		final LangResourceManager resourceManager = new LangResourceManager();
 
 		this.file_menu.setText(resourceManager.getLocaleString(LangResourceKeys.file_menu));
@@ -344,8 +349,10 @@ public class EditBirthdayViewController extends Controller{
 
 		this.edit_menu.setText(resourceManager.getLocaleString(LangResourceKeys.edit_menu));
 		this.newBirthday_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.newBirthday_MenuItem));
-		this.importBirthdays_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.importBirthdays_MenuItem));
-		this.deleteBirthdays_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.deleteBirthdays_MenuItem));
+		this.importBirthdays_MenuItem
+				.setText(resourceManager.getLocaleString(LangResourceKeys.importBirthdays_MenuItem));
+		this.deleteBirthdays_MenuItem
+				.setText(resourceManager.getLocaleString(LangResourceKeys.deleteBirthdays_MenuItem));
 
 		this.help_menu.setText(resourceManager.getLocaleString(LangResourceKeys.help_menu));
 
@@ -356,9 +363,8 @@ public class EditBirthdayViewController extends Controller{
 		this.birthday_Label.setText(resourceManager.getLocaleString(LangResourceKeys.birthday_Label));
 
 		this.openFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromFileChooserHandler);
-		String property = null;
-		property = this.getMainController().getSessionInfos().getPropertiesHandler().getPropertie(PropertieFields.LAST_OPEND);
-		this.recentFiles_MenuItem = new MenuItem(new File(property).getName());
+		this.recentFiles_MenuItem = new MenuItem(
+				new File(PropertieManager.getPropertie(PropertieFields.LAST_OPEND)).getName());
 		this.recentFiles_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromRecentHandler);
 		this.openRecent_MenuItem.getItems().add(this.recentFiles_MenuItem);
 	}

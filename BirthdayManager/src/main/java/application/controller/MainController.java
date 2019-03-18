@@ -14,12 +14,11 @@ import org.apache.logging.log4j.Logger;
 import application.model.PersonManager;
 import application.model.SessionInfos;
 import application.processes.SaveBirthdaysToFileTask;
-import application.processes.SaveLastFileUsedTask;
 import application.util.PropertieFields;
+import application.util.PropertieManager;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
 import javafx.application.Platform;
-import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -55,8 +54,7 @@ public class MainController {
 	final EventHandler<ActionEvent> closeAppHandler = new EventHandler<ActionEvent>() {
 		@Override
 		public void handle(final ActionEvent event) {
-			if (new Boolean(
-					MainController.this.sessionInfos.getPropertiesHandler().getPropertie(PropertieFields.AUTOSAVE))) {
+			if (new Boolean(PropertieManager.getPropertie(PropertieFields.AUTOSAVE))) {
 				new Thread(new SaveBirthdaysToFileTask()).start();
 			} else {
 				final Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -110,8 +108,8 @@ public class MainController {
 			fileChooser.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
 
 			try {
-				fileChooser.setInitialDirectory(new File(MainController.this.getSessionInfos().getPropertiesHandler()
-						.getPropertie(PropertieFields.LAST_OPEND).toString()).getParentFile());
+				fileChooser.setInitialDirectory(
+						new File(PropertieManager.getPropertie(PropertieFields.LAST_OPEND).toString()).getParentFile());
 			} catch (final NullPointerException nullPointerException) {
 				fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
 			}
@@ -132,8 +130,8 @@ public class MainController {
 			fileChooser.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
 
 			try {
-				fileChooser.setInitialDirectory(new File(MainController.this.getSessionInfos().getPropertiesHandler()
-						.getPropertie(PropertieFields.LAST_OPEND).toString()).getParentFile());
+				fileChooser.setInitialDirectory(
+						new File(PropertieManager.getPropertie(PropertieFields.LAST_OPEND).toString()).getParentFile());
 			} catch (final NullPointerException nullPointerException) {
 				fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
 			}
@@ -150,48 +148,32 @@ public class MainController {
 			PersonManager.getInstance().setSaveFile(selectedFile);
 			MainController.this.sessionInfos.getRecentFileName().set(selectedFile.getName());
 
-			final SaveLastFileUsedTask saveLastFileUsedTask = new SaveLastFileUsedTask(MainController.this);
-			saveLastFileUsedTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED,
-					new EventHandler<WorkerStateEvent>() {
-
-						@Override
-						public void handle(final WorkerStateEvent t) {
-							final Boolean result = saveLastFileUsedTask.getValue();
-							if (result) {
-								MainController.this.LOG.info("Saved recent succsesfully");
-							} else {
-								MainController.this.LOG.error("Saveing recent faild");
-							}
-						}
-					});
-			new Thread(saveLastFileUsedTask).start();
+			PropertieManager.getInstance().getProperties().setProperty(PropertieFields.LAST_OPEND,
+					PersonManager.getInstance().getSaveFile().getAbsolutePath());
+			try {
+				PropertieManager.getInstance().storeProperties("Saved recent file.");
+			} catch (IOException ioException) {
+				LOG.catching(Level.FATAL, ioException);
+			}
 			MainController.this.sessionInfos.updateSubLists();
 		}
 	};
 	final EventHandler<ActionEvent> openFromRecentHandler = new EventHandler<ActionEvent>() {
 		@Override
 		public void handle(final ActionEvent event) {
-			final String lastUsedFilePath = MainController.this.getSessionInfos().getPropertiesHandler()
-					.getPropertie(PropertieFields.LAST_OPEND).toString();
+			final String lastUsedFilePath = PropertieManager.getPropertie(PropertieFields.LAST_OPEND).toString();
 			MainController.this.LOG.debug("Saved as recend used: " + lastUsedFilePath);
 			final File birthdayFile = new File(lastUsedFilePath);
 
 			PersonManager.getInstance().setSaveFile(birthdayFile);
 
-			final SaveLastFileUsedTask saveLastFileUsedTask = new SaveLastFileUsedTask(MainController.this);
-			saveLastFileUsedTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED,
-					new EventHandler<WorkerStateEvent>() {
-						@Override
-						public void handle(final WorkerStateEvent t) {
-							final Boolean result = saveLastFileUsedTask.getValue();
-							if (result) {
-								MainController.this.LOG.info("Saved recent succsesfully");
-							} else {
-								MainController.this.LOG.error("Saveing recent faild");
-							}
-						}
-					});
-			new Thread(saveLastFileUsedTask).start();
+			PropertieManager.getInstance().getProperties().setProperty(PropertieFields.LAST_OPEND,
+					PersonManager.getInstance().getSaveFile().getAbsolutePath());
+			try {
+				PropertieManager.getInstance().storeProperties("Saved recent file.");
+			} catch (IOException ioException) {
+				LOG.catching(Level.FATAL, ioException);
+			}
 			MainController.this.getSessionInfos().updateSubLists();
 		}
 	};
@@ -334,6 +316,8 @@ public class MainController {
 		loader.setLocation(this.getClass().getResource(fxmlPath));
 		loader.setController(controller);
 		final Parent root = loader.load();
+		// TODO DO i really want this
+//		new JMetro(JMetro.Style.LIGHT).applyTheme(root);
 		final Scene scene = new Scene(root);
 		scene.getStylesheets().add("test.css");
 		this.stage.setScene(scene);
@@ -353,10 +337,9 @@ public class MainController {
 		this.activeController = new BirthdaysOverviewController(this);
 		try {
 			this.replaceSceneContent("/application/view/BirthdaysOverview.fxml", this.activeController);
-			if (new Boolean(
-					this.sessionInfos.getPropertiesHandler().getPropertie(PropertieFields.OPEN_FILE_ON_START))) {
-				PersonManager.getInstance().setSaveFile(
-						new File(this.sessionInfos.getPropertiesHandler().getPropertie(PropertieFields.FILE_ON_START)));
+			if (new Boolean(PropertieManager.getPropertie(PropertieFields.OPEN_FILE_ON_START))) {
+				PersonManager.getInstance()
+						.setSaveFile(new File(PropertieManager.getPropertie(PropertieFields.FILE_ON_START)));
 				this.sessionInfos.updateSubLists();
 				this.LOG.debug("OPEN with File");
 			}

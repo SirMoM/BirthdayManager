@@ -11,6 +11,7 @@ import java.util.ResourceBundle;
 import application.model.Person;
 import application.model.PersonManager;
 import application.util.PropertieFields;
+import application.util.PropertieManager;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
 import javafx.event.ActionEvent;
@@ -31,7 +32,7 @@ import javafx.scene.text.Font;
  * @author Noah Ruben
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
-public class NewBirthdayViewController extends Controller{
+public class NewBirthdayViewController extends Controller {
 
 	final private Person newPerson;
 
@@ -136,29 +137,30 @@ public class NewBirthdayViewController extends Controller{
 	@FXML
 	private Label date_label;
 
-	private final EventHandler<ActionEvent> savePersonHandler = new EventHandler<ActionEvent>(){
+	private final EventHandler<ActionEvent> savePersonHandler = new EventHandler<ActionEvent>() {
 
 		@Override
-		public void handle(final ActionEvent actionEvent){
+		public void handle(final ActionEvent actionEvent) {
 			final String nameFromTextField = NewBirthdayViewController.this.name_TextField.getText();
 			final String middleNameFromTextField = NewBirthdayViewController.this.middleName_TextField.getText();
 			final String surnameFromTextfield = NewBirthdayViewController.this.surname_TextField.getText();
 			final LocalDate birthdayFromDatePicker = NewBirthdayViewController.this.birthday_DatePicker.getValue();
 
-			if(nameFromTextField != null){
+			if (nameFromTextField != null) {
 				NewBirthdayViewController.this.newPerson.setName(nameFromTextField);
 			}
-			if(middleNameFromTextField != null){
+			if (middleNameFromTextField != null) {
 				NewBirthdayViewController.this.newPerson.setMisc(middleNameFromTextField);
 			}
-			if(surnameFromTextfield != null){
+			if (surnameFromTextfield != null) {
 				NewBirthdayViewController.this.newPerson.setSurname(surnameFromTextfield);
 			}
-			if(birthdayFromDatePicker != null){
+			if (birthdayFromDatePicker != null) {
 				NewBirthdayViewController.this.newPerson.setBirthday(birthdayFromDatePicker);
 			}
 
-			if(birthdayFromDatePicker == null || (surnameFromTextfield.isEmpty() && nameFromTextField.isEmpty() && middleNameFromTextField.isEmpty())){
+			if (birthdayFromDatePicker == null || (surnameFromTextfield.isEmpty() && nameFromTextField.isEmpty()
+					&& middleNameFromTextField.isEmpty())) {
 				final LangResourceManager langResourceManager = new LangResourceManager();
 				final Alert alert = new Alert(AlertType.WARNING);
 				alert.setTitle(langResourceManager.getLocaleString(LangResourceKeys.person_not_valid_warning));
@@ -173,10 +175,10 @@ public class NewBirthdayViewController extends Controller{
 		}
 	};
 
-	private final EventHandler<ActionEvent> exitHandler = new EventHandler<ActionEvent>(){
+	private final EventHandler<ActionEvent> exitHandler = new EventHandler<ActionEvent>() {
 
 		@Override
-		public void handle(final ActionEvent event){
+		public void handle(final ActionEvent event) {
 			NewBirthdayViewController.this.getMainController().goToBirthdaysOverview();
 		}
 	};
@@ -184,7 +186,7 @@ public class NewBirthdayViewController extends Controller{
 	/**
 	 * @see application.controller.Controller#Controller(MainController)
 	 */
-	public NewBirthdayViewController(final MainController mainController){
+	public NewBirthdayViewController(final MainController mainController) {
 		super(mainController);
 		this.newPerson = new Person();
 	}
@@ -193,7 +195,7 @@ public class NewBirthdayViewController extends Controller{
 	 * All assertions for the controller. Checks if all FXML-Components have been
 	 * loaded properly.
 	 */
-	private void assertions(){
+	private void assertions() {
 		assert this.file_menu != null : "fx:id=\"file_menu\" was not injected: check your FXML file 'EditBirthdayView.fxml'.";
 		assert this.openFile_MenuItem != null : "fx:id=\"openFile_MenuItem\" was not injected: check your FXML file 'EditBirthdayView.fxml'.";
 		assert this.openRecent_MenuItem != null : "fx:id=\"openRecent_MenuItem\" was not injected: check your FXML file 'EditBirthdayView.fxml'.";
@@ -230,7 +232,7 @@ public class NewBirthdayViewController extends Controller{
 	/**
 	 * Binds the JavaFX Components to their {@link EventHandler}.
 	 */
-	private void bindComponents(){
+	private void bindComponents() {
 		this.cancel_Button.addEventHandler(ActionEvent.ANY, this.exitHandler);
 		this.save_Button.addEventHandler(ActionEvent.ANY, this.savePersonHandler);
 		this.delete_Button.setVisible(false);
@@ -245,7 +247,7 @@ public class NewBirthdayViewController extends Controller{
 	 * java.util.ResourceBundle)
 	 */
 	@Override
-	public void initialize(final URL arg0, final ResourceBundle arg1){
+	public void initialize(final URL arg0, final ResourceBundle arg1) {
 		this.assertions();
 		this.updateLocalisation();
 		this.bindComponents();
@@ -257,7 +259,7 @@ public class NewBirthdayViewController extends Controller{
 	 * @see application.controller.Controller#updateLocalisation()
 	 */
 	@Override
-	public void updateLocalisation(){
+	public void updateLocalisation() {
 		final LangResourceManager resourceManager = new LangResourceManager();
 
 		this.file_menu.setText(resourceManager.getLocaleString(LangResourceKeys.file_menu));
@@ -271,8 +273,10 @@ public class NewBirthdayViewController extends Controller{
 
 		this.edit_menu.setText(resourceManager.getLocaleString(LangResourceKeys.edit_menu));
 		this.newBirthday_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.newBirthday_MenuItem));
-		this.importBirthdays_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.importBirthdays_MenuItem));
-		this.deleteBirthdays_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.deleteBirthdays_MenuItem));
+		this.importBirthdays_MenuItem
+				.setText(resourceManager.getLocaleString(LangResourceKeys.importBirthdays_MenuItem));
+		this.deleteBirthdays_MenuItem
+				.setText(resourceManager.getLocaleString(LangResourceKeys.deleteBirthdays_MenuItem));
 
 		this.help_menu.setText(resourceManager.getLocaleString(LangResourceKeys.help_menu));
 
@@ -283,9 +287,8 @@ public class NewBirthdayViewController extends Controller{
 		this.birthday_Label.setText(resourceManager.getLocaleString(LangResourceKeys.birthday_Label));
 
 		this.openFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromFileChooserHandler);
-		String property = null;
-		property = this.getMainController().getSessionInfos().getPropertiesHandler().getPropertie(PropertieFields.LAST_OPEND);
-		this.recentFiles_MenuItem = new MenuItem(new File(property).getName());
+		this.recentFiles_MenuItem = new MenuItem(
+				new File(PropertieManager.getPropertie(PropertieFields.LAST_OPEND)).getName());
 		this.recentFiles_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromRecentHandler);
 		this.openRecent_MenuItem.getItems().add(this.recentFiles_MenuItem);
 	}

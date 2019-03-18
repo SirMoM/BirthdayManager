@@ -441,7 +441,7 @@ public class BirthdaysOverviewController extends Controller {
 			System.out.println(this.getMainController().getSessionInfos().getPersonsInAWeekList());
 			this.week_tableView.refresh();
 		});
-
+		
 		expandRightSide_Button.setOnAction((p) -> {
 			if (expandRightSide_Button.getText().matches(">")) {
 				expandRightSide_Button.setText("<");
