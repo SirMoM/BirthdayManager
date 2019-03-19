@@ -248,6 +248,7 @@ public class NewBirthdayViewController extends Controller {
 	 */
 	@Override
 	public void initialize(final URL arg0, final ResourceBundle arg1) {
+		getMainController().getStage().setWidth(1200);
 		this.assertions();
 		this.updateLocalisation();
 		this.bindComponents();

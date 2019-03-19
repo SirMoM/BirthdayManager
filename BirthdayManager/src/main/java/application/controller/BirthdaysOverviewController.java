@@ -17,6 +17,7 @@ import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -291,16 +292,16 @@ public class BirthdaysOverviewController extends Controller {
 			return new ListCell<Person>() {
 				@Override
 				protected void updateItem(Person item, boolean empty) {
-					if (!empty) {
+					super.updateItem(item, empty);
+					styleProperty().bind(new SimpleStringProperty(""));
+					if (!empty && item != null) {
 						if (item.getBirthday().isEqual(LocalDate.now().withYear(item.getBirthday().getYear()))) {
 							styleProperty().bind(Bindings.when(selectedProperty())
 									.then(new SimpleStringProperty("-fx-background-color: -fx-selection-bar;"))
 									.otherwise(new SimpleStringProperty(
 											String.format("-fx-background-color: rgba(%s,%s,%s,%s)", "100%", "0%", "0%",
 													"0.4") + ";")));
-						}
-
-						if (LocalDate.now().withYear(item.getBirthday().getYear()).isBefore(item.getBirthday())
+						} else if (LocalDate.now().withYear(item.getBirthday().getYear()).isBefore(item.getBirthday())
 								&& item.getBirthday()
 										.isBefore(LocalDate.now().withYear(item.getBirthday().getYear()).plusDays(7))) {
 
@@ -313,10 +314,11 @@ public class BirthdaysOverviewController extends Controller {
 						setText(item.toString() + "\t \t \t "
 								+ (new LangResourceManager().getLocaleString(LangResourceKeys.age)) + ":\t"
 								+ (LocalDate.now().getYear() - item.getBirthday().getYear()));
+
 					} else {
 						setText(null);
+						setStyle("");
 					}
-					super.updateItem(item, empty);
 				}
 			};
 
@@ -414,6 +416,13 @@ public class BirthdaysOverviewController extends Controller {
 		this.nextBdaysList.setCellFactory(colorCellFactory);
 		this.nextBdaysList.addEventHandler(MouseEvent.MOUSE_CLICKED, this.birthdayDoubleClickHandler);
 		this.nextBdaysList.addEventHandler(KeyEvent.KEY_PRESSED, this.birthdayDoubleClickHandler);
+		// TODO this can be an performance issue
+		// make the colorCellFactory rebuild the complete List
+		this.nextBdaysList.getItems().addListener((ListChangeListener<Person>) change -> {
+			nextBdaysList.setCellFactory(null);
+			nextBdaysList.refresh();
+			nextBdaysList.setCellFactory(colorCellFactory);
+		});
 
 		// set Texts
 		this.date_label.setText(DATE_FORMATTER.format(LocalDate.now()));
@@ -441,7 +450,7 @@ public class BirthdaysOverviewController extends Controller {
 			System.out.println(this.getMainController().getSessionInfos().getPersonsInAWeekList());
 			this.week_tableView.refresh();
 		});
-		
+
 		expandRightSide_Button.setOnAction((p) -> {
 			if (expandRightSide_Button.getText().matches(">")) {
 				expandRightSide_Button.setText("<");
@@ -475,7 +484,7 @@ public class BirthdaysOverviewController extends Controller {
 	@Override
 	public void initialize(final URL location, final ResourceBundle resources) {
 		getMainController().getStage().setWidth(550);
-		
+
 		this.assertion();
 		// Localisation
 		this.updateLocalisation();
