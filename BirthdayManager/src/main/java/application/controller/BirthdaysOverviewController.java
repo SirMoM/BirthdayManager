@@ -317,7 +317,6 @@ public class BirthdaysOverviewController extends Controller {
 
 					} else {
 						setText(null);
-						setStyle("");
 					}
 				}
 			};
