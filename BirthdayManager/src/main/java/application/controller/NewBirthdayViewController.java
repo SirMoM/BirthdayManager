@@ -10,10 +10,12 @@ import java.util.ResourceBundle;
 
 import application.model.Person;
 import application.model.PersonManager;
+import application.processes.SaveBirthdaysToFileTask;
 import application.util.PropertieFields;
 import application.util.PropertieManager;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -172,6 +174,21 @@ public class NewBirthdayViewController extends Controller {
 			NewBirthdayViewController.this.getMainController().goToBirthdaysOverview();
 
 			NewBirthdayViewController.this.getMainController().getSessionInfos().updateSubLists();
+			if (new Boolean(PropertieManager.getPropertie(PropertieFields.WRITE_THRU))) {
+				SaveBirthdaysToFileTask task = new SaveBirthdaysToFileTask();
+				task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+
+					@Override
+					public void handle(WorkerStateEvent event) {
+						if (event.getEventType() == WorkerStateEvent.WORKER_STATE_SUCCEEDED) {
+							LOG.debug("Saved changes to file	(via write thru)");
+						}
+					}
+				});
+
+				new Thread(task).start();
+			}
+
 		}
 	};
 

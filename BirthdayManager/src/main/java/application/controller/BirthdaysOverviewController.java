@@ -12,6 +12,9 @@ import java.util.ResourceBundle;
 import application.model.Person;
 import application.model.PersonManager;
 import application.model.PersonsInAWeek;
+import application.processes.SaveBirthdaysToFileTask;
+import application.util.PropertieFields;
+import application.util.PropertieManager;
 import application.util.WeekTableCallback;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
@@ -19,6 +22,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -202,6 +206,22 @@ public class BirthdaysOverviewController extends Controller {
 				final int indexOf = PersonManager.getInstance().getPersonDB().indexOf(selectedItems.get(0));
 				PersonManager.getInstance().deletePerson(PersonManager.getInstance().get(indexOf));
 				BirthdaysOverviewController.this.getMainController().getSessionInfos().updateSubLists();
+
+				if (new Boolean(PropertieManager.getPropertie(PropertieFields.WRITE_THRU))) {
+					SaveBirthdaysToFileTask task = new SaveBirthdaysToFileTask();
+					task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+
+						@Override
+						public void handle(WorkerStateEvent event) {
+							if (event.getEventType() == WorkerStateEvent.WORKER_STATE_SUCCEEDED) {
+								LOG.debug("Saved changes to file	(via write thru)");
+							}
+						}
+					});
+
+					new Thread(task).start();
+				}
+
 				// TODO Das ist mist code
 				BirthdaysOverviewController.this.nextBdaysList.setStyle(null);
 				BirthdaysOverviewController.this.nextBdaysList.setCellFactory(null);

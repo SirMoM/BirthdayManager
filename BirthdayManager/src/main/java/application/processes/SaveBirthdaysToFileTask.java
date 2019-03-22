@@ -12,19 +12,21 @@ import javafx.concurrent.Task;
  * @author Noah Ruben
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
-public class SaveBirthdaysToFileTask extends Task<Boolean>{
+public class SaveBirthdaysToFileTask extends Task<Boolean> {
 	File selectedFile;
 
 	/**
 	 * Base constructor
 	 */
-	public SaveBirthdaysToFileTask(){
+	public SaveBirthdaysToFileTask() {
 	}
 
 	/**
+	 * This is used to save the birthdays as.
+	 * 
 	 * @param selectedFile the File
 	 */
-	public SaveBirthdaysToFileTask(final File selectedFile){
+	public SaveBirthdaysToFileTask(final File selectedFile) {
 		this.selectedFile = selectedFile;
 	}
 
@@ -34,10 +36,10 @@ public class SaveBirthdaysToFileTask extends Task<Boolean>{
 	 * @see javafx.concurrent.Task#call()
 	 */
 	@Override
-	protected Boolean call() throws Exception{
-		if(this.selectedFile == null){
+	protected Boolean call() throws Exception {
+		if (this.selectedFile == null) {
 			return PersonManager.getInstance().save();
-		} else{
+		} else {
 			return PersonManager.getInstance().save(this.selectedFile);
 		}
 	}
