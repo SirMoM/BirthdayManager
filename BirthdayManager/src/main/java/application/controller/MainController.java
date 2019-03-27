@@ -30,6 +30,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.MenuItem;
+import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
@@ -188,6 +189,7 @@ public class MainController {
 		this.stage = stage;
 		this.sessionInfos = new SessionInfos();
 		this.LOG = LogManager.getLogger(this.getClass().getName());
+		this.stage.getIcons().add(new Image(getClass().getResourceAsStream("/img/icons8-birthday-50.png")));
 	}
 
 	/**
