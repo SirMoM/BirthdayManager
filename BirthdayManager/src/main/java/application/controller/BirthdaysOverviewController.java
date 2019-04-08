@@ -3,14 +3,10 @@
  */
 package application.controller;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.ResourceBundle;
 
 import application.model.Person;
@@ -22,11 +18,6 @@ import application.util.PropertieManager;
 import application.util.WeekTableCallback;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
-import biweekly.ICalVersion;
-import biweekly.ICalendar;
-import biweekly.component.VEvent;
-import biweekly.io.text.ICalWriter;
-import biweekly.property.Summary;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ListChangeListener;
@@ -42,6 +33,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -206,6 +198,9 @@ public class BirthdaysOverviewController extends Controller {
 
 	@FXML
 	private Label date_label;
+
+	@FXML
+	private ProgressBar progressbar;
 
 	private final EventHandler<ActionEvent> deletePersonHandler = new EventHandler<ActionEvent>() {
 		@Override
@@ -430,27 +425,7 @@ public class BirthdaysOverviewController extends Controller {
 		this.saveFile_MenuItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
 		this.saveAsFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().exportToFileHandler);
 
-		this.exportToCalendar_MenuItem.setOnAction(x -> {
-			ICalendar ical = new ICalendar();
-
-			for (Person person : PersonManager.getInstance().getPersonDB()) {
-				System.out.println(person);
-				VEvent event = new VEvent();
-				Summary summary = event.setSummary(person.toString());
-				summary.setLanguage("de-DE");
-				Date start = Date.from(person.getBirthday().atStartOfDay(ZoneId.systemDefault()).toInstant());
-				event.setDateStart(start, false);
-				ical.addEvent(event);
-				ICalWriter writer = null;
-				try {
-					writer = new ICalWriter(new File("testCal.ics"), ICalVersion.V2_0);
-					writer.write(ical);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		});
-
+		this.exportToCalendar_MenuItem.addEventHandler(ActionEvent.ANY, getMainController().exportToCalendarHandler);
 		this.preferences_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openPreferencesHander);
 
 		this.quit_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().closeAppHandler);
@@ -470,7 +445,9 @@ public class BirthdaysOverviewController extends Controller {
 		this.nextBdaysList.addEventHandler(KeyEvent.KEY_PRESSED, this.birthdayDoubleClickHandler);
 		// TODO this can be an performance issue
 		// make the colorCellFactory rebuild the complete List
-		this.nextBdaysList.getItems().addListener((ListChangeListener<Person>) change -> {
+		this.nextBdaysList.getItems().addListener((ListChangeListener<Person>) change ->
+
+		{
 			nextBdaysList.setCellFactory(null);
 			nextBdaysList.refresh();
 			nextBdaysList.setCellFactory(colorCellFactory);
@@ -514,6 +491,7 @@ public class BirthdaysOverviewController extends Controller {
 				getMainController().getStage().setWidth(550);
 			}
 		});
+
 	}
 
 	/**
@@ -599,5 +577,19 @@ public class BirthdaysOverviewController extends Controller {
 		this.saturday_column2.setText(resourceManager.getLocaleString(LangResourceKeys.saturday_column2));
 		this.sunday_column2.setText(resourceManager.getLocaleString(LangResourceKeys.sunday_column2));
 
+	}
+
+	/**
+	 * @return the progressbar
+	 */
+	public ProgressBar getProgressbar() {
+		return progressbar;
+	}
+
+	/**
+	 * @param progressbar the progressbar to set
+	 */
+	public void setProgressbar(ProgressBar progressbar) {
+		this.progressbar = progressbar;
 	}
 }
