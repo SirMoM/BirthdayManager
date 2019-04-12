@@ -3,10 +3,7 @@
  */
 package application.model;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -95,25 +92,26 @@ public class PersonManager{
 		return this.saveFile;
 	}
 
-	/**
-	 * Populates the {@link ArrayList} which contains the Persons ==
-	 * {@link #personDB}
-	 *
-	 * @throws FileNotFoundException if the File is not found
-	 * @throws IOException           if a new File could not be read
-	 */
-	private void populateList() throws IOException, FileNotFoundException{
-		this.personDB.clear();
-		String line;
-		final BufferedReader bufferedReader = new BufferedReader(new FileReader(this.saveFile));
-		while ((line = bufferedReader.readLine()) != null){
-			final Person parsedPerson = Person.parseFromTXTLine(line);
-			if(parsedPerson != null){
-				this.personDB.add(parsedPerson);
-			}
-		}
-		bufferedReader.close();
-	}
+//	/**
+//	 * Populates the {@link ArrayList} which contains the Persons ==
+//	 * {@link #personDB}
+//	 *
+//	 * @throws FileNotFoundException if the File is not found
+//	 * @throws IOException           if a new File could not be read
+//	 */
+//	private void populateList() throws IOException, FileNotFoundException{
+//		final LoadPersonsTask loadPersonsTask = new LoadPersonsTask(this.saveFile, this.saveFile.getAbsolutePath().endsWith(".csv"));
+//		loadPersonsTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>(){
+//
+//			@Override
+//			public void handle(final WorkerStateEvent event){
+//				PersonManager.this.personDB.clear();
+//				PersonManager.this.personDB.addAll(loadPersonsTask.getValue());
+//			}
+//		});
+//		new Thread(loadPersonsTask).start();
+//
+//	}
 
 	/**
 	 * Saves the {@link ArrayList} {@link #personDB} to the {@link #saveFile}
@@ -208,13 +206,7 @@ public class PersonManager{
 		this.saveFile = saveFile;
 		if(saveFile == null){
 			LOG.info("Warn saveFile is null");
-		} else if(saveFile.exists()){
-			try{
-				this.populateList();
-			} catch (final IOException ioException){
-				LOG.catching(ioException);
-			}
-		} else{
+		} else if(!saveFile.exists()){
 			try{
 				saveFile.createNewFile();
 			} catch (final IOException ioException){
