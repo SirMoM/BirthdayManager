@@ -33,6 +33,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -51,7 +52,7 @@ import javafx.util.Callback;
  * @author Noah Ruben
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
-public class BirthdaysOverviewController extends Controller{
+public class BirthdaysOverviewController extends Controller {
 
 	protected final static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
@@ -80,6 +81,9 @@ public class BirthdaysOverviewController extends Controller{
 
 	@FXML
 	private MenuItem saveAsFile_MenuItem;
+
+	@FXML // fx:id="exportToCalendar_MenuItem"
+	private MenuItem exportToCalendar_MenuItem; // Value injected by FXMLLoader
 
 	@FXML
 	private MenuItem preferences_MenuItem;
@@ -194,6 +198,9 @@ public class BirthdaysOverviewController extends Controller{
 
 	@FXML
 	private Label date_label;
+
+	@FXML
+	private ProgressBar progressbar;
 
 	private final EventHandler<ActionEvent> deletePersonHandler = new EventHandler<ActionEvent>(){
 		@Override
@@ -399,6 +406,7 @@ public class BirthdaysOverviewController extends Controller{
 		this.saveFile_MenuItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
 		this.saveAsFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().exportToFileHandler);
 
+		this.exportToCalendar_MenuItem.addEventHandler(ActionEvent.ANY, getMainController().exportToCalendarHandler);
 		this.preferences_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openPreferencesHander);
 
 		this.quit_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().closeAppHandler);
@@ -418,7 +426,9 @@ public class BirthdaysOverviewController extends Controller{
 		this.nextBdaysList.addEventHandler(KeyEvent.KEY_PRESSED, this.birthdayDoubleClickHandler);
 		// TODO this can be an performance issue
 		// make the colorCellFactory rebuild the complete List
-		this.nextBdaysList.getItems().addListener((ListChangeListener<Person>) change -> {
+		this.nextBdaysList.getItems().addListener((ListChangeListener<Person>) change ->
+
+		{
 			this.nextBdaysList.setCellFactory(null);
 			this.nextBdaysList.refresh();
 			this.nextBdaysList.setCellFactory(this.colorCellFactory);
@@ -462,6 +472,7 @@ public class BirthdaysOverviewController extends Controller{
 				this.getMainController().getStage().setWidth(550);
 			}
 		});
+
 	}
 
 	/**
@@ -543,5 +554,19 @@ public class BirthdaysOverviewController extends Controller{
 		this.saturday_column2.setText(resourceManager.getLocaleString(LangResourceKeys.saturday_column2));
 		this.sunday_column2.setText(resourceManager.getLocaleString(LangResourceKeys.sunday_column2));
 
+	}
+
+	/**
+	 * @return the progressbar
+	 */
+	public ProgressBar getProgressbar() {
+		return progressbar;
+	}
+
+	/**
+	 * @param progressbar the progressbar to set
+	 */
+	public void setProgressbar(ProgressBar progressbar) {
+		this.progressbar = progressbar;
 	}
 }
