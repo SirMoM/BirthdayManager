@@ -79,12 +79,17 @@ public enum LangResourceKeys{
 	chooseFile_button,
 	cancel_button,
 	save_button,
+	firstHighlightingColor_label,
+	secondHighlightingColor_label,
+	appearanceOptions_label,
+	countBirthdaysShown_Label,
+	iCalNotification_checkBox,
 
 	autsave_Tooltipp,
 	writeThru_Tooltip,
 	openFileOnStartUp_ToolTipp,
 
-	// miscalenius
+	// Miscellaneous
 
 	person_not_valid_warning;
 }

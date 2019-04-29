@@ -18,42 +18,42 @@ import org.junit.Test;
  */
 public class PropertieManagerTest {
 
-	private PropertieManager classToTest;
+	private PropertyManager classToTest;
 
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@Before
 	public void setUp() throws Exception {
-		this.classToTest = PropertieManager.getInstance();
+		this.classToTest = PropertyManager.getInstance();
 	}
 
 	/**
 	 * Test method for
-	 * {@link application.util.PropertieManager#getPropertie(java.lang.String)}.
+	 * {@link application.util.PropertyManager#getProperty(java.lang.String)}.
 	 */
 	@Test
 	public final void testGetPropertie() {
-		assertThat(PropertieManager.getPropertie(PropertieFields.SHOW_BIRTHDAYS_COUNT), is("10"));
-		assertThat(PropertieManager.getPropertie(PropertieFields.WRITE_THRU), is("false"));
-		assertThat(PropertieManager.getPropertie(PropertieFields.AUTOSAVE), is("false"));
+		assertThat(PropertyManager.getProperty(PropertyFields.SHOW_BIRTHDAYS_COUNT), is("10"));
+		assertThat(PropertyManager.getProperty(PropertyFields.WRITE_THRU), is("false"));
+		assertThat(PropertyManager.getProperty(PropertyFields.AUTOSAVE), is("false"));
 	}
 
 	/**
-	 * Test method for {@link application.util.PropertieManager#loadProperties()}.
+	 * Test method for {@link application.util.PropertyManager#loadProperties()}.
 	 *
 	 * @throws IOException
 	 * @throws FileNotFoundException
 	 */
 	@Test
 	public final void testStoreLoadProperties() throws FileNotFoundException, IOException {
-		final PropertieManager tempPropertieManager = PropertieManager.getInstance();
+		final PropertyManager tempPropertieManager = PropertyManager.getInstance();
 		tempPropertieManager.getProperties().setProperty("test", "test");
 		tempPropertieManager.storeProperties("test");
 
 		this.classToTest.loadProperties();
 
-		assertThat(PropertieManager.getPropertie("test"), is("test"));
+		assertThat(PropertyManager.getProperty("test"), is("test"));
 
 	}
 }

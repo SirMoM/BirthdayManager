@@ -11,8 +11,8 @@ import java.util.ResourceBundle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import application.util.PropertieFields;
-import application.util.PropertieManager;
+import application.util.PropertyFields;
+import application.util.PropertyManager;
 
 /**
  * @author Noah Ruben
@@ -27,7 +27,7 @@ public class LangResourceManager {
 	 * The Basic Constructor
 	 */
 	public LangResourceManager() {
-		final Locale locale = new Locale(PropertieManager.getPropertie(PropertieFields.SAVED_LOCALE));
+		final Locale locale = new Locale(PropertyManager.getProperty(PropertyFields.SAVED_LOCALE));
 		try {
 			this.langResourceBundle = PropertyResourceBundle.getBundle(this.LANG_BUNDLE_BASE_NAME, locale);
 		} catch (final MissingResourceException missingResourceException) {

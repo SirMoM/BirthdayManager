@@ -11,8 +11,8 @@ import java.util.ResourceBundle;
 import application.model.Person;
 import application.model.PersonManager;
 import application.processes.SaveBirthdaysToFileTask;
-import application.util.PropertieFields;
-import application.util.PropertieManager;
+import application.util.PropertyFields;
+import application.util.PropertyManager;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
 import javafx.concurrent.WorkerStateEvent;
@@ -173,8 +173,7 @@ public class NewBirthdayViewController extends Controller {
 			PersonManager.getInstance().addNewPerson(NewBirthdayViewController.this.newPerson);
 			NewBirthdayViewController.this.getMainController().goToBirthdaysOverview();
 
-			NewBirthdayViewController.this.getMainController().getSessionInfos().updateSubLists();
-			if (new Boolean(PropertieManager.getPropertie(PropertieFields.WRITE_THRU))) {
+			if (new Boolean(PropertyManager.getProperty(PropertyFields.WRITE_THRU))) {
 				SaveBirthdaysToFileTask task = new SaveBirthdaysToFileTask();
 				task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 
@@ -306,7 +305,7 @@ public class NewBirthdayViewController extends Controller {
 
 		this.openFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromFileChooserHandler);
 		this.recentFiles_MenuItem = new MenuItem(
-				new File(PropertieManager.getPropertie(PropertieFields.LAST_OPEND)).getName());
+				new File(PropertyManager.getProperty(PropertyFields.LAST_OPEND)).getName());
 		this.recentFiles_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromRecentHandler);
 		this.openRecent_MenuItem.getItems().add(this.recentFiles_MenuItem);
 	}

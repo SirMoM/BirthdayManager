@@ -13,8 +13,8 @@ import application.model.Person;
 import application.model.PersonManager;
 import application.model.PersonsInAWeek;
 import application.processes.SaveBirthdaysToFileTask;
-import application.util.PropertieFields;
-import application.util.PropertieManager;
+import application.util.PropertyFields;
+import application.util.PropertyManager;
 import application.util.WeekTableCallback;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
@@ -202,24 +202,25 @@ public class BirthdaysOverviewController extends Controller {
 	@FXML
 	private ProgressBar progressbar;
 
-	private final EventHandler<ActionEvent> deletePersonHandler = new EventHandler<ActionEvent>(){
+	private final EventHandler<ActionEvent> deletePersonHandler = new EventHandler<ActionEvent>() {
 		@Override
-		public void handle(final ActionEvent event){
-			final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
-			if(selectedItems.isEmpty()){
+		public void handle(final ActionEvent event) {
+			final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList
+					.getSelectionModel().getSelectedItems();
+			if (selectedItems.isEmpty()) {
 				return;
-			} else{
+			} else {
 				final int indexOf = PersonManager.getInstance().getPersonDB().indexOf(selectedItems.get(0));
 				PersonManager.getInstance().deletePerson(PersonManager.getInstance().get(indexOf));
 				BirthdaysOverviewController.this.getMainController().getSessionInfos().updateSubLists();
 
-				if(new Boolean(PropertieManager.getPropertie(PropertieFields.WRITE_THRU))){
+				if (new Boolean(PropertyManager.getProperty(PropertyFields.WRITE_THRU))) {
 					final SaveBirthdaysToFileTask task = new SaveBirthdaysToFileTask();
-					task.setOnSucceeded(new EventHandler<WorkerStateEvent>(){
+					task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 
 						@Override
-						public void handle(final WorkerStateEvent event){
-							if(event.getEventType() == WorkerStateEvent.WORKER_STATE_SUCCEEDED){
+						public void handle(final WorkerStateEvent event) {
+							if (event.getEventType() == WorkerStateEvent.WORKER_STATE_SUCCEEDED) {
 								BirthdaysOverviewController.this.LOG.debug("Saved changes to file	(via write thru)");
 
 							}
@@ -233,38 +234,42 @@ public class BirthdaysOverviewController extends Controller {
 				BirthdaysOverviewController.this.nextBdaysList.setStyle(null);
 				BirthdaysOverviewController.this.nextBdaysList.setCellFactory(null);
 				BirthdaysOverviewController.this.nextBdaysList.refresh();
-				BirthdaysOverviewController.this.nextBdaysList.setCellFactory(BirthdaysOverviewController.this.colorCellFactory);
+				BirthdaysOverviewController.this.nextBdaysList
+						.setCellFactory(BirthdaysOverviewController.this.colorCellFactory);
 				BirthdaysOverviewController.this.nextBdaysList.refresh();
 			}
 
 		}
 	};
 
-	final EventHandler<ActionEvent> openBirthday = new EventHandler<ActionEvent>(){
+	final EventHandler<ActionEvent> openBirthday = new EventHandler<ActionEvent>() {
 		@Override
-		public void handle(final ActionEvent arg0){
-			final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
-			if(selectedItems.isEmpty()){
+		public void handle(final ActionEvent arg0) {
+			final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList
+					.getSelectionModel().getSelectedItems();
+			if (selectedItems.isEmpty()) {
 				return;
-			} else{
+			} else {
 				final int indexOf = PersonManager.getInstance().getPersonDB().indexOf(selectedItems.get(0));
 				BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(indexOf);
 			}
 		}
 	};
-	final EventHandler<ActionEvent> newBirthdayHandler = new EventHandler<ActionEvent>(){
+	final EventHandler<ActionEvent> newBirthdayHandler = new EventHandler<ActionEvent>() {
 		@Override
-		public void handle(final ActionEvent arg0){
+		public void handle(final ActionEvent arg0) {
 			BirthdaysOverviewController.this.getMainController().goToEditBirthdayView();
 		}
 	};
 
-	final EventHandler<ActionEvent> showRecentBirthdaysHandler = new EventHandler<ActionEvent>(){
+	final EventHandler<ActionEvent> showRecentBirthdaysHandler = new EventHandler<ActionEvent>() {
 
 		@Override
-		public void handle(final ActionEvent event){
-			BirthdaysOverviewController.this.nextBdaysList.setItems(BirthdaysOverviewController.this.getMainController().getSessionInfos().getRecentBirthdays());
-			BirthdaysOverviewController.this.nextBirthday_Label.setText(new LangResourceManager().getLocaleString(LangResourceKeys.str_recentBirthday_Label));
+		public void handle(final ActionEvent event) {
+			BirthdaysOverviewController.this.nextBdaysList.setItems(
+					BirthdaysOverviewController.this.getMainController().getSessionInfos().getRecentBirthdays());
+			BirthdaysOverviewController.this.nextBirthday_Label
+					.setText(new LangResourceManager().getLocaleString(LangResourceKeys.str_recentBirthday_Label));
 			BirthdaysOverviewController.this.nextBdaysList.setStyle(null);
 			BirthdaysOverviewController.this.nextBdaysList.setCellFactory(null);
 			BirthdaysOverviewController.this.nextBdaysList.refresh();
@@ -272,31 +277,36 @@ public class BirthdaysOverviewController extends Controller {
 		}
 	};
 
-	final EventHandler<ActionEvent> showNextBirthdaysHandler = new EventHandler<ActionEvent>(){
+	final EventHandler<ActionEvent> showNextBirthdaysHandler = new EventHandler<ActionEvent>() {
 
 		@Override
-		public void handle(final ActionEvent event){
-			BirthdaysOverviewController.this.nextBdaysList.setItems(BirthdaysOverviewController.this.getMainController().getSessionInfos().getNextBirthdays());
-			BirthdaysOverviewController.this.nextBirthday_Label.setText(new LangResourceManager().getLocaleString(LangResourceKeys.str_nextBirthday_Label));
+		public void handle(final ActionEvent event) {
+			BirthdaysOverviewController.this.nextBdaysList.setItems(
+					BirthdaysOverviewController.this.getMainController().getSessionInfos().getNextBirthdays());
+			BirthdaysOverviewController.this.nextBirthday_Label
+					.setText(new LangResourceManager().getLocaleString(LangResourceKeys.str_nextBirthday_Label));
 			BirthdaysOverviewController.this.nextBdaysList.setStyle(null);
-			BirthdaysOverviewController.this.nextBdaysList.setCellFactory(BirthdaysOverviewController.this.colorCellFactory);
+			BirthdaysOverviewController.this.nextBdaysList
+					.setCellFactory(BirthdaysOverviewController.this.colorCellFactory);
 			BirthdaysOverviewController.this.nextBdaysList.refresh();
 		}
 	};
 
-	private final EventHandler<Event> birthdayDoubleClickHandler = new EventHandler<Event>(){
+	private final EventHandler<Event> birthdayDoubleClickHandler = new EventHandler<Event>() {
 
 		@Override
-		public void handle(final Event event){
-			if(event.getEventType().equals(MouseEvent.MOUSE_CLICKED)){
-				if(((MouseEvent) event).getClickCount() >= 2){
-					final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
+		public void handle(final Event event) {
+			if (event.getEventType().equals(MouseEvent.MOUSE_CLICKED)) {
+				if (((MouseEvent) event).getClickCount() >= 2) {
+					final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList
+							.getSelectionModel().getSelectedItems();
 					final int indexOf = PersonManager.getInstance().getPersonDB().indexOf(selectedItems.get(0));
 					BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(indexOf);
 				}
-			} else if(event.getEventType().equals(KeyEvent.KEY_PRESSED)){
-				if(((KeyEvent) event).getCode() == KeyCode.ENTER){
-					final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
+			} else if (event.getEventType().equals(KeyEvent.KEY_PRESSED)) {
+				if (((KeyEvent) event).getCode() == KeyCode.ENTER) {
+					final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList
+							.getSelectionModel().getSelectedItems();
 					final int indexOf = PersonManager.getInstance().getPersonDB().indexOf(selectedItems.get(0));
 					BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(indexOf);
 				}
@@ -304,26 +314,40 @@ public class BirthdaysOverviewController extends Controller {
 		}
 	};
 
-	Callback<ListView<Person>, ListCell<Person>> colorCellFactory = new Callback<ListView<Person>, ListCell<Person>>(){
+	Callback<ListView<Person>, ListCell<Person>> colorCellFactory = new Callback<ListView<Person>, ListCell<Person>>() {
 
 		@Override
-		public ListCell<Person> call(final ListView<Person> param){
+		public ListCell<Person> call(final ListView<Person> param) {
 
-			return new ListCell<Person>(){
+			return new ListCell<Person>() {
 				@Override
-				protected void updateItem(final Person item, final boolean empty){
+				protected void updateItem(final Person item, final boolean empty) {
+					Color firstColor = Color.web(PropertyManager.getProperty(PropertyFields.FIRST_HIGHLIGHT_COLOR));
+					Color secoundColor = Color.web(PropertyManager.getProperty(PropertyFields.SECOND_HIGHLIGHT_COLOR));
 					super.updateItem(item, empty);
 					this.styleProperty().bind(new SimpleStringProperty(""));
-					if(!empty && item != null){
-						if(item.getBirthday().isEqual(LocalDate.now().withYear(item.getBirthday().getYear()))){
-							this.styleProperty().bind(Bindings.when(this.selectedProperty()).then(new SimpleStringProperty("-fx-background-color: -fx-selection-bar;")).otherwise(new SimpleStringProperty(String.format("-fx-background-color: rgba(%s,%s,%s,%s)", "100%", "0%", "0%", "0.4") + ";")));
-						} else if(LocalDate.now().withYear(item.getBirthday().getYear()).isBefore(item.getBirthday()) && item.getBirthday().isBefore(LocalDate.now().withYear(item.getBirthday().getYear()).plusDays(7))){
+					if (!empty && item != null) {
+						if (item.getBirthday().isEqual(LocalDate.now().withYear(item.getBirthday().getYear()))) {
+							this.styleProperty()
+									.bind(Bindings.when(this.selectedProperty())
+											.then(new SimpleStringProperty("-fx-background-color: -fx-selection-bar;"))
+											.otherwise(new SimpleStringProperty("-fx-background-color: " + "#"
+													+ Integer.toHexString(firstColor.hashCode()))));
+						} else if (LocalDate.now().withYear(item.getBirthday().getYear()).isBefore(item.getBirthday())
+								&& item.getBirthday()
+										.isBefore(LocalDate.now().withYear(item.getBirthday().getYear()).plusDays(7))) {
 
-							this.styleProperty().bind(Bindings.when(this.selectedProperty()).then(new SimpleStringProperty("-fx-background-color: -fx-selection-bar;")).otherwise(new SimpleStringProperty(String.format("-fx-background-color: rgba(%s,%s,%s,%s)", "100%", "75%", "0%", "0.4") + ";")));
+							this.styleProperty()
+									.bind(Bindings.when(this.selectedProperty())
+											.then(new SimpleStringProperty("-fx-background-color: -fx-selection-bar;"))
+											.otherwise(new SimpleStringProperty("-fx-background-color: " + "#"
+													+ Integer.toHexString(secoundColor.hashCode()))));
 						}
-						this.setText(item.toString() + "\t \t \t " + (new LangResourceManager().getLocaleString(LangResourceKeys.age)) + ":\t" + (LocalDate.now().getYear() - item.getBirthday().getYear()));
+						this.setText(item.toString() + "\t \t \t "
+								+ (new LangResourceManager().getLocaleString(LangResourceKeys.age)) + ":\t"
+								+ (LocalDate.now().getYear() - item.getBirthday().getYear()));
 
-					} else{
+					} else {
 						this.setText(null);
 					}
 				}
@@ -337,7 +361,7 @@ public class BirthdaysOverviewController extends Controller {
 	 *
 	 * @see application.controller.Controller#Controller(MainController)
 	 */
-	public BirthdaysOverviewController(final MainController mainController){
+	public BirthdaysOverviewController(final MainController mainController) {
 		super(mainController);
 	}
 
@@ -345,7 +369,7 @@ public class BirthdaysOverviewController extends Controller {
 	 * All assertions for the controller. Checks if all FXML-Components have been
 	 * loaded properly.
 	 */
-	private void assertion(){
+	private void assertion() {
 		assert this.file_menu != null : "fx:id=\"file_menu\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
 		assert this.openFile_MenuItem != null : "fx:id=\"openFile_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
 		assert this.openRecent_MenuItem != null : "fx:id=\"openRecent_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
@@ -393,7 +417,7 @@ public class BirthdaysOverviewController extends Controller {
 	/**
 	 * Bind EventHandlers an JavaFX-Components
 	 */
-	private void bindComponents(){
+	private void bindComponents() {
 		// Menu items
 		// File
 		this.openFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromFileChooserHandler);
@@ -432,6 +456,7 @@ public class BirthdaysOverviewController extends Controller {
 			this.nextBdaysList.setCellFactory(null);
 			this.nextBdaysList.refresh();
 			this.nextBdaysList.setCellFactory(this.colorCellFactory);
+			this.nextBdaysList.refresh();
 		});
 
 		// set Texts
@@ -455,18 +480,20 @@ public class BirthdaysOverviewController extends Controller {
 		this.sunday_column1.setCellValueFactory(new WeekTableCallback(DayOfWeek.SUNDAY));
 
 		this.refresh_MenuItem.setOnAction((p) -> {
-			this.week_tableView.setItems(this.getMainController().getSessionInfos().getPersonsInAWeekList());
 			this.getMainController().getSessionInfos().updateSubLists();
-			System.out.println(this.getMainController().getSessionInfos().getPersonsInAWeekList());
 			this.week_tableView.refresh();
+			this.nextBdaysList.setCellFactory(null);
+			this.nextBdaysList.refresh();
+			this.nextBdaysList.setCellFactory(this.colorCellFactory);
+			this.nextBdaysList.refresh();
 		});
 
 		this.expandRightSide_Button.setOnAction((p) -> {
-			if(this.expandRightSide_Button.getText().matches(">")){
+			if (this.expandRightSide_Button.getText().matches(">")) {
 				this.expandRightSide_Button.setText("<");
 				this.rightSide_TapView.visibleProperty().set(true);
 				this.getMainController().getStage().setWidth(1200);
-			} else{
+			} else {
 				this.expandRightSide_Button.setText(">");
 				this.rightSide_TapView.visibleProperty().set(false);
 				this.getMainController().getStage().setWidth(550);
@@ -478,7 +505,7 @@ public class BirthdaysOverviewController extends Controller {
 	/**
 	 *
 	 */
-	private void createRecentFilesMenueItems(){
+	private void createRecentFilesMenueItems() {
 		// create Menue Items and adding them
 		this.recentFiles_MenuItem = new MenuItem();
 		this.recentFiles_MenuItem.textProperty().bind(this.getMainController().getSessionInfos().getRecentFileName());
@@ -493,7 +520,7 @@ public class BirthdaysOverviewController extends Controller {
 	 * java.util.ResourceBundle)
 	 */
 	@Override
-	public void initialize(final URL location, final ResourceBundle resources){
+	public void initialize(final URL location, final ResourceBundle resources) {
 		this.getMainController().getStage().setWidth(550);
 
 		this.assertion();
@@ -510,7 +537,7 @@ public class BirthdaysOverviewController extends Controller {
 	 * @see application.controller.Controller#updateLocalisation()
 	 */
 	@Override
-	public void updateLocalisation(){
+	public void updateLocalisation() {
 		final LangResourceManager resourceManager = new LangResourceManager();
 
 		this.nextBirthday_Label.setText(resourceManager.getLocaleString(LangResourceKeys.str_nextBirthday_Label));
@@ -525,11 +552,15 @@ public class BirthdaysOverviewController extends Controller {
 		this.quit_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.quit_MenuItem));
 
 		this.edit_menu.setText(resourceManager.getLocaleString(LangResourceKeys.edit_menu));
-		this.showNextBirthdays_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.showNextBirthdays_MenuItem));
-		this.showLastBirthdays_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.showLastBirthdays_MenuItem));
+		this.showNextBirthdays_MenuItem
+				.setText(resourceManager.getLocaleString(LangResourceKeys.showNextBirthdays_MenuItem));
+		this.showLastBirthdays_MenuItem
+				.setText(resourceManager.getLocaleString(LangResourceKeys.showLastBirthdays_MenuItem));
 		this.newBirthday_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.newBirthday_MenuItem));
-		this.importBirthdays_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.importBirthdays_MenuItem));
-		this.deleteBirthdays_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.deleteBirthdays_MenuItem));
+		this.importBirthdays_MenuItem
+				.setText(resourceManager.getLocaleString(LangResourceKeys.importBirthdays_MenuItem));
+		this.deleteBirthdays_MenuItem
+				.setText(resourceManager.getLocaleString(LangResourceKeys.deleteBirthdays_MenuItem));
 
 		this.help_menu.setText(resourceManager.getLocaleString(LangResourceKeys.help_menu));
 
