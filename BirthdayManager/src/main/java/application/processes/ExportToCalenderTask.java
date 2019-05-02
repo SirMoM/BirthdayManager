@@ -66,9 +66,9 @@ public class ExportToCalenderTask extends Task<Boolean> {
 	}
 
 	private void createCalender() {
-		int size = PersonManager.getInstance().getPersonDB().size();
+		int size = PersonManager.getInstance().getPersons().size();
 		for (int i = 0; i < size; i++) {
-			Person person = PersonManager.getInstance().getPersonDB().get(i);
+			Person person = PersonManager.getInstance().getPersons().get(i);
 			VEvent event = new VEvent();
 			Summary summary = event.setSummary(person.namesToString());
 			summary.setLanguage("de-DE");

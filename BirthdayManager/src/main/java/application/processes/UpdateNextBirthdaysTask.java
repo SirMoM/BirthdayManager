@@ -33,8 +33,8 @@ public class UpdateNextBirthdaysTask extends Task<List<Person>> {
 	public UpdateNextBirthdaysTask() {
 		this.LOG = LogManager.getLogger(this.getClass().getName());
 		NEXT_BIRTHDAYS_COUNT = Integer.parseInt(PropertyManager.getProperty(PropertyFields.SHOW_BIRTHDAYS_COUNT));
-		if (PersonManager.getInstance().getPersonDB() != null && !PersonManager.getInstance().getPersonDB().isEmpty()) {
-			personDB = PersonManager.getInstance().getPersonDB();
+		if (PersonManager.getInstance().getPersons() != null && !PersonManager.getInstance().getPersons().isEmpty()) {
+			personDB = PersonManager.getInstance().getPersons();
 		}
 		this.updateProgress(0, NEXT_BIRTHDAYS_COUNT);
 	}
@@ -49,8 +49,8 @@ public class UpdateNextBirthdaysTask extends Task<List<Person>> {
 	@Override
 	protected List<Person> call() throws Exception {
 		LOG.debug("Started " + this.getClass().getName() + " " + System.currentTimeMillis());
-		while (personDB == null || PersonManager.getInstance().getPersonDB().isEmpty()) {
-			personDB = PersonManager.getInstance().getPersonDB();
+		while (personDB == null || PersonManager.getInstance().getPersons().isEmpty()) {
+			personDB = PersonManager.getInstance().getPersons();
 			LOG.warn("Waiting for personenDB to be filled!");
 			Thread.sleep(500);
 		}

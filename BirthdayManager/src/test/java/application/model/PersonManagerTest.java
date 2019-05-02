@@ -55,7 +55,7 @@ public class PersonManagerTest{
 	public void testDeletePerson(){
 		PersonManager.getInstance().deletePerson(this.person);
 		this.personDB.remove(this.person);
-		assertThat(this.personDB, is(PersonManager.getInstance().getPersonDB()));
+		assertThat(this.personDB, is(PersonManager.getInstance().getPersons()));
 	}
 
 	/**
@@ -124,8 +124,8 @@ public class PersonManagerTest{
 	 */
 	@Test
 	public void testUpdatePerson(){
-		PersonManager.getInstance().getPersonDB().get(0).setName("TEST");
+		PersonManager.getInstance().getPersons().get(0).setName("TEST");
 		this.personDB.get(0).setName("TEST");
-		assertThat(this.personDB, is(PersonManager.getInstance().getPersonDB()));
+		assertThat(this.personDB, is(PersonManager.getInstance().getPersons()));
 	}
 }

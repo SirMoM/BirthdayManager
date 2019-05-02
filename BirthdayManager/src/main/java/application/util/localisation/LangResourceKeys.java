@@ -85,11 +85,20 @@ public enum LangResourceKeys{
 	countBirthdaysShown_Label,
 	iCalNotification_checkBox,
 
+	//ToolTipps
 	autsave_Tooltipp,
 	writeThru_Tooltip,
 	openFileOnStartUp_ToolTipp,
 
+	// Alert messages usw.
+	save_before_exit,
+	person_not_valid_warning, 
+	save_before_exit_question,
+	
 	// Miscellaneous
-
-	person_not_valid_warning;
+	yes,
+	no, 
+	csv_file,
+	;
+	
 }

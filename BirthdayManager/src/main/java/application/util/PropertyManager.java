@@ -74,7 +74,7 @@ public class PropertyManager {
 	 * <li>WRITE_THRU == false</li>
 	 * </ul>
 	 */
-	private void fillWithStandartProperties() {
+	protected void fillWithStandartProperties() {
 		this.properties.setProperty(PropertyFields.SAVED_LOCALE, "en_GB");
 		this.properties.setProperty(PropertyFields.AUTOSAVE, "true");
 		this.properties.setProperty(PropertyFields.WRITE_THRU, "true");

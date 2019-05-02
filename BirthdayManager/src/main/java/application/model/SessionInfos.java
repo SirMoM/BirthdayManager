@@ -37,6 +37,7 @@ public class SessionInfos {
 	final MainController mainController;
 
 	private Locale appLocale;
+	private File saveFile;
 	private final StringProperty fileToOpenName = new SimpleStringProperty();
 	private StringProperty recentFileName = new SimpleStringProperty();
 
@@ -232,6 +233,14 @@ public class SessionInfos {
 					}
 				});
 		new Thread(updateRecentBirthdaysTask).start();
+	}
+
+	public File getSaveFile() {
+		return saveFile;
+	}
+
+	public void setSaveFile(File saveFile) {
+		this.saveFile = saveFile;
 	}
 
 }

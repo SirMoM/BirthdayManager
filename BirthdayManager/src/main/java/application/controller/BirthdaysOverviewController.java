@@ -210,12 +210,13 @@ public class BirthdaysOverviewController extends Controller {
 			if (selectedItems.isEmpty()) {
 				return;
 			} else {
-				final int indexOf = PersonManager.getInstance().getPersonDB().indexOf(selectedItems.get(0));
-				PersonManager.getInstance().deletePerson(PersonManager.getInstance().get(indexOf));
+				final int indexOf = PersonManager.getInstance().getPersons().indexOf(selectedItems.get(0));
+				PersonManager.getInstance().deletePerson(PersonManager.getInstance().getPersonFromIndex(indexOf));
 				BirthdaysOverviewController.this.getMainController().getSessionInfos().updateSubLists();
 
 				if (new Boolean(PropertyManager.getProperty(PropertyFields.WRITE_THRU))) {
-					final SaveBirthdaysToFileTask task = new SaveBirthdaysToFileTask();
+					final SaveBirthdaysToFileTask task = new SaveBirthdaysToFileTask(
+							getMainController().getSessionInfos().getSaveFile());
 					task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 
 						@Override
@@ -250,7 +251,7 @@ public class BirthdaysOverviewController extends Controller {
 			if (selectedItems.isEmpty()) {
 				return;
 			} else {
-				final int indexOf = PersonManager.getInstance().getPersonDB().indexOf(selectedItems.get(0));
+				final int indexOf = PersonManager.getInstance().getPersons().indexOf(selectedItems.get(0));
 				BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(indexOf);
 			}
 		}
@@ -300,14 +301,14 @@ public class BirthdaysOverviewController extends Controller {
 				if (((MouseEvent) event).getClickCount() >= 2) {
 					final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList
 							.getSelectionModel().getSelectedItems();
-					final int indexOf = PersonManager.getInstance().getPersonDB().indexOf(selectedItems.get(0));
+					final int indexOf = PersonManager.getInstance().getPersons().indexOf(selectedItems.get(0));
 					BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(indexOf);
 				}
 			} else if (event.getEventType().equals(KeyEvent.KEY_PRESSED)) {
 				if (((KeyEvent) event).getCode() == KeyCode.ENTER) {
 					final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList
 							.getSelectionModel().getSelectedItems();
-					final int indexOf = PersonManager.getInstance().getPersonDB().indexOf(selectedItems.get(0));
+					final int indexOf = PersonManager.getInstance().getPersons().indexOf(selectedItems.get(0));
 					BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(indexOf);
 				}
 			}

@@ -32,7 +32,6 @@ public class LoadPersonsTask extends Task<List<Person>> {
 	 */
 	public LoadPersonsTask(final File file, final boolean csvFile) throws IOException {
 		super();
-		long x = 100;
 		this.LOG = LogManager.getLogger();
 		this.reader = new BufferedReader(new FileReader(file));
 		BufferedReader tempReader = new BufferedReader(new FileReader(file));
@@ -51,8 +50,8 @@ public class LoadPersonsTask extends Task<List<Person>> {
 
 	@Override
 	protected List<Person> call() throws Exception {
-		LOG.debug("\t \t Started " + this.getClass().getName());
-		final ArrayList<Person> persons = new ArrayList<Person>(10);
+		LOG.debug("Started " + this.getClass().getName());
+		final ArrayList<Person> persons = new ArrayList<Person>((int) MAX_Prozess);
 		if (this.reader == null) {
 			this.LOG.fatal("There is no reader to get the CSV Data from!");
 		}

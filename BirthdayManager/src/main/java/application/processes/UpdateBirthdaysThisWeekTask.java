@@ -35,8 +35,8 @@ public class UpdateBirthdaysThisWeekTask extends Task<List<PersonsInAWeek>> {
 		week = LocalDate.now().get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
 		this.LOG.info("Gathering the Birthdays for this week: " + week);
 
-		if (PersonManager.getInstance().getPersonDB() != null && !PersonManager.getInstance().getPersonDB().isEmpty()) {
-			personDB = PersonManager.getInstance().getPersonDB();
+		if (PersonManager.getInstance().getPersons() != null && !PersonManager.getInstance().getPersons().isEmpty()) {
+			personDB = PersonManager.getInstance().getPersons();
 		}
 	}
 
@@ -50,8 +50,8 @@ public class UpdateBirthdaysThisWeekTask extends Task<List<PersonsInAWeek>> {
 	@Override
 	protected List<PersonsInAWeek> call() throws Exception {
 		LOG.debug("Started " + this.getClass().getName());
-		while (personDB == null || PersonManager.getInstance().getPersonDB().isEmpty()) {
-			personDB = PersonManager.getInstance().getPersonDB();
+		while (personDB == null || PersonManager.getInstance().getPersons().isEmpty()) {
+			personDB = PersonManager.getInstance().getPersons();
 			LOG.warn("Waiting for personenDB to be filled!");
 			Thread.sleep(500);
 		}

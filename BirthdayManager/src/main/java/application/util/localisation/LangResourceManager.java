@@ -57,8 +57,8 @@ public class LangResourceManager {
 	 * @param langResourceKey A key from {@link LangResourceKeys}
 	 * @return the component string in the correct language
 	 */
-	public String getLocaleString(final LangResourceKeys langResourceKey) {
-		return this.langResourceBundle.getString(langResourceKey.name());
+	public String getLocaleString(final LangResourceKeys LangResourceKeys) {
+		return this.langResourceBundle.getString(LangResourceKeys.name());
 	}
 
 }
