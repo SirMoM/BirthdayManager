@@ -357,6 +357,8 @@ public class BirthdaysOverviewController extends Controller {
 
 	};
 
+	protected boolean showNextBirthdays;
+
 	/**
 	 *
 	 * @see application.controller.Controller#Controller(MainController)
@@ -498,6 +500,24 @@ public class BirthdaysOverviewController extends Controller {
 				this.rightSide_TapView.visibleProperty().set(false);
 				this.getMainController().getStage().setWidth(550);
 			}
+		});
+		getMainController().getStage().addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+
+			@Override
+			public void handle(KeyEvent keyEvent) {
+				if (keyEvent.getCode() == KeyCode.TAB) {
+					if (BirthdaysOverviewController.this.showNextBirthdays) {
+						showNextBirthdays_MenuItem.fire();
+						BirthdaysOverviewController.this.showNextBirthdays = !BirthdaysOverviewController.this.showNextBirthdays;
+					} else {
+						showLastBirthdays_MenuItem.fire();
+						BirthdaysOverviewController.this.showNextBirthdays = !BirthdaysOverviewController.this.showNextBirthdays;
+					}
+					keyEvent.consume();
+				}
+
+			}
+
 		});
 
 	}
