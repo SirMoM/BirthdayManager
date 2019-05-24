@@ -3,15 +3,20 @@
  */
 package application.controller;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
+import org.apache.logging.log4j.Level;
+
 import application.model.Person;
 import application.model.PersonManager;
 import application.model.PersonsInAWeek;
+import application.processes.LoadPersonsTask;
 import application.processes.SaveBirthdaysToFileTask;
 import application.util.PropertyFields;
 import application.util.PropertyManager;
@@ -46,6 +51,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.Callback;
 
 /**
@@ -360,6 +367,42 @@ public class BirthdaysOverviewController extends Controller {
 
 	protected boolean showNextBirthdays;
 
+	private EventHandler<ActionEvent> importBirthdaysHandler = new EventHandler<ActionEvent>() {
+
+		@Override
+		public void handle(ActionEvent event) {
+			final FileChooser fileChooser = new FileChooser();
+			fileChooser.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
+			fileChooser.getExtensionFilters().add(new ExtensionFilter(new LangResourceManager().getLocaleString(LangResourceKeys.txt_file), "*.txt"));
+			fileChooser.getExtensionFilters().add(new ExtensionFilter(new LangResourceManager().getLocaleString(LangResourceKeys.csv_file), "*.csv"));
+			fileChooser.getExtensionFilters().add(new ExtensionFilter(new LangResourceManager().getLocaleString(LangResourceKeys.all_files), "*.*"));
+			fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+
+			// if the chooser is "x'ed" the file is null
+			final File selectedFile = fileChooser.showOpenDialog(getMainController().getStage().getScene().getWindow());
+			if (selectedFile == null) {
+				return;
+			}
+			BirthdaysOverviewController.this.LOG.debug("Importing file:" + selectedFile.getAbsolutePath());
+			try {
+				final LoadPersonsTask loadPersonsTask = new LoadPersonsTask(selectedFile, selectedFile.getAbsolutePath().endsWith(".csv"));
+				loadPersonsTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>() {
+					@Override
+					public void handle(final WorkerStateEvent event) {
+						PersonManager.getInstance().getPersons().addAll(loadPersonsTask.getValue());
+						BirthdaysOverviewController.this.LOG.debug("Imported birthdays from File");
+						getMainController().getSessionInfos().updateSubLists();
+					}
+				});
+				new Thread(loadPersonsTask).start();
+			} catch (IOException ioException) {
+				BirthdaysOverviewController.this.LOG.catching(Level.ERROR, ioException);
+			}
+
+		}
+
+	};
+
 	/**
 	 *
 	 * @see application.controller.Controller#Controller(MainController)
@@ -441,6 +484,7 @@ public class BirthdaysOverviewController extends Controller {
 		this.openBirthday_MenuItem.addEventHandler(ActionEvent.ANY, this.openBirthday);
 		this.newBirthday_MenuItem.addEventHandler(ActionEvent.ANY, this.newBirthdayHandler);
 		this.newBirthday_MenuItem.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
+		this.importBirthdays_MenuItem.addEventHandler(ActionEvent.ANY, this.importBirthdaysHandler);
 
 		this.showNextBirthdays_MenuItem.addEventHandler(ActionEvent.ANY, this.showNextBirthdaysHandler);
 		this.showLastBirthdays_MenuItem.addEventHandler(ActionEvent.ANY, this.showRecentBirthdaysHandler);
@@ -483,12 +527,7 @@ public class BirthdaysOverviewController extends Controller {
 		this.sunday_column1.setCellValueFactory(new WeekTableCallback(DayOfWeek.SUNDAY));
 
 		this.refresh_MenuItem.setOnAction((p) -> {
-			this.getMainController().getSessionInfos().updateSubLists();
-			this.week_tableView.refresh();
-			this.nextBdaysList.setCellFactory(null);
-			this.nextBdaysList.refresh();
-			this.nextBdaysList.setCellFactory(this.colorCellFactory);
-			this.nextBdaysList.refresh();
+			this.refreshBirthdayTableView();
 		});
 
 		this.expandRightSide_Button.setOnAction((p) -> {
@@ -521,6 +560,18 @@ public class BirthdaysOverviewController extends Controller {
 
 		});
 
+	}
+
+	/**
+	 * 
+	 */
+	private void refreshBirthdayTableView() {
+		this.getMainController().getSessionInfos().updateSubLists();
+		this.week_tableView.refresh();
+		this.nextBdaysList.setCellFactory(null);
+		this.nextBdaysList.refresh();
+		this.nextBdaysList.setCellFactory(this.colorCellFactory);
+		this.nextBdaysList.refresh();
 	}
 
 	/**

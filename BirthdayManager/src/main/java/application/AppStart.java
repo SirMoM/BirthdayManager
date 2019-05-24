@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import application.controller.MainController;
 import application.model.PersonManager;
@@ -17,25 +18,28 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
-public class AppStart extends Application{
+public class AppStart extends Application {
 
-	public static void main(final String[] args){
+	Logger LOG = LogManager.getLogger(AppStart.class.getName());
+
+	public static void main(final String[] args) {
 		launch(args);
 	}
 
 	@Override
-	public void init() throws Exception{
-		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler(){
+	public void init() throws Exception {
+		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 			@Override
-			public void uncaughtException(final Thread thread, final Throwable throwable){
+			public void uncaughtException(final Thread thread, final Throwable throwable) {
 				LogManager.getLogger(PersonManager.class).catching(Level.FATAL, throwable);
 				LogManager.getLogger(PersonManager.class).catching(Level.FATAL, throwable.getCause());
+
 				final Alert alert = new Alert(AlertType.WARNING);
 				alert.setTitle("ERROR");
 				alert.setHeaderText("Someting went wrong! \n Consider sending me the log.");
 
 				final StringBuilder stringBuilder = new StringBuilder("Stacktrace: \n");
-				for(int i = 0; i < throwable.getStackTrace().length; i++){
+				for (int i = 0; i < throwable.getStackTrace().length; i++) {
 					stringBuilder.append(throwable.getStackTrace()[i]);
 					stringBuilder.append(System.getProperty("line.separator"));
 				}
@@ -63,8 +67,16 @@ public class AppStart extends Application{
 	}
 
 	@Override
-	public void start(final Stage stage) throws FileNotFoundException{
+	public void start(final Stage stage) throws FileNotFoundException {
 		final MainController mainController = new MainController(stage);
 		mainController.start();
+	}
+
+	@Override
+	public void stop() {
+		System.out.println("Stage is closing");
+
+		LOG.debug("CLOSING!");
+//		System.exit(0);
 	}
 }

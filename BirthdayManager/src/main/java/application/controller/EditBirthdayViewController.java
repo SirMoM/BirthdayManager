@@ -43,8 +43,6 @@ public class EditBirthdayViewController extends Controller {
 
 	final private Person personToEdit;
 
-	boolean hasChange = true;
-
 	private MenuItem recentFiles_MenuItem;
 
 	@FXML
@@ -177,9 +175,9 @@ public class EditBirthdayViewController extends Controller {
 				}
 				anyChangeAtAll = true;
 			}
+			LOG.info("");
 			if (anyChangeAtAll) {
-				if (birthdayFromDatePicker == null || (surnameFromTextfield.isEmpty() && nameFromTextField.isEmpty()
-						&& middleNameFromTextField.isEmpty())) {
+				if (birthdayFromDatePicker == null || surnameFromTextfield.isEmpty() || nameFromTextField.isEmpty()) {
 					final LangResourceManager langResourceManager = new LangResourceManager();
 					final Alert alert = new Alert(AlertType.WARNING);
 					alert.setTitle(langResourceManager.getLocaleString(LangResourceKeys.person_not_valid_warning));
@@ -192,7 +190,6 @@ public class EditBirthdayViewController extends Controller {
 				PersonManager.getInstance().updatePerson(EditBirthdayViewController.this.indexPerson, updatedPerson);
 				EditBirthdayViewController.this.getMainController().goToBirthdaysOverview();
 			}
-			LOG.debug(EditBirthdayViewController.this.hasChange);
 			if (new Boolean(PropertyManager.getProperty(PropertyFields.WRITE_THRU))) {
 				SaveBirthdaysToFileTask task = new SaveBirthdaysToFileTask(
 						getMainController().getSessionInfos().getSaveFile());

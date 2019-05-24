@@ -26,6 +26,7 @@ public class UpdateNextBirthdaysTask extends Task<List<Person>> {
 	private final Logger LOG;
 	private List<Person> personDB;
 	private final int NEXT_BIRTHDAYS_COUNT;
+	private int timeInWaiting;
 
 	/**
 	 *
@@ -51,8 +52,13 @@ public class UpdateNextBirthdaysTask extends Task<List<Person>> {
 		LOG.debug("Started " + this.getClass().getName() + " " + System.currentTimeMillis());
 		while (personDB == null || PersonManager.getInstance().getPersons().isEmpty()) {
 			personDB = PersonManager.getInstance().getPersons();
-			LOG.warn("Waiting for personenDB to be filled!");
+			LOG.info("Waiting for personenDB to be filled!");
 			Thread.sleep(500);
+			this.timeInWaiting += 500;
+			if (this.timeInWaiting > 10000) {
+				this.cancel();
+				LOG.debug("Thread canceled because it took too long to wait for the list of people!");
+			}
 		}
 		final List<Person> upcomming = new ArrayList<Person>();
 		final List<Person> after = new ArrayList<Person>();

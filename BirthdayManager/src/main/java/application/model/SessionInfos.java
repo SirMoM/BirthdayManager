@@ -186,8 +186,7 @@ public class SessionInfos {
 				new EventHandler<WorkerStateEvent>() {
 					@Override
 					public void handle(final WorkerStateEvent workerStateEvent) {
-						LOG.debug(workerStateEvent.getSource().getClass().getName() + " ENDED "
-								+ System.currentTimeMillis());
+						LOG.debug(workerStateEvent.getSource().getClass().getName() + " ENDED ");
 						SessionInfos.this.getNextBirthdays().setAll(updateNextBirthdaysTask.getValue());
 						if (progressBar != null) {
 							// Unbind progress property

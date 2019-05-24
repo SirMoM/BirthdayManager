@@ -22,6 +22,8 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
@@ -148,8 +150,12 @@ public class PreferencesViewController extends Controller {
 			PropertyManager.getInstance().getProperties().setProperty(PropertyFields.EXPORT_WITH_ALARM,
 					PreferencesViewController.this.iCalNotification_CheckBox.selectedProperty().getValue().toString());
 			try {
-				PropertyManager.getInstance().getProperties().setProperty(PropertyFields.FILE_ON_START,
-						PreferencesViewController.this.startupFile_textField.getText());
+				if (!PreferencesViewController.this.startupFile_textField.getText().endsWith("*.csv")) {
+					new Alert(AlertType.WARNING).setContentText("Tried to set the file to be opened automatically so that it is not CSV!");
+				} else {
+					PropertyManager.getInstance().getProperties().setProperty(PropertyFields.FILE_ON_START,
+							PreferencesViewController.this.startupFile_textField.getText());
+				}
 			} catch (final NullPointerException nullPointerException) {
 				PreferencesViewController.this.LOG.catching(Level.INFO, nullPointerException);
 				PreferencesViewController.this.LOG.info("startupFile_textField was not properly set ?");
