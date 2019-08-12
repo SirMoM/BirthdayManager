@@ -7,7 +7,7 @@ apply plugin: 'application'
 import java.text.SimpleDateFormat
 
 mainClassName = 'application.AppStart'
-version = '0.2.x-beta'
+version = '0.3.x-beta'
 
 def websiteDest = 'C:/Users/Admin/git/BirthdayManagerWebsite'
 def name = 'Birthday Manager'
