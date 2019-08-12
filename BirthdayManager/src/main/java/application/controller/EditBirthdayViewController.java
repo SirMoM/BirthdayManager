@@ -15,8 +15,8 @@ import org.apache.logging.log4j.Logger;
 import application.model.Person;
 import application.model.PersonManager;
 import application.processes.SaveBirthdaysToFileTask;
-import application.util.PropertieFields;
-import application.util.PropertieManager;
+import application.util.PropertyFields;
+import application.util.PropertyManager;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
 import javafx.concurrent.WorkerStateEvent;
@@ -42,8 +42,6 @@ public class EditBirthdayViewController extends Controller {
 	final static Logger LOG = LogManager.getLogger();
 
 	final private Person personToEdit;
-
-	boolean hasChange = true;
 
 	private MenuItem recentFiles_MenuItem;
 
@@ -177,9 +175,9 @@ public class EditBirthdayViewController extends Controller {
 				}
 				anyChangeAtAll = true;
 			}
+			LOG.info("");
 			if (anyChangeAtAll) {
-				if (birthdayFromDatePicker == null || (surnameFromTextfield.isEmpty() && nameFromTextField.isEmpty()
-						&& middleNameFromTextField.isEmpty())) {
+				if (birthdayFromDatePicker == null || surnameFromTextfield.isEmpty() || nameFromTextField.isEmpty()) {
 					final LangResourceManager langResourceManager = new LangResourceManager();
 					final Alert alert = new Alert(AlertType.WARNING);
 					alert.setTitle(langResourceManager.getLocaleString(LangResourceKeys.person_not_valid_warning));
@@ -192,9 +190,9 @@ public class EditBirthdayViewController extends Controller {
 				PersonManager.getInstance().updatePerson(EditBirthdayViewController.this.indexPerson, updatedPerson);
 				EditBirthdayViewController.this.getMainController().goToBirthdaysOverview();
 			}
-			LOG.debug(EditBirthdayViewController.this.hasChange);
-			if (new Boolean(PropertieManager.getPropertie(PropertieFields.WRITE_THRU))) {
-				SaveBirthdaysToFileTask task = new SaveBirthdaysToFileTask();
+			if (new Boolean(PropertyManager.getProperty(PropertyFields.WRITE_THRU))) {
+				SaveBirthdaysToFileTask task = new SaveBirthdaysToFileTask(
+						getMainController().getSessionInfos().getSaveFile());
 				task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 
 					@Override
@@ -223,7 +221,7 @@ public class EditBirthdayViewController extends Controller {
 		@Override
 		public void handle(final ActionEvent event) {
 			PersonManager.getInstance().deletePerson(EditBirthdayViewController.this.personToEdit);
-			EditBirthdayViewController.this.getMainController().getSessionInfos().updateSubLists();
+//			EditBirthdayViewController.this.getMainController().getSessionInfos().updateSubLists(); TODO now in the overview
 			EditBirthdayViewController.this.getMainController().goToBirthdaysOverview();
 
 		}
@@ -238,7 +236,7 @@ public class EditBirthdayViewController extends Controller {
 	 */
 	public EditBirthdayViewController(final MainController mainController, final int indexPerson) {
 		super(mainController);
-		this.personToEdit = PersonManager.getInstance().get(indexPerson);
+		this.personToEdit = PersonManager.getInstance().getPersonFromIndex(indexPerson);
 		this.indexPerson = indexPerson;
 	}
 
@@ -378,7 +376,7 @@ public class EditBirthdayViewController extends Controller {
 
 		this.openFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromFileChooserHandler);
 		this.recentFiles_MenuItem = new MenuItem(
-				new File(PropertieManager.getPropertie(PropertieFields.LAST_OPEND)).getName());
+				new File(PropertyManager.getProperty(PropertyFields.LAST_OPEND)).getName());
 		this.recentFiles_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromRecentHandler);
 		this.openRecent_MenuItem.getItems().add(this.recentFiles_MenuItem);
 	}

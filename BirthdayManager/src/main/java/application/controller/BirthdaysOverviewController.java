@@ -3,18 +3,23 @@
  */
 package application.controller;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
+import org.apache.logging.log4j.Level;
+
 import application.model.Person;
 import application.model.PersonManager;
 import application.model.PersonsInAWeek;
+import application.processes.LoadPersonsTask;
 import application.processes.SaveBirthdaysToFileTask;
-import application.util.PropertieFields;
-import application.util.PropertieManager;
+import application.util.PropertyFields;
+import application.util.PropertyManager;
 import application.util.WeekTableCallback;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
@@ -46,6 +51,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.Callback;
 
 /**
@@ -210,18 +217,20 @@ public class BirthdaysOverviewController extends Controller {
 			if (selectedItems.isEmpty()) {
 				return;
 			} else {
-				final int indexOf = PersonManager.getInstance().getPersonDB().indexOf(selectedItems.get(0));
-				PersonManager.getInstance().deletePerson(PersonManager.getInstance().get(indexOf));
+				final int indexOf = PersonManager.getInstance().getPersons().indexOf(selectedItems.get(0));
+				PersonManager.getInstance().deletePerson(PersonManager.getInstance().getPersonFromIndex(indexOf));
 				BirthdaysOverviewController.this.getMainController().getSessionInfos().updateSubLists();
 
-				if (new Boolean(PropertieManager.getPropertie(PropertieFields.WRITE_THRU))) {
-					SaveBirthdaysToFileTask task = new SaveBirthdaysToFileTask();
+				if (new Boolean(PropertyManager.getProperty(PropertyFields.WRITE_THRU))) {
+					final SaveBirthdaysToFileTask task = new SaveBirthdaysToFileTask(
+							getMainController().getSessionInfos().getSaveFile());
 					task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 
 						@Override
-						public void handle(WorkerStateEvent event) {
+						public void handle(final WorkerStateEvent event) {
 							if (event.getEventType() == WorkerStateEvent.WORKER_STATE_SUCCEEDED) {
-								LOG.debug("Saved changes to file	(via write thru)");
+								BirthdaysOverviewController.this.LOG.debug("Saved changes to file	(via write thru)");
+
 							}
 						}
 					});
@@ -233,7 +242,8 @@ public class BirthdaysOverviewController extends Controller {
 				BirthdaysOverviewController.this.nextBdaysList.setStyle(null);
 				BirthdaysOverviewController.this.nextBdaysList.setCellFactory(null);
 				BirthdaysOverviewController.this.nextBdaysList.refresh();
-				BirthdaysOverviewController.this.nextBdaysList.setCellFactory(colorCellFactory);
+				BirthdaysOverviewController.this.nextBdaysList
+						.setCellFactory(BirthdaysOverviewController.this.colorCellFactory);
 				BirthdaysOverviewController.this.nextBdaysList.refresh();
 			}
 
@@ -248,7 +258,7 @@ public class BirthdaysOverviewController extends Controller {
 			if (selectedItems.isEmpty()) {
 				return;
 			} else {
-				final int indexOf = PersonManager.getInstance().getPersonDB().indexOf(selectedItems.get(0));
+				final int indexOf = PersonManager.getInstance().getPersons().indexOf(selectedItems.get(0));
 				BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(indexOf);
 			}
 		}
@@ -284,7 +294,8 @@ public class BirthdaysOverviewController extends Controller {
 			BirthdaysOverviewController.this.nextBirthday_Label
 					.setText(new LangResourceManager().getLocaleString(LangResourceKeys.str_nextBirthday_Label));
 			BirthdaysOverviewController.this.nextBdaysList.setStyle(null);
-			BirthdaysOverviewController.this.nextBdaysList.setCellFactory(colorCellFactory);
+			BirthdaysOverviewController.this.nextBdaysList
+					.setCellFactory(BirthdaysOverviewController.this.colorCellFactory);
 			BirthdaysOverviewController.this.nextBdaysList.refresh();
 		}
 	};
@@ -297,14 +308,14 @@ public class BirthdaysOverviewController extends Controller {
 				if (((MouseEvent) event).getClickCount() >= 2) {
 					final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList
 							.getSelectionModel().getSelectedItems();
-					final int indexOf = PersonManager.getInstance().getPersonDB().indexOf(selectedItems.get(0));
+					final int indexOf = PersonManager.getInstance().getPersons().indexOf(selectedItems.get(0));
 					BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(indexOf);
 				}
 			} else if (event.getEventType().equals(KeyEvent.KEY_PRESSED)) {
 				if (((KeyEvent) event).getCode() == KeyCode.ENTER) {
 					final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList
 							.getSelectionModel().getSelectedItems();
-					final int indexOf = PersonManager.getInstance().getPersonDB().indexOf(selectedItems.get(0));
+					final int indexOf = PersonManager.getInstance().getPersons().indexOf(selectedItems.get(0));
 					BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(indexOf);
 				}
 			}
@@ -314,39 +325,79 @@ public class BirthdaysOverviewController extends Controller {
 	Callback<ListView<Person>, ListCell<Person>> colorCellFactory = new Callback<ListView<Person>, ListCell<Person>>() {
 
 		@Override
-		public ListCell<Person> call(ListView<Person> param) {
+		public ListCell<Person> call(final ListView<Person> param) {
 
 			return new ListCell<Person>() {
 				@Override
-				protected void updateItem(Person item, boolean empty) {
+				protected void updateItem(final Person item, final boolean empty) {
+					Color firstColor = Color.web(PropertyManager.getProperty(PropertyFields.FIRST_HIGHLIGHT_COLOR));
+					Color secoundColor = Color.web(PropertyManager.getProperty(PropertyFields.SECOND_HIGHLIGHT_COLOR));
 					super.updateItem(item, empty);
-					styleProperty().bind(new SimpleStringProperty(""));
+					this.styleProperty().bind(new SimpleStringProperty(""));
 					if (!empty && item != null) {
 						if (item.getBirthday().isEqual(LocalDate.now().withYear(item.getBirthday().getYear()))) {
-							styleProperty().bind(Bindings.when(selectedProperty())
-									.then(new SimpleStringProperty("-fx-background-color: -fx-selection-bar;"))
-									.otherwise(new SimpleStringProperty(
-											String.format("-fx-background-color: rgba(%s,%s,%s,%s)", "100%", "0%", "0%",
-													"0.4") + ";")));
+							this.styleProperty()
+									.bind(Bindings.when(this.selectedProperty())
+											.then(new SimpleStringProperty("-fx-background-color: -fx-selection-bar;"))
+											.otherwise(new SimpleStringProperty("-fx-background-color: " + "#"
+													+ Integer.toHexString(firstColor.hashCode()))));
 						} else if (LocalDate.now().withYear(item.getBirthday().getYear()).isBefore(item.getBirthday())
 								&& item.getBirthday()
 										.isBefore(LocalDate.now().withYear(item.getBirthday().getYear()).plusDays(7))) {
 
-							styleProperty().bind(Bindings.when(selectedProperty())
-									.then(new SimpleStringProperty("-fx-background-color: -fx-selection-bar;"))
-									.otherwise(new SimpleStringProperty(
-											String.format("-fx-background-color: rgba(%s,%s,%s,%s)", "100%", "75%",
-													"0%", "0.4") + ";")));
+							this.styleProperty()
+									.bind(Bindings.when(this.selectedProperty())
+											.then(new SimpleStringProperty("-fx-background-color: -fx-selection-bar;"))
+											.otherwise(new SimpleStringProperty("-fx-background-color: " + "#"
+													+ Integer.toHexString(secoundColor.hashCode()))));
 						}
-						setText(item.toString() + "\t \t \t "
+						this.setText(item.toString() + "\t \t \t "
 								+ (new LangResourceManager().getLocaleString(LangResourceKeys.age)) + ":\t"
 								+ (LocalDate.now().getYear() - item.getBirthday().getYear()));
 
 					} else {
-						setText(null);
+						this.setText(null);
 					}
 				}
 			};
+
+		}
+
+	};
+
+	protected boolean showNextBirthdays;
+
+	private EventHandler<ActionEvent> importBirthdaysHandler = new EventHandler<ActionEvent>() {
+
+		@Override
+		public void handle(ActionEvent event) {
+			final FileChooser fileChooser = new FileChooser();
+			fileChooser.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
+			fileChooser.getExtensionFilters().add(new ExtensionFilter(new LangResourceManager().getLocaleString(LangResourceKeys.txt_file), "*.txt"));
+			fileChooser.getExtensionFilters().add(new ExtensionFilter(new LangResourceManager().getLocaleString(LangResourceKeys.csv_file), "*.csv"));
+			fileChooser.getExtensionFilters().add(new ExtensionFilter(new LangResourceManager().getLocaleString(LangResourceKeys.all_files), "*.*"));
+			fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+
+			// if the chooser is "x'ed" the file is null
+			final File selectedFile = fileChooser.showOpenDialog(getMainController().getStage().getScene().getWindow());
+			if (selectedFile == null) {
+				return;
+			}
+			BirthdaysOverviewController.this.LOG.debug("Importing file:" + selectedFile.getAbsolutePath());
+			try {
+				final LoadPersonsTask loadPersonsTask = new LoadPersonsTask(selectedFile, selectedFile.getAbsolutePath().endsWith(".csv"));
+				loadPersonsTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>() {
+					@Override
+					public void handle(final WorkerStateEvent event) {
+						PersonManager.getInstance().getPersons().addAll(loadPersonsTask.getValue());
+						BirthdaysOverviewController.this.LOG.debug("Imported birthdays from File");
+						getMainController().getSessionInfos().updateSubLists();
+					}
+				});
+				new Thread(loadPersonsTask).start();
+			} catch (IOException ioException) {
+				BirthdaysOverviewController.this.LOG.catching(Level.ERROR, ioException);
+			}
 
 		}
 
@@ -365,48 +416,48 @@ public class BirthdaysOverviewController extends Controller {
 	 * loaded properly.
 	 */
 	private void assertion() {
-		assert file_menu != null : "fx:id=\"file_menu\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert openFile_MenuItem != null : "fx:id=\"openFile_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert openRecent_MenuItem != null : "fx:id=\"openRecent_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert closeFile_MenuItem != null : "fx:id=\"closeFile_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert saveFile_MenuItem != null : "fx:id=\"saveFile_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert saveAsFile_MenuItem != null : "fx:id=\"saveAsFile_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert preferences_MenuItem != null : "fx:id=\"preferences_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert quit_MenuItem != null : "fx:id=\"quit_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert edit_menu != null : "fx:id=\"edit_menu\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert showNextBirthdays_MenuItem != null : "fx:id=\"showNextBirthdays_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert showLastBirthdays_MenuItem != null : "fx:id=\"showLastBirthdays_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert newBirthday_MenuItem != null : "fx:id=\"newBirthday_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert importBirthdays_MenuItem != null : "fx:id=\"importBirthdays_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert deleteBirthdays_MenuItem != null : "fx:id=\"deleteBirthdays_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert help_menu != null : "fx:id=\"help_menu\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert debug != null : "fx:id=\"debug\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert refresh_MenuItem != null : "fx:id=\"refresh_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert openFileExternal_Button != null : "fx:id=\"openFileExternal_Button\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert nextBirthday_Label != null : "fx:id=\"nextBirthday_Label\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert nextBdaysList != null : "fx:id=\"nextBdaysList\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert openBirthday_MenuItem != null : "fx:id=\"openBirthday_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert week_tap != null : "fx:id=\"week_tap\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert week_tableView != null : "fx:id=\"week_tableView\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert monday_column1 != null : "fx:id=\"monday_column1\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert tuesday_column1 != null : "fx:id=\"tuesday_column1\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert wednesday_column1 != null : "fx:id=\"wednesday_column1\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert thursday_column1 != null : "fx:id=\"thursday_column1\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert friday_column1 != null : "fx:id=\"friday_column1\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert saturday_column1 != null : "fx:id=\"saturday_column1\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert sunday_column1 != null : "fx:id=\"sunday_column1\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert month_tap != null : "fx:id=\"month_tap\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert monday_column2 != null : "fx:id=\"monday_column2\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert tuesday_column2 != null : "fx:id=\"tuesday_column2\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert wednesday_column2 != null : "fx:id=\"wednesday_column2\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert thursday_column2 != null : "fx:id=\"thursday_column2\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert friday_column2 != null : "fx:id=\"friday_column2\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert saturday_column2 != null : "fx:id=\"saturday_column2\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert sunday_column2 != null : "fx:id=\"sunday_column2\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert openedFile_label != null : "fx:id=\"openedFile_label\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert x3 != null : "fx:id=\"x3\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert x4 != null : "fx:id=\"x4\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert date_label != null : "fx:id=\"date_label\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.file_menu != null : "fx:id=\"file_menu\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.openFile_MenuItem != null : "fx:id=\"openFile_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.openRecent_MenuItem != null : "fx:id=\"openRecent_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.closeFile_MenuItem != null : "fx:id=\"closeFile_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.saveFile_MenuItem != null : "fx:id=\"saveFile_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.saveAsFile_MenuItem != null : "fx:id=\"saveAsFile_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.preferences_MenuItem != null : "fx:id=\"preferences_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.quit_MenuItem != null : "fx:id=\"quit_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.edit_menu != null : "fx:id=\"edit_menu\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.showNextBirthdays_MenuItem != null : "fx:id=\"showNextBirthdays_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.showLastBirthdays_MenuItem != null : "fx:id=\"showLastBirthdays_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.newBirthday_MenuItem != null : "fx:id=\"newBirthday_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.importBirthdays_MenuItem != null : "fx:id=\"importBirthdays_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.deleteBirthdays_MenuItem != null : "fx:id=\"deleteBirthdays_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.help_menu != null : "fx:id=\"help_menu\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.debug != null : "fx:id=\"debug\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.refresh_MenuItem != null : "fx:id=\"refresh_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.openFileExternal_Button != null : "fx:id=\"openFileExternal_Button\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.nextBirthday_Label != null : "fx:id=\"nextBirthday_Label\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.nextBdaysList != null : "fx:id=\"nextBdaysList\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.openBirthday_MenuItem != null : "fx:id=\"openBirthday_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.week_tap != null : "fx:id=\"week_tap\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.week_tableView != null : "fx:id=\"week_tableView\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.monday_column1 != null : "fx:id=\"monday_column1\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.tuesday_column1 != null : "fx:id=\"tuesday_column1\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.wednesday_column1 != null : "fx:id=\"wednesday_column1\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.thursday_column1 != null : "fx:id=\"thursday_column1\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.friday_column1 != null : "fx:id=\"friday_column1\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.saturday_column1 != null : "fx:id=\"saturday_column1\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.sunday_column1 != null : "fx:id=\"sunday_column1\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.month_tap != null : "fx:id=\"month_tap\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.monday_column2 != null : "fx:id=\"monday_column2\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.tuesday_column2 != null : "fx:id=\"tuesday_column2\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.wednesday_column2 != null : "fx:id=\"wednesday_column2\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.thursday_column2 != null : "fx:id=\"thursday_column2\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.friday_column2 != null : "fx:id=\"friday_column2\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.saturday_column2 != null : "fx:id=\"saturday_column2\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.sunday_column2 != null : "fx:id=\"sunday_column2\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.openedFile_label != null : "fx:id=\"openedFile_label\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.x3 != null : "fx:id=\"x3\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.x4 != null : "fx:id=\"x4\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+		assert this.date_label != null : "fx:id=\"date_label\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
 	}
 
 	/**
@@ -433,6 +484,7 @@ public class BirthdaysOverviewController extends Controller {
 		this.openBirthday_MenuItem.addEventHandler(ActionEvent.ANY, this.openBirthday);
 		this.newBirthday_MenuItem.addEventHandler(ActionEvent.ANY, this.newBirthdayHandler);
 		this.newBirthday_MenuItem.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
+		this.importBirthdays_MenuItem.addEventHandler(ActionEvent.ANY, this.importBirthdaysHandler);
 
 		this.showNextBirthdays_MenuItem.addEventHandler(ActionEvent.ANY, this.showNextBirthdaysHandler);
 		this.showLastBirthdays_MenuItem.addEventHandler(ActionEvent.ANY, this.showRecentBirthdaysHandler);
@@ -440,7 +492,7 @@ public class BirthdaysOverviewController extends Controller {
 		// configure the List
 		this.nextBdaysList.setItems(this.getMainController().getSessionInfos().getNextBirthdays());
 		this.nextBdaysList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-		this.nextBdaysList.setCellFactory(colorCellFactory);
+		this.nextBdaysList.setCellFactory(this.colorCellFactory);
 		this.nextBdaysList.addEventHandler(MouseEvent.MOUSE_CLICKED, this.birthdayDoubleClickHandler);
 		this.nextBdaysList.addEventHandler(KeyEvent.KEY_PRESSED, this.birthdayDoubleClickHandler);
 		// TODO this can be an performance issue
@@ -448,9 +500,10 @@ public class BirthdaysOverviewController extends Controller {
 		this.nextBdaysList.getItems().addListener((ListChangeListener<Person>) change ->
 
 		{
-			nextBdaysList.setCellFactory(null);
-			nextBdaysList.refresh();
-			nextBdaysList.setCellFactory(colorCellFactory);
+			this.nextBdaysList.setCellFactory(null);
+			this.nextBdaysList.refresh();
+			this.nextBdaysList.setCellFactory(this.colorCellFactory);
+			this.nextBdaysList.refresh();
 		});
 
 		// set Texts
@@ -462,7 +515,7 @@ public class BirthdaysOverviewController extends Controller {
 
 		this.openFileExternal_Button.addEventHandler(ActionEvent.ANY, this.getMainController().openFileExternal);
 
-		rightSide_TapView.visibleProperty().set(false);
+		this.rightSide_TapView.visibleProperty().set(false);
 
 		this.week_tableView.setItems(this.getMainController().getSessionInfos().getPersonsInAWeekList());
 		this.monday_column1.setCellValueFactory(new WeekTableCallback(DayOfWeek.MONDAY));
@@ -473,25 +526,52 @@ public class BirthdaysOverviewController extends Controller {
 		this.saturday_column1.setCellValueFactory(new WeekTableCallback(DayOfWeek.SATURDAY));
 		this.sunday_column1.setCellValueFactory(new WeekTableCallback(DayOfWeek.SUNDAY));
 
-		refresh_MenuItem.setOnAction((p) -> {
-			this.week_tableView.setItems(this.getMainController().getSessionInfos().getPersonsInAWeekList());
-			getMainController().getSessionInfos().updateSubLists();
-			System.out.println(this.getMainController().getSessionInfos().getPersonsInAWeekList());
-			this.week_tableView.refresh();
+		this.refresh_MenuItem.setOnAction((p) -> {
+			this.refreshBirthdayTableView();
 		});
 
-		expandRightSide_Button.setOnAction((p) -> {
-			if (expandRightSide_Button.getText().matches(">")) {
-				expandRightSide_Button.setText("<");
-				rightSide_TapView.visibleProperty().set(true);
-				getMainController().getStage().setWidth(1200);
+		this.expandRightSide_Button.setOnAction((p) -> {
+			if (this.expandRightSide_Button.getText().matches(">")) {
+				this.expandRightSide_Button.setText("<");
+				this.rightSide_TapView.visibleProperty().set(true);
+				this.getMainController().getStage().setWidth(1200);
 			} else {
-				expandRightSide_Button.setText(">");
-				rightSide_TapView.visibleProperty().set(false);
-				getMainController().getStage().setWidth(550);
+				this.expandRightSide_Button.setText(">");
+				this.rightSide_TapView.visibleProperty().set(false);
+				this.getMainController().getStage().setWidth(550);
 			}
 		});
+		getMainController().getStage().addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
 
+			@Override
+			public void handle(KeyEvent keyEvent) {
+				if (keyEvent.getCode() == KeyCode.TAB) {
+					if (BirthdaysOverviewController.this.showNextBirthdays) {
+						showNextBirthdays_MenuItem.fire();
+						BirthdaysOverviewController.this.showNextBirthdays = !BirthdaysOverviewController.this.showNextBirthdays;
+					} else {
+						showLastBirthdays_MenuItem.fire();
+						BirthdaysOverviewController.this.showNextBirthdays = !BirthdaysOverviewController.this.showNextBirthdays;
+					}
+					keyEvent.consume();
+				}
+
+			}
+
+		});
+
+	}
+
+	/**
+	 * 
+	 */
+	private void refreshBirthdayTableView() {
+		this.getMainController().getSessionInfos().updateSubLists();
+		this.week_tableView.refresh();
+		this.nextBdaysList.setCellFactory(null);
+		this.nextBdaysList.refresh();
+		this.nextBdaysList.setCellFactory(this.colorCellFactory);
+		this.nextBdaysList.refresh();
 	}
 
 	/**
@@ -513,7 +593,7 @@ public class BirthdaysOverviewController extends Controller {
 	 */
 	@Override
 	public void initialize(final URL location, final ResourceBundle resources) {
-		getMainController().getStage().setWidth(550);
+		this.getMainController().getStage().setWidth(550);
 
 		this.assertion();
 		// Localisation

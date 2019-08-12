@@ -8,11 +8,13 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 
+import org.apache.logging.log4j.Level;
+
 import application.model.Person;
 import application.model.PersonManager;
 import application.processes.SaveBirthdaysToFileTask;
-import application.util.PropertieFields;
-import application.util.PropertieManager;
+import application.util.PropertyFields;
+import application.util.PropertyManager;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
 import javafx.concurrent.WorkerStateEvent;
@@ -161,8 +163,7 @@ public class NewBirthdayViewController extends Controller {
 				NewBirthdayViewController.this.newPerson.setBirthday(birthdayFromDatePicker);
 			}
 
-			if (birthdayFromDatePicker == null || (surnameFromTextfield.isEmpty() && nameFromTextField.isEmpty()
-					&& middleNameFromTextField.isEmpty())) {
+			if (birthdayFromDatePicker == null || surnameFromTextfield.isEmpty() || nameFromTextField.isEmpty()) {
 				final LangResourceManager langResourceManager = new LangResourceManager();
 				final Alert alert = new Alert(AlertType.WARNING);
 				alert.setTitle(langResourceManager.getLocaleString(LangResourceKeys.person_not_valid_warning));
@@ -173,20 +174,19 @@ public class NewBirthdayViewController extends Controller {
 			PersonManager.getInstance().addNewPerson(NewBirthdayViewController.this.newPerson);
 			NewBirthdayViewController.this.getMainController().goToBirthdaysOverview();
 
-			NewBirthdayViewController.this.getMainController().getSessionInfos().updateSubLists();
-			if (new Boolean(PropertieManager.getPropertie(PropertieFields.WRITE_THRU))) {
-				SaveBirthdaysToFileTask task = new SaveBirthdaysToFileTask();
-				task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+			if (new Boolean(PropertyManager.getProperty(PropertyFields.WRITE_THRU)) && (getMainController().getSessionInfos().getSaveFile() != null)) {
+				SaveBirthdaysToFileTask saveBirthdaysToFileTask = new SaveBirthdaysToFileTask(getMainController().getSessionInfos().getSaveFile());
+				saveBirthdaysToFileTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 
 					@Override
 					public void handle(WorkerStateEvent event) {
 						if (event.getEventType() == WorkerStateEvent.WORKER_STATE_SUCCEEDED) {
-							LOG.debug("Saved changes to file	(via write thru)");
+							LOG.debug("Saved changes to file (via write thru)");
 						}
 					}
 				});
 
-				new Thread(task).start();
+				new Thread(saveBirthdaysToFileTask).start();
 			}
 
 		}
@@ -305,9 +305,14 @@ public class NewBirthdayViewController extends Controller {
 		this.birthday_Label.setText(resourceManager.getLocaleString(LangResourceKeys.birthday_Label));
 
 		this.openFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromFileChooserHandler);
-		this.recentFiles_MenuItem = new MenuItem(
-				new File(PropertieManager.getPropertie(PropertieFields.LAST_OPEND)).getName());
-		this.recentFiles_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromRecentHandler);
-		this.openRecent_MenuItem.getItems().add(this.recentFiles_MenuItem);
+		try {
+			this.recentFiles_MenuItem = new MenuItem(
+					new File(PropertyManager.getProperty(PropertyFields.LAST_OPEND)).getName());
+			this.recentFiles_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromRecentHandler);
+			this.openRecent_MenuItem.getItems().add(this.recentFiles_MenuItem);
+		} catch (NullPointerException nullPointerException) {
+			LOG.catching(Level.INFO, nullPointerException);
+			LOG.info("No recent File opend ?");
+		}
 	}
 }

@@ -1,17 +1,13 @@
 /*
  * user guide available at https://docs.gradle.org/4.8.1/userguide/java_library_plugin.html
  */
-plugins {
-  id "edu.sc.seis.launch4j" version "2.4.4"
-}
 apply plugin: 'java-library'
-apply plugin: 'eclipse-wtp'
 apply plugin: 'application'
 
 import java.text.SimpleDateFormat
 
 mainClassName = 'application.AppStart'
-version = '0.1.x-beta'
+version = '0.2.x-beta'
 
 def websiteDest = 'C:/Users/Admin/git/BirthdayManagerWebsite'
 def name = 'Birthday Manager'
@@ -58,11 +54,6 @@ repositories {
 	mavenCentral()
 }
 
-launch4j {
-    outfile = 'TestMain.exe'
-    mainClassName = 'application.AppStart'
-}
-
 clean {
     delete "C:/Users/Admin/git/BirthdayManagerWebsite/jar"
     delete "C:/Users/Admin/git/BirthdayManagerWebsite/javaDocs"
@@ -70,6 +61,21 @@ clean {
 
 def getDate() {
     return new Date().format('dd.MM.yyyy_HH:mm:ss')
+}
+
+task createProperties(dependsOn: processResources) {
+  doLast {
+    new File("$buildDir/resources/main/version.properties").withWriter { w ->
+        Properties p = new Properties()
+        p['version'] = project.version.toString()
+        p['date'] = getDate()
+        p.store w, null
+    }
+  }
+}
+
+classes {
+    dependsOn createProperties
 }
 
 task versionJS()  {

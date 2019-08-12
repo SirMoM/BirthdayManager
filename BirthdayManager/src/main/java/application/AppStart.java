@@ -1,7 +1,10 @@
 package application;
 
+import java.io.FileNotFoundException;
+
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import application.controller.MainController;
 import application.model.PersonManager;
@@ -17,6 +20,8 @@ import javafx.stage.Stage;
 
 public class AppStart extends Application {
 
+	Logger LOG = LogManager.getLogger(AppStart.class.getName());
+
 	public static void main(final String[] args) {
 		launch(args);
 	}
@@ -28,6 +33,7 @@ public class AppStart extends Application {
 			public void uncaughtException(final Thread thread, final Throwable throwable) {
 				LogManager.getLogger(PersonManager.class).catching(Level.FATAL, throwable);
 				LogManager.getLogger(PersonManager.class).catching(Level.FATAL, throwable.getCause());
+
 				final Alert alert = new Alert(AlertType.WARNING);
 				alert.setTitle("ERROR");
 				alert.setHeaderText("Someting went wrong! \n Consider sending me the log.");
@@ -61,9 +67,16 @@ public class AppStart extends Application {
 	}
 
 	@Override
-	public void start(final Stage stage) {
-
+	public void start(final Stage stage) throws FileNotFoundException {
 		final MainController mainController = new MainController(stage);
 		mainController.start();
+	}
+
+	@Override
+	public void stop() {
+		System.out.println("Stage is closing");
+
+		LOG.debug("CLOSING!");
+//		System.exit(0);
 	}
 }

@@ -17,7 +17,7 @@ import application.model.PersonManager;
  * @author Admin
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
-public class PropertieManager {
+public class PropertyManager {
 
 	private final Logger LOG = LogManager.getLogger(this.getClass().getName());
 
@@ -25,16 +25,16 @@ public class PropertieManager {
 	private final File propertiesFile;
 	private final String PROPERTIE_FILE_NAME = "BirthdayManager.properties";
 
-	private static PropertieManager propertieManagerSingelton = null;
+	private static PropertyManager propertieManagerSingelton = null;
 
 	/**
 	 * Static method to create instance of PersonManager class
 	 *
 	 * @return the only instance {@link PersonManager}
 	 */
-	public static PropertieManager getInstance() {
+	public static PropertyManager getInstance() {
 		if (propertieManagerSingelton == null) {
-			propertieManagerSingelton = new PropertieManager();
+			propertieManagerSingelton = new PropertyManager();
 		}
 		return propertieManagerSingelton;
 	}
@@ -43,7 +43,7 @@ public class PropertieManager {
 	 * Basis ConfigHandler uses the a app.cfg file generates it if necessary Private
 	 * constructor restricted to this class itself.
 	 */
-	private PropertieManager() {
+	private PropertyManager() {
 		this.properties = new Properties();
 //		this.propertiesFile = new File(System.getProperty("java.io.tmpdir") + this.PROPERTIE_FILE_NAME);
 		this.propertiesFile = new File(this.PROPERTIE_FILE_NAME);
@@ -53,9 +53,9 @@ public class PropertieManager {
 			if (this.propertiesFile.createNewFile()) {
 				this.LOG.info("Created new properties File");
 				this.fillWithStandartProperties();
-				this.LOG.info("Loaded default properties");
 			} else {
 				this.loadProperties();
+				this.fillWithStandartProperties();
 				this.LOG.info("Loaded properties");
 			}
 		} catch (final FileNotFoundException fileNotFoundException) {
@@ -74,14 +74,39 @@ public class PropertieManager {
 	 * <li>WRITE_THRU == false</li>
 	 * </ul>
 	 */
-	private void fillWithStandartProperties() {
-		this.properties.setProperty(PropertieFields.SHOW_BIRTHDAYS_COUNT, "15");
-		this.properties.setProperty(PropertieFields.SAVED_LOCALE, "en_GB");
-		this.properties.setProperty(PropertieFields.AUTOSAVE, "true");
-		this.properties.setProperty(PropertieFields.WRITE_THRU, "true");
-		this.properties.setProperty(PropertieFields.OPEN_FILE_ON_START, "true");
-		this.properties.setProperty(PropertieFields.HIGHLIGHT_TODAY_COLOR, "mediumseagreen");
-		this.properties.setProperty(PropertieFields.EXPORT_WITH_ALARM, "true");
+	protected void fillWithStandartProperties() {
+		if (this.properties.getProperty(PropertyFields.SAVED_LOCALE) == null) {
+			this.properties.setProperty(PropertyFields.SAVED_LOCALE, "en_GB");
+			LOG.info("Added " + PropertyFields.SAVED_LOCALE + " propery");
+		}
+		if (this.properties.getProperty(PropertyFields.AUTOSAVE) == null) {
+			this.properties.setProperty(PropertyFields.AUTOSAVE, "true");
+			LOG.info("Added " + PropertyFields.AUTOSAVE + " propery");
+		}
+		if (this.properties.getProperty(PropertyFields.WRITE_THRU) == null) {
+			this.properties.setProperty(PropertyFields.WRITE_THRU, "true");
+			LOG.info("Added " + PropertyFields.WRITE_THRU + " propery");
+		}
+		if (this.properties.getProperty(PropertyFields.OPEN_FILE_ON_START) == null) {
+			this.properties.setProperty(PropertyFields.OPEN_FILE_ON_START, "false");
+			LOG.info("Added " + PropertyFields.OPEN_FILE_ON_START + " propery");
+		}
+		if (this.properties.getProperty(PropertyFields.SHOW_BIRTHDAYS_COUNT) == null) {
+			this.properties.setProperty(PropertyFields.SHOW_BIRTHDAYS_COUNT, "15");
+			LOG.info("Added " + PropertyFields.SHOW_BIRTHDAYS_COUNT + " propery");
+		}
+		if (this.properties.getProperty(PropertyFields.FIRST_HIGHLIGHT_COLOR) == null) {
+			this.properties.setProperty(PropertyFields.FIRST_HIGHLIGHT_COLOR, "#ff000066");
+			LOG.info("Added " + PropertyFields.FIRST_HIGHLIGHT_COLOR + " propery");
+		}
+		if (this.properties.getProperty(PropertyFields.SECOND_HIGHLIGHT_COLOR) == null) {
+			this.properties.setProperty(PropertyFields.SECOND_HIGHLIGHT_COLOR, "#ffcc6666");
+			LOG.info("Added " + PropertyFields.SECOND_HIGHLIGHT_COLOR + " propery");
+		}
+		if (this.properties.getProperty(PropertyFields.EXPORT_WITH_ALARM) == null) {
+			this.properties.setProperty(PropertyFields.EXPORT_WITH_ALARM, "true");
+			LOG.info("Added " + PropertyFields.EXPORT_WITH_ALARM + " propery");
+		}
 		try {
 			this.storeProperties("Default properties stored");
 		} catch (final IOException ioException) {
@@ -92,7 +117,7 @@ public class PropertieManager {
 	/**
 	 * @return the a propertie
 	 */
-	public static String getPropertie(final String key) {
+	public static String getProperty(final String key) {
 		String propertie = null;
 		try {
 			propertie = getInstance().properties.get(key).toString();

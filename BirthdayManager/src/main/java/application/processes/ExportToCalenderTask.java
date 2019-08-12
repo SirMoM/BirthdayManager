@@ -10,8 +10,8 @@ import java.util.Date;
 
 import application.model.Person;
 import application.model.PersonManager;
-import application.util.PropertieFields;
-import application.util.PropertieManager;
+import application.util.PropertyFields;
+import application.util.PropertyManager;
 import biweekly.ICalVersion;
 import biweekly.ICalendar;
 import biweekly.component.VAlarm;
@@ -66,9 +66,9 @@ public class ExportToCalenderTask extends Task<Boolean> {
 	}
 
 	private void createCalender() {
-		int size = PersonManager.getInstance().getPersonDB().size();
+		int size = PersonManager.getInstance().getPersons().size();
 		for (int i = 0; i < size; i++) {
-			Person person = PersonManager.getInstance().getPersonDB().get(i);
+			Person person = PersonManager.getInstance().getPersons().get(i);
 			VEvent event = new VEvent();
 			Summary summary = event.setSummary(person.namesToString());
 			summary.setLanguage("de-DE");
@@ -77,7 +77,7 @@ public class ExportToCalenderTask extends Task<Boolean> {
 			event.setDateStart(start, false);
 			event.setClassification(Classification.PUBLIC);
 
-			if (new Boolean(PropertieManager.getPropertie(PropertieFields.EXPORT_WITH_ALARM))) {
+			if (new Boolean(PropertyManager.getProperty(PropertyFields.EXPORT_WITH_ALARM))) {
 				Duration dayBefore = Duration.builder().prior(true).days(1).build();
 				Duration onBirthday = Duration.builder().prior(false).hours(8).build();
 				event.addAlarm(new VAlarm(Action.display(), new Trigger(dayBefore, Related.START)));

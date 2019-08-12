@@ -11,9 +11,9 @@ import java.util.List;
  * @author Admin
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
-public class PersonsInAWeek{
+public class PersonsInAWeek {
 
-	static public List<PersonsInAWeek> parseAList(final List<Person> list){
+	static public List<PersonsInAWeek> parseAList(final List<Person> list) {
 		final List<Person> personsToParse = list;
 		Person mondayPerson = null;
 		Person tuesdayPerson = null;
@@ -24,65 +24,64 @@ public class PersonsInAWeek{
 		Person sundayPerson = null;
 
 		final ArrayList<PersonsInAWeek> personsInAWeekList = new ArrayList<PersonsInAWeek>();
-		System.out.println("personsToParse.size() " + personsToParse.size());
-		for(int i = 0; i < personsToParse.size(); i++){
+		for (int i = 0; i < personsToParse.size(); i++) {
 			final LocalDate birthday = personsToParse.get(i).getBirthday();
 			final LocalDate thisYearsBirthday = birthday.withYear(2019);
 
 			switch (thisYearsBirthday.getDayOfWeek()) {
-				case MONDAY:
-					if(mondayPerson == null){
-						mondayPerson = personsToParse.remove(i);
-						i = -1;
-					}
-					break;
-				case TUESDAY:
-					if(tuesdayPerson == null){
-						tuesdayPerson = personsToParse.remove(i);
-						i = -1;
-					}
-					break;
-				case WEDNESDAY:
-					if(wednesdayPerson == null){
-						wednesdayPerson = personsToParse.remove(i);
-						i = -1;
-					}
-					break;
-				case THURSDAY:
-					if(thursdayPerson == null){
-						thursdayPerson = personsToParse.remove(i);
-						i = -1;
-					}
-					break;
-				case FRIDAY:
-					if(fridayPerson == null){
-						fridayPerson = personsToParse.remove(i);
-						i = -1;
-					}
-					break;
-				case SATURDAY:
-					if(saturdayPerson == null){
-						saturdayPerson = personsToParse.remove(i);
-						i = -1;
-					}
-					break;
-				case SUNDAY:
-					if(sundayPerson == null){
-						sundayPerson = personsToParse.remove(i);
-						i = -1;
-					}
-					break;
+			case MONDAY:
+				if (mondayPerson == null) {
+					mondayPerson = personsToParse.remove(i);
+					i = -1;
+				}
+				break;
+			case TUESDAY:
+				if (tuesdayPerson == null) {
+					tuesdayPerson = personsToParse.remove(i);
+					i = -1;
+				}
+				break;
+			case WEDNESDAY:
+				if (wednesdayPerson == null) {
+					wednesdayPerson = personsToParse.remove(i);
+					i = -1;
+				}
+				break;
+			case THURSDAY:
+				if (thursdayPerson == null) {
+					thursdayPerson = personsToParse.remove(i);
+					i = -1;
+				}
+				break;
+			case FRIDAY:
+				if (fridayPerson == null) {
+					fridayPerson = personsToParse.remove(i);
+					i = -1;
+				}
+				break;
+			case SATURDAY:
+				if (saturdayPerson == null) {
+					saturdayPerson = personsToParse.remove(i);
+					i = -1;
+				}
+				break;
+			case SUNDAY:
+				if (sundayPerson == null) {
+					sundayPerson = personsToParse.remove(i);
+					i = -1;
+				}
+				break;
 			}
 		}
-		personsInAWeekList.add(new PersonsInAWeek(mondayPerson, tuesdayPerson, wednesdayPerson, thursdayPerson, fridayPerson, saturdayPerson, sundayPerson));
-		if(!personsToParse.isEmpty()){
+		personsInAWeekList.add(new PersonsInAWeek(mondayPerson, tuesdayPerson, wednesdayPerson, thursdayPerson,
+				fridayPerson, saturdayPerson, sundayPerson));
+		if (!personsToParse.isEmpty()) {
 			final List<PersonsInAWeek> parseAList = parseAList(personsToParse);
 			personsInAWeekList.addAll(parseAList);
 		}
 
 		return personsInAWeekList;
 	}
-
 
 	private Person mondayPerson;
 	private Person tuesdayPerson;
@@ -101,7 +100,9 @@ public class PersonsInAWeek{
 	 * @param saturdayPerson
 	 * @param sundayPerson
 	 */
-	public PersonsInAWeek(final Person mondayPerson, final Person tuesdayPerson, final Person wednesdayPerson, final Person thursdayPerson, final Person fridayPerson, final Person saturdayPerson, final Person sundayPerson){
+	public PersonsInAWeek(final Person mondayPerson, final Person tuesdayPerson, final Person wednesdayPerson,
+			final Person thursdayPerson, final Person fridayPerson, final Person saturdayPerson,
+			final Person sundayPerson) {
 		this.mondayPerson = mondayPerson;
 		this.tuesdayPerson = tuesdayPerson;
 		this.wednesdayPerson = wednesdayPerson;
@@ -117,39 +118,39 @@ public class PersonsInAWeek{
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-	public String toString(){
+	public String toString() {
 		final StringBuilder builder = new StringBuilder();
-		if(this.mondayPerson != null){
+		if (this.mondayPerson != null) {
 			builder.append("mondayPerson=");
 			builder.append(getMondayPerson());
 			builder.append(", ");
 		}
-		if(this.tuesdayPerson != null){
+		if (this.tuesdayPerson != null) {
 			builder.append("tuesdayPerson=");
 			builder.append(getTuesdayPerson());
 			builder.append(", ");
 		}
-		if(this.wednesdayPerson != null){
+		if (this.wednesdayPerson != null) {
 			builder.append("wednesdayPerson=");
 			builder.append(getWednesdayPerson());
 			builder.append(", ");
 		}
-		if(this.thursdayPerson != null){
+		if (this.thursdayPerson != null) {
 			builder.append("thursdayPerson=");
 			builder.append(getThursdayPerson());
 			builder.append(", ");
 		}
-		if(this.fridayPerson != null){
+		if (this.fridayPerson != null) {
 			builder.append("fridayPerson=");
 			builder.append(getFridayPerson());
 			builder.append(", ");
 		}
-		if(this.saturdayPerson != null){
+		if (this.saturdayPerson != null) {
 			builder.append("saturdayPerson=");
 			builder.append(getSaturdayPerson());
 			builder.append(", ");
 		}
-		if(this.sundayPerson != null){
+		if (this.sundayPerson != null) {
 			builder.append("sundayPerson=");
 			builder.append(getSundayPerson());
 		}
