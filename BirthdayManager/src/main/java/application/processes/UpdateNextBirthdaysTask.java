@@ -25,15 +25,20 @@ public class UpdateNextBirthdaysTask extends Task<List<Person>> {
 
 	private final Logger LOG;
 	private List<Person> personDB;
+	
+	
+	/**
+	 * How many birthdays will be shown. 
+	 */
 	private final int NEXT_BIRTHDAYS_COUNT;
+	
 	private int timeInWaiting;
 
-	/**
-	 *
-	 */
 	public UpdateNextBirthdaysTask() {
 		this.LOG = LogManager.getLogger(this.getClass().getName());
+		
 		NEXT_BIRTHDAYS_COUNT = Integer.parseInt(PropertyManager.getProperty(PropertyFields.SHOW_BIRTHDAYS_COUNT));
+		
 		if (PersonManager.getInstance().getPersons() != null && !PersonManager.getInstance().getPersons().isEmpty()) {
 			personDB = PersonManager.getInstance().getPersons();
 		}
@@ -50,9 +55,12 @@ public class UpdateNextBirthdaysTask extends Task<List<Person>> {
 	@Override
 	protected List<Person> call() throws Exception {
 		LOG.debug("Started " + this.getClass().getName() + " " + System.currentTimeMillis());
+		
+		// Checks if Data is there else aborts this Task.
 		while (personDB == null || PersonManager.getInstance().getPersons().isEmpty()) {
 			personDB = PersonManager.getInstance().getPersons();
 			LOG.info("Waiting for personenDB to be filled!");
+
 			Thread.sleep(500);
 			this.timeInWaiting += 500;
 			if (this.timeInWaiting > 10000) {
@@ -60,13 +68,16 @@ public class UpdateNextBirthdaysTask extends Task<List<Person>> {
 				LOG.debug("Thread canceled because it took too long to wait for the list of people!");
 			}
 		}
+		
 		final List<Person> upcomming = new ArrayList<Person>();
 		final List<Person> after = new ArrayList<Person>();
 		final List<Person> nextBirthdays = new ArrayList<Person>();
 
-		for (int i = 0; i < personDB.size(); i++) {
+		for (int i = 0; i < personDB.size() - 1; i++) {
 			final Person person = personDB.get(i);
-			if (person.getBirthday().getDayOfYear() >= LocalDate.now().getDayOfYear()) {
+			int dayOfYear = person.getBirthday().withYear(LocalDate.now().getYear()).getDayOfYear();
+			if (dayOfYear >= LocalDate.now().getDayOfYear()) {
+//			if (person.getBirthday().getDayOfYear() >= LocalDate.now().getDayOfYear()) {
 				upcomming.add(person);
 			} else {
 				after.add(person);

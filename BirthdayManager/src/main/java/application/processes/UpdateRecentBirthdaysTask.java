@@ -62,9 +62,10 @@ public class UpdateRecentBirthdaysTask extends Task<List<Person>> {
 		final List<Person> after = new ArrayList<Person>();
 		final List<Person> recentBirthdays = new ArrayList<Person>();
 
-		for (int i = 0; i < personDB.size(); i++) {
+		for (int i = 0; i < personDB.size() - 1; i++) {
 			final Person person = personDB.get(i);
-			if (person.getBirthday().getDayOfYear() >= LocalDate.now().getDayOfYear()) {
+			int dayOfYear = person.getBirthday().withYear(LocalDate.now().getYear()).getDayOfYear();
+			if (dayOfYear >= LocalDate.now().getDayOfYear()) {
 				upcomming.add(person);
 			} else {
 				after.add(person);
