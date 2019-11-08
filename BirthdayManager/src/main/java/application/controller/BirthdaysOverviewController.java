@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Level;
 import application.model.Person;
 import application.model.PersonManager;
 import application.model.PersonsInAWeek;
+import application.processes.CheckMissedBirthdays;
 import application.processes.LoadPersonsTask;
 import application.processes.SaveBirthdaysToFileTask;
 import application.util.PropertyFields;

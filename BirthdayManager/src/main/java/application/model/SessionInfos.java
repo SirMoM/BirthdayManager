@@ -5,9 +5,12 @@ package application.model;
 
 import java.io.File;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -15,18 +18,24 @@ import org.apache.logging.log4j.Logger;
 
 import application.controller.BirthdaysOverviewController;
 import application.controller.MainController;
+import application.processes.CheckMissedBirthdays;
 import application.processes.UpdateBirthdaysThisWeekTask;
 import application.processes.UpdateNextBirthdaysTask;
 import application.processes.UpdateRecentBirthdaysTask;
 import application.util.PropertyFields;
 import application.util.PropertyManager;
+import application.util.localisation.LangResourceKeys;
+import application.util.localisation.LangResourceManager;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.TextArea;
 
 /**
  * @author Noah Ruben
@@ -232,6 +241,47 @@ public class SessionInfos {
 					}
 				});
 		new Thread(updateRecentBirthdaysTask).start();
+		
+		CheckMissedBirthdays missedBirthdays = new CheckMissedBirthdays();
+		missedBirthdays.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>() {
+
+			@Override
+			public void handle(final WorkerStateEvent workerStateEvent) {
+				List<Person> value = missedBirthdays.getValue();
+				for (Person person : value) {
+					System.out.println(person);
+				}
+				
+				LangResourceManager lRM = new LangResourceManager();
+				
+				final Alert alert = new Alert(AlertType.WARNING);
+				alert.setTitle(lRM.getLocaleString(LangResourceKeys.missedBirthdays));
+				alert.setHeaderText(lRM.getLocaleString(LangResourceKeys.missedBirthdays));
+
+				StringBuilder stringBuilder = new StringBuilder();
+
+				for (Person person : value) {
+					int age = (LocalDate.now().getYear() - person.getBirthday().getYear());
+//					stringBuilder.append(lRM.getLocaleString(LangResourceKeys.age) + ": " + age+ "\t");
+					long days = ChronoUnit.DAYS.between(person.getBirthday().withYear(LocalDate.now().getYear()), LocalDate.now());
+					stringBuilder.append(person.namesToString()+ " ");
+					String missedBirthdaysMessage = String.format(lRM.getLocaleString(LangResourceKeys.missedBirthdaysMsg), days, age);
+					stringBuilder.append(missedBirthdaysMessage);
+					stringBuilder.append("\n");
+				}
+
+				final TextArea textArea = new TextArea(stringBuilder.toString());
+				textArea.setEditable(false);
+				textArea.setWrapText(false);
+
+				alert.getDialogPane().setContent(textArea);
+				alert.showAndWait();
+				LOG.debug(workerStateEvent.getSource().getClass().getName() + " ENDED ");
+			}
+		});
+
+	new Thread(missedBirthdays).start();
+
 	}
 
 	public File getSaveFile() {

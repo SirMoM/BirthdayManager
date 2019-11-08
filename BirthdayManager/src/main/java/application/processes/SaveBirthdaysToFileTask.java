@@ -61,8 +61,8 @@ public class SaveBirthdaysToFileTask extends Task<Boolean> {
 			if (this.saveFile.getAbsolutePath().endsWith(".csv")) {
 				LOG.debug("Saving to CSV");
 
-				for (int i = 0; i < persons.size(); i++) {
-					fileWriter.write(persons.get(i).toCSVString());
+				for (Person person: persons) {
+					fileWriter.write(person.toCSVString());
 					fileWriter.write(System.lineSeparator());
 					fileWriter.flush();
 				}

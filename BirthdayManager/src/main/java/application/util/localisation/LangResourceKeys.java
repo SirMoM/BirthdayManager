@@ -100,7 +100,9 @@ public enum LangResourceKeys {
 	no,
 	csv_file,
 	txt_file,
-	all_files,
+	all_files, 
+	missedBirthdays,
+	missedBirthdaysMsg,
 	;
 
 }

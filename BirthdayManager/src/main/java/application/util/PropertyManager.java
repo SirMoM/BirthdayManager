@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.Properties;
 
 import org.apache.logging.log4j.Level;
@@ -106,6 +108,10 @@ public class PropertyManager {
 		if (this.properties.getProperty(PropertyFields.EXPORT_WITH_ALARM) == null) {
 			this.properties.setProperty(PropertyFields.EXPORT_WITH_ALARM, "true");
 			LOG.info("Added " + PropertyFields.EXPORT_WITH_ALARM + " propery");
+		}
+		if (this.properties.getProperty(PropertyFields.LAST_VISIT) == null) {
+			this.properties.setProperty(PropertyFields.LAST_VISIT, LocalDate.now().toString());
+			LOG.info("Added " + PropertyFields.LAST_VISIT + " propery");
 		}
 		try {
 			this.storeProperties("Default properties stored");
