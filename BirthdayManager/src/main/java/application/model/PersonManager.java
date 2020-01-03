@@ -101,16 +101,6 @@ public class PersonManager {
 	}
 
 	/**
-	 * Saves the {@link ArrayList} {@link #personDB} to the {@link #saveFile} TODO
-	 * DELETE THIS
-	 *
-	 * @return a boolean which indicates if the save was completed
-	 */
-	public boolean save() {
-		return this.saveToFile();
-	}
-
-	/**
 	 * Saves the {@link ArrayList} {@link #personDB} to the selectedFile TODO DELETE
 	 * THIS
 	 *
@@ -144,46 +134,6 @@ public class PersonManager {
 		return true;
 	}
 
-	/**
-	 * Private saves the {@link ArrayList} {@link #personDB} to the TODO DELETE THIS
-	 * {@link #saveFile}
-	 *
-	 * @return a boolean which indicates if the save was completed
-	 */
-	private boolean saveToFile() {
-		if (saveFile == null) {
-			return false;
-		}
-
-		this.saveFile.delete();
-		LOG.info("Deleted File", this.saveFile);
-		this.checkSaveFile();
-
-		try {
-			final FileWriter fileWriter = new FileWriter(this.saveFile);
-			if (this.saveFile.getAbsolutePath().endsWith(".csv")) {
-				LOG.debug("Saving to CSV");
-				for (final Person person : this.personDB) {
-					fileWriter.write(person.toCSVString());
-					fileWriter.write(System.lineSeparator());
-					fileWriter.flush();
-				}
-			} else {
-				LOG.debug("Saving to TXT");
-				for (final Person person : this.personDB) {
-					fileWriter.write(person.toTXTString());
-					fileWriter.write(System.lineSeparator());
-					fileWriter.flush();
-				}
-
-			}
-			fileWriter.close();
-		} catch (final IOException ioException) {
-			LOG.catching(ioException);
-			return false;
-		}
-		return true;
-	}
 
 	/**
 	 * @param personDB the personDB to set

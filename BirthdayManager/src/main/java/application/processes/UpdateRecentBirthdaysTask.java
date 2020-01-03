@@ -34,7 +34,7 @@ public class UpdateRecentBirthdaysTask extends Task<List<Person>> {
 	public UpdateRecentBirthdaysTask() {
 		this.LOG = LogManager.getLogger(this.getClass().getName());
 		NEXT_BIRTHDAYS_COUNT = Integer.parseInt(PropertyManager.getProperty(PropertyFields.SHOW_BIRTHDAYS_COUNT));
-		if (PersonManager.getInstance().getPersons() != null && !PersonManager.getInstance().getPersons().isEmpty()) {
+		if (PersonManager.getInstance().getPersons() != null && !(PersonManager.getInstance().getPersons().isEmpty())) {
 			personDB = PersonManager.getInstance().getPersons();
 		}
 	}
@@ -87,7 +87,7 @@ public class UpdateRecentBirthdaysTask extends Task<List<Person>> {
 		int j = 0;
 		for (; j < NEXT_BIRTHDAYS_COUNT - i; j++) {
 			try {
-				recentBirthdays.add(after.get((upcomming.size() - 1) - j));
+				recentBirthdays.add(upcomming.get((upcomming.size() - 1) - j));
 			} catch (final IndexOutOfBoundsException indexOutOfBoundsException) {
 				LOG.debug("Probably not enought Persons to geather the 10 birthdays for recent",
 						indexOutOfBoundsException);
