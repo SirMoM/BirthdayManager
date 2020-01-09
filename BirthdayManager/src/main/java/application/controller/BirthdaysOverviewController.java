@@ -404,10 +404,6 @@ public class BirthdaysOverviewController extends Controller {
 
 	};
 
-	/**
-	 *
-	 * @see application.controller.Controller#Controller(MainController)
-	 */
 	public BirthdaysOverviewController(final MainController mainController) {
 		super(mainController);
 	}

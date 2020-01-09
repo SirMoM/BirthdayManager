@@ -22,7 +22,6 @@ import javafx.event.EventHandler;
 public class LoadPersonsTask extends Task<List<Person>> {
 	private final BufferedReader reader;
 	private final Logger LOG;
-	private final boolean HEADER = false;
 	private int prozess = 0;
 	private final boolean csvFile;
 	private final long MAX_Prozess;
@@ -30,7 +29,9 @@ public class LoadPersonsTask extends Task<List<Person>> {
 	/**
 	 * Base constructor
 	 *
-	 * @throws IOException
+	 * @param file File with all the persons.
+	 * @param csvFile if it is a CSV-file.
+	 * @throws IOException If the file can't be read.
 	 */
 	public LoadPersonsTask(final File file, final boolean csvFile) throws IOException {
 		super();

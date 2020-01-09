@@ -200,9 +200,6 @@ public class NewBirthdayViewController extends Controller {
 		}
 	};
 
-	/**
-	 * @see application.controller.Controller#Controller(MainController)
-	 */
 	public NewBirthdayViewController(final MainController mainController) {
 		super(mainController);
 		this.newPerson = new Person();

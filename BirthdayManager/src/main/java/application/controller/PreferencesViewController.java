@@ -222,10 +222,6 @@ public class PreferencesViewController extends Controller {
 		}
 	};
 
-	/**
-	 *
-	 * @see application.controller.Controller#Controller(MainController)
-	 */
 	public PreferencesViewController(final MainController mainController) {
 		super(mainController);
 	}

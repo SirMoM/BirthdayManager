@@ -230,7 +230,8 @@ public class EditBirthdayViewController extends Controller {
 	private int indexPerson = -1;
 
 	/**
-	 * @param indexPerson the index of Person to edit
+	 * @param mainController The "MainController" of this application.
+	 * @param indexPerson    the index of Person to edit.
 	 *
 	 * @see application.controller.Controller#Controller(MainController)
 	 */
