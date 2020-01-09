@@ -65,6 +65,7 @@ public class CheckMissedBirthdays extends Task<List<Person>> {
 			}
 		}
 		
+		// Get and manage last visit to comcare with today.
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		LocalDate lastVisit = LocalDate.parse(PropertyManager.getProperty(PropertyFields.LAST_VISIT), dateTimeFormatter);
 		PropertyManager.getInstance().getProperties().setProperty(PropertyFields.LAST_VISIT, LocalDate.now().format(dateTimeFormatter));
@@ -83,7 +84,6 @@ public class CheckMissedBirthdays extends Task<List<Person>> {
 	private List<Person> getBrithdaysSince(LocalDate lastVisit, LocalDate now) {
 		List<Person> skippedBirthdays = new ArrayList<Person>();
 		for (Person person : personDB) {
-			LOG.debug(person.toExtendedString());
 			if (person.getBirthday().withYear(now.getYear()).isAfter(lastVisit) && person.getBirthday().withYear(now.getYear()).isBefore(now)) {
 				LOG.debug(person.toExtendedString() + " missed!");
 				skippedBirthdays.add(person);

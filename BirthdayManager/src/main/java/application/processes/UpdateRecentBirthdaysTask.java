@@ -58,11 +58,17 @@ public class UpdateRecentBirthdaysTask extends Task<List<Person>> {
 			}
 		}
 
+		/** All upcomming persons / birthdays */
 		final List<Person> upcomming = new ArrayList<Person>();
+
+		/** All passed persons / birthdays */
 		final List<Person> after = new ArrayList<Person>();
+		
+		/** Final recent persons / birthdays */
 		final List<Person> recentBirthdays = new ArrayList<Person>();
 
-		for (int i = 0; i < personDB.size() - 1; i++) {
+		// Fill upcomming and after based on today
+		for (int i = 0; i < personDB.size(); i++) {
 			final Person person = personDB.get(i);
 			int dayOfYear = person.getBirthday().withYear(LocalDate.now().getYear()).getDayOfYear();
 			if (dayOfYear >= LocalDate.now().getDayOfYear()) {
