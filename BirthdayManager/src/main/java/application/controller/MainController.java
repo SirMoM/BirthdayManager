@@ -370,6 +370,20 @@ public class MainController{
 			this.LOG.catching(Level.ERROR, exception);
 		}
 	}
+	
+	/**
+	 * Swiches scenes to the BirthdayOverview. Generates a new Controller.
+	 *
+	 * @see EditBirthdayViewController
+	 */
+	public void goToSearchView(){
+		this.setActiveController(new SearchViewController(this));
+		try{
+			this.replaceSceneContent("/application/view/SearchView.fxml", this.getActiveController());
+		} catch (final Exception exception){
+			this.LOG.catching(Level.ERROR, exception);
+		}
+	}
 
 	/**
 	 * @param fxmlPath   the path of the FXML-File representing the view
