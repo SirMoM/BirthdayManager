@@ -8,7 +8,7 @@ import java.util.Arrays;
  * @created 02.02.2020
  */
 public class LevenshteinDistanz {
-	static int calculate(String x, String y) {
+	public static int calculate(String x, String y) {
 		// Check early break conditiones
 		if (x == null || y == null) {
 			throw new NullPointerException("String not filled!");
