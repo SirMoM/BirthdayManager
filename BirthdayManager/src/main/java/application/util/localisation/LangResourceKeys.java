@@ -85,6 +85,13 @@ public enum LangResourceKeys {
 	countBirthdaysShown_Label,
 	iCalNotification_checkBox,
 
+	// Search View
+	search,
+	enableFuzzy_RadioButton,
+	enableRegEx_RadioButton,
+	advancedSettings_TitledPane,
+	
+	
 	// ToolTipps
 	autsave_Tooltipp,
 	writeThru_Tooltip,

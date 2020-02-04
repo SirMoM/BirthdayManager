@@ -3,6 +3,10 @@
  */
 package application.controller;
 
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.Comparator;
@@ -43,39 +47,44 @@ public class SearchViewController extends Controller {
 
 	private ObservableList<Person> searchResults;
 
-	@FXML
-	private Label search_Label;
+	@FXML // ResourceBundle that was given to the FXMLLoader
+	private ResourceBundle resources;
 
-	@FXML
-	private TextField searchText_TextField;
+	@FXML // URL location of the FXML file that was given to the FXMLLoader
+	private URL location;
 
-	@FXML
-	private Button search_Button;
+	@FXML // fx:id="search_Label"
+	private Label search_Label; // Value injected by FXMLLoader
 
-	@FXML
-	private TitledPane advancedSettings_Accordion;
+	@FXML // fx:id="searchText_TextField"
+	private TextField searchText_TextField; // Value injected by FXMLLoader
 
-	@FXML
-	private DatePicker dateSearch_DatePicker;
+	@FXML // fx:id="search_Button"
+	private Button search_Button; // Value injected by FXMLLoader
 
-	@FXML
-	private RadioButton enableFuzzy_RadioButton;
+	@FXML // fx:id="advancedSettings_TitledPane"
+	private TitledPane advancedSettings_TitledPane; // Value injected by FXMLLoader
 
-	@FXML
-	private RadioButton enableRegEx_RadioButton;
+	@FXML // fx:id="dateSearch_DatePicker"
+	private DatePicker dateSearch_DatePicker; // Value injected by FXMLLoader
 
-	@FXML
-	private Button dateSearch_Button;
+	@FXML // fx:id="enableFuzzy_RadioButton"
+	private RadioButton enableFuzzy_RadioButton; // Value injected by FXMLLoader
 
-	@FXML
-	private ListView<Person> searchResults_ListView;
+	@FXML // fx:id="enableRegEx_RadioButton"
+	private RadioButton enableRegEx_RadioButton; // Value injected by FXMLLoader
 
-	@FXML
-	private MenuItem openBirthday_MenuItem;
+	@FXML // fx:id="dateSearch_Button"
+	private Button dateSearch_Button; // Value injected by FXMLLoader
+
+	@FXML // fx:id="searchResults_ListView"
+	private ListView<Person> searchResults_ListView; // Value injected by FXMLLoader
+
+	@FXML // fx:id="openBirthday_MenuItem"
+	private MenuItem openBirthday_MenuItem; // Value injected by FXMLLoader
 
 	private EventHandler<Event> searchEventHandler = new EventHandler<Event>() {
-
-		@Override
+		@Override 
 		public void handle(Event event) {
 			if (event instanceof KeyEvent) {
 				KeyEvent keyEvent = (KeyEvent) event;
@@ -99,9 +108,12 @@ public class SearchViewController extends Controller {
 				start = System.currentTimeMillis();
 				for (Person person : PersonManager.getInstance().getPersons()) {
 					String searchString = searchText.toUpperCase();
-					boolean surname = person.getSurname()	!= null && LevenshteinDistanz.calculate(person.getSurname().toUpperCase(), searchString) <= 2;
-					boolean name = person.getName() 		!= null && LevenshteinDistanz.calculate(person.getName().toUpperCase(), searchString) <= 2;
-					boolean misc = person.getMisc()			!= null && LevenshteinDistanz.calculate(person.getMisc().toUpperCase(), searchString) <= 2;
+					boolean surname = person.getSurname() != null
+							&& LevenshteinDistanz.calculate(person.getSurname().toUpperCase(), searchString) <= 2;
+					boolean name = person.getName() != null
+							&& LevenshteinDistanz.calculate(person.getName().toUpperCase(), searchString) <= 2;
+					boolean misc = person.getMisc() != null
+							&& LevenshteinDistanz.calculate(person.getMisc().toUpperCase(), searchString) <= 2;
 
 					if (surname || name || misc) {
 						searchResults.add(person);
@@ -134,33 +146,64 @@ public class SearchViewController extends Controller {
 			double x = (end - start) * 1e-3;
 			SearchViewController.this.LOG.debug("Searching the data took: " + x + " Seconds.");
 
-		}};
+		}
+	};
 
-	final EventHandler<ActionEvent> openBirthday=new EventHandler<ActionEvent>(){@Override public void handle(final ActionEvent arg0){final ObservableList<Person>selectedItems=SearchViewController.this.searchResults_ListView.getSelectionModel().getSelectedItems();if(selectedItems.isEmpty()){return;}else{final int indexOf=PersonManager.getInstance().getPersons().indexOf(selectedItems.get(0));SearchViewController.this.getMainController().goToEditBirthdayView(indexOf);}}};
+	final EventHandler<ActionEvent> openBirthday = new EventHandler<ActionEvent>() {
+		@Override
+		public void handle(final ActionEvent arg0) {
+			final ObservableList<Person> selectedItems = SearchViewController.this.searchResults_ListView
+					.getSelectionModel().getSelectedItems();
+			if (selectedItems.isEmpty()) {
+				return;
+			} else {
+				final int indexOf = PersonManager.getInstance().getPersons().indexOf(selectedItems.get(0));
+				SearchViewController.this.getMainController().goToEditBirthdayView(indexOf);
+			}
+		}
+	};
 
-	private EventHandler<ActionEvent> switchFuzzyRegExEventHandler=new EventHandler<ActionEvent>(){
+	private EventHandler<ActionEvent> switchFuzzyRegExEventHandler = new EventHandler<ActionEvent>() {
 
-	@Override public void handle(ActionEvent event){if(event.getSource()instanceof RadioButton){RadioButton radioButtonSource=(RadioButton)event.getSource();if(!radioButtonSource.isSelected()){return;}if(radioButtonSource.getId()==enableFuzzy_RadioButton.getId()){SearchViewController.this.enableRegEx_RadioButton.selectedProperty().set(!SearchViewController.this.enableFuzzy_RadioButton.selectedProperty().getValue());}else{SearchViewController.this.enableFuzzy_RadioButton.selectedProperty().set(!SearchViewController.this.enableRegEx_RadioButton.selectedProperty().getValue());}}}};
-
-	private EventHandler<ActionEvent> searchDateEventHandler = new EventHandler<ActionEvent>() {
-		
 		@Override
 		public void handle(ActionEvent event) {
-			
+			if (event.getSource() instanceof RadioButton) {
+				RadioButton radioButtonSource = (RadioButton) event.getSource();
+				if (!radioButtonSource.isSelected()) {
+					return;
+				}
+				if (radioButtonSource.getId() == enableFuzzy_RadioButton.getId()) {
+					SearchViewController.this.enableRegEx_RadioButton.selectedProperty()
+							.set(!SearchViewController.this.enableFuzzy_RadioButton.selectedProperty().getValue());
+				} else {
+					SearchViewController.this.enableFuzzy_RadioButton.selectedProperty()
+							.set(!SearchViewController.this.enableRegEx_RadioButton.selectedProperty().getValue());
+				}
+			}
+		}
+	};
+
+	private EventHandler<ActionEvent> searchDateEventHandler = new EventHandler<ActionEvent>() {
+
+		@Override
+		public void handle(ActionEvent event) {
+
 			if (SearchViewController.this.dateSearch_DatePicker.getValue() == null) {
 				return;
 			}
-			
+
 			int year = LocalDate.now().getYear();
 			SearchViewController.this.searchResults.clear();
-			
+
 			for (Person person : PersonManager.getInstance().getPersons()) {
 //				if (person.getBirthday().withYear(year).isEqual(SearchViewController.this.dateSearch_DatePicker.getValue())) {
 //					SearchViewController.this.searchResults.add(person);
 //				}
-				boolean start = person.getBirthday().withYear(year).isAfter(SearchViewController.this.dateSearch_DatePicker.getValue().minusDays(6));
-				boolean end = person.getBirthday().withYear(year).isBefore(SearchViewController.this.dateSearch_DatePicker.getValue().plusDays(6));
-				
+				boolean start = person.getBirthday().withYear(year)
+						.isAfter(SearchViewController.this.dateSearch_DatePicker.getValue().minusDays(6));
+				boolean end = person.getBirthday().withYear(year)
+						.isBefore(SearchViewController.this.dateSearch_DatePicker.getValue().plusDays(6));
+
 				if (start && end) {
 					SearchViewController.this.searchResults.add(person);
 				}
@@ -172,6 +215,13 @@ public class SearchViewController extends Controller {
 	public SearchViewController(MainController mainController) {
 		super(mainController);
 		searchResults = FXCollections.observableArrayList();
+	}
+
+	@FXML
+	void showRegExHelp(ActionEvent event) throws IOException, URISyntaxException {
+		if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+		    Desktop.getDesktop().browse(new URI("https://regexr.com/"));
+		}
 	}
 
 	/**
@@ -231,7 +281,7 @@ public class SearchViewController extends Controller {
 		assert search_Label != null : "fx:id=\"search_Label\" was not injected: check your FXML file 'SearchView.fxml'.";
 		assert searchText_TextField != null : "fx:id=\"searchText_TextField\" was not injected: check your FXML file 'SearchView.fxml'.";
 		assert search_Button != null : "fx:id=\"search_Button\" was not injected: check your FXML file 'SearchView.fxml'.";
-		assert advancedSettings_Accordion != null : "fx:id=\"advancedSettings_Accordion\" was not injected: check your FXML file 'SearchView.fxml'.";
+		assert advancedSettings_TitledPane != null : "fx:id=\"advancedSettings_TitledPane\" was not injected: check your FXML file 'SearchView.fxml'.";
 		assert dateSearch_DatePicker != null : "fx:id=\"dateSearch_DatePicker\" was not injected: check your FXML file 'SearchView.fxml'.";
 		assert enableFuzzy_RadioButton != null : "fx:id=\"enableFuzzy_RadioButton\" was not injected: check your FXML file 'SearchView.fxml'.";
 		assert enableRegEx_RadioButton != null : "fx:id=\"enableRegEx_RadioButton\" was not injected: check your FXML file 'SearchView.fxml'.";
@@ -257,8 +307,15 @@ public class SearchViewController extends Controller {
 
 	@Override
 	public void updateLocalisation() {
-		this.openBirthday_MenuItem
-				.setText((new LangResourceManager()).getLocaleString(LangResourceKeys.openBirthday_MenuItem));
+		LangResourceManager lrm = new LangResourceManager();
+		this.openBirthday_MenuItem.setText(lrm.getLocaleString(LangResourceKeys.openBirthday_MenuItem));
+		this.search_Label.setText(lrm.getLocaleString(LangResourceKeys.search));
+		this.search_Button.setText(lrm.getLocaleString(LangResourceKeys.search));
+		this.enableFuzzy_RadioButton.setText(lrm.getLocaleString(LangResourceKeys.enableFuzzy_RadioButton));
+		this.enableRegEx_RadioButton.setText(lrm.getLocaleString(LangResourceKeys.enableRegEx_RadioButton));
+		this.dateSearch_Button.setText(lrm.getLocaleString(LangResourceKeys.search));
+		this.openBirthday_MenuItem.setText(lrm.getLocaleString(LangResourceKeys.openBirthday_MenuItem));
+		this.advancedSettings_TitledPane.setText(lrm.getLocaleString(LangResourceKeys.advancedSettings_TitledPane));
 	}
 
 }
