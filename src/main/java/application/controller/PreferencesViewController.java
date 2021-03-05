@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import javafx.scene.control.*;
 import org.apache.logging.log4j.Level;
 
 import application.util.PropertyFields;
@@ -23,20 +24,8 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ColorPicker;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -125,6 +114,9 @@ public class PreferencesViewController extends Controller {
 
 	@FXML
 	private Label countBirthdaysShown_Label;
+
+	@FXML
+	private ToggleButton darkMode_ToggleButton;
 
 	ChangeListener<Boolean> openFileOnStartCheckboxChangeListener = new ChangeListener<Boolean>() {
 
@@ -231,29 +223,30 @@ public class PreferencesViewController extends Controller {
 	 * loaded properly.
 	 */
 	private void assertions() {
-		assert this.languageOptions_Label != null : "fx:id=\"languageOptions_Label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.chooseLanguage_Label != null : "fx:id=\"chooseLanguage_Label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.language_CompoBox != null : "fx:id=\"language_CompoBox\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.saveOptions_Label != null : "fx:id=\"saveOptions_Label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.writeThru_CheckBox != null : "fx:id=\"writeThru_CheckBox\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.writeThru_Tooltip != null : "fx:id=\"writeThru_Tooltip\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.autoSave_CheckBox != null : "fx:id=\"autoSave_CheckBox\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.autsave_Tooltipp != null : "fx:id=\"autsave_Tooltipp\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.miscellaneous_label != null : "fx:id=\"miscellaneous_label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.openFileOnStart_Checkbox != null : "fx:id=\"openFileOnStart_Checkbox\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.openFileOnStartUp_ToolTipp != null : "fx:id=\"openFileOnStartUp_ToolTipp\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.startupFile_textField != null : "fx:id=\"startupFile_textField\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.chooseFile_button != null : "fx:id=\"chooseFile_button\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.cancel_button != null : "fx:id=\"cancel_button\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.save_button != null : "fx:id=\"save_button\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.iCalNotification_CheckBox != null : "fx:id=\"iCalNotification_CheckBox\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.first_ColorPicker != null : "fx:id=\"first_ColorPicker\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.second_ColorPicker != null : "fx:id=\"second_ColorPicker\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.firstHighlightingColor_Label != null : "fx:id=\"firstHighlightingColor_Label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.secondHighlightingColor_Label != null : "fx:id=\"secondHighlightingColor_Label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.appearanceOptions_Label != null : "fx:id=\"appearanceOptions_Label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.countBirthdaysShown_Spinner != null : "fx:id=\"countBirthdaysShown_Spinner\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.countBirthdaysShown_Label != null : "fx:id=\"countBirthdaysShown_Label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert languageOptions_Label != null : "fx:id=\"languageOptions_Label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert chooseLanguage_Label != null : "fx:id=\"chooseLanguage_Label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert language_CompoBox != null : "fx:id=\"language_CompoBox\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert saveOptions_Label != null : "fx:id=\"saveOptions_Label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert writeThru_CheckBox != null : "fx:id=\"writeThru_CheckBox\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert writeThru_Tooltip != null : "fx:id=\"writeThru_Tooltip\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert autoSave_CheckBox != null : "fx:id=\"autoSave_CheckBox\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert autsave_Tooltipp != null : "fx:id=\"autsave_Tooltipp\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert miscellaneous_label != null : "fx:id=\"miscellaneous_label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert openFileOnStart_Checkbox != null : "fx:id=\"openFileOnStart_Checkbox\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert openFileOnStartUp_ToolTipp != null : "fx:id=\"openFileOnStartUp_ToolTipp\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert startupFile_textField != null : "fx:id=\"startupFile_textField\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert chooseFile_button != null : "fx:id=\"chooseFile_button\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert cancel_button != null : "fx:id=\"cancel_button\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert save_button != null : "fx:id=\"save_button\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert iCalNotification_CheckBox != null : "fx:id=\"iCalNotification_CheckBox\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert first_ColorPicker != null : "fx:id=\"first_ColorPicker\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert second_ColorPicker != null : "fx:id=\"second_ColorPicker\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert firstHighlightingColor_Label != null : "fx:id=\"firstHighlightingColor_Label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert secondHighlightingColor_Label != null : "fx:id=\"secondHighlightingColor_Label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert appearanceOptions_Label != null : "fx:id=\"appearanceOptions_Label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert countBirthdaysShown_Spinner != null : "fx:id=\"countBirthdaysShown_Spinner\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert countBirthdaysShown_Label != null : "fx:id=\"countBirthdaysShown_Label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert darkMode_ToggleButton != null : "fx:id=\"darkMode_ToggleButton\" was not injected: check your FXML file 'PreferencesView.fxml'.";
 
 	}
 

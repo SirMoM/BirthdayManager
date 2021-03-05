@@ -449,6 +449,7 @@ public class MainController{
 			final Stage stage = new Stage();
 			stage.setTitle("Preferences");
 			stage.setScene(scene);
+			scene.getStylesheets().add("dark-mode.css");
 			stage.show();
 		} catch (final IOException ioException){
 			this.LOG.log(Level.ERROR, "Failed to create new Window.", ioException);
