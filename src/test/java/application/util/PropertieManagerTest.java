@@ -26,6 +26,7 @@ public class PropertieManagerTest {
 	@Before
 	public void setUp() throws Exception {
 		PropertyManager.getInstance().fillWithStandartProperties();
+		System.out.println(PropertyManager.getInstance());
 
 	}
 
