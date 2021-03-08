@@ -18,4 +18,4 @@ jobs:
       - name: Get graddle wrapper
         run: ./gradlew wrapper
       - name: Publish to GH packages
-        run: ./gradlew clean check jar publish
+        run: ./gradlew publish
