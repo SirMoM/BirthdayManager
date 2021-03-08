@@ -113,7 +113,7 @@ release {
     git {
         requireBranch = 'master'
         pushToRemote = 'origin'
-        pushToBranchPrefix = 'release'
+        pushToBranchPrefix = 'release/'
         commitVersionFileOnly = false
         signTag = false
     }
