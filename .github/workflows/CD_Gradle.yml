@@ -18,4 +18,6 @@ jobs:
       - name: Get graddle wrapper
         run: ./gradlew wrapper
       - name: Publish to GH packages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew publish
