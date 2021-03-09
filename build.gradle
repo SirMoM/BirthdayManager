@@ -24,6 +24,7 @@ dependencies {
     // Gradle dependencies
     // This dependency is used by the application.
     implementation 'com.google.guava:guava:29.0-jre'
+    implementation 'org.junit.jupiter:junit-jupiter:5.4.2'
 
 
     // Exporting to iCal
