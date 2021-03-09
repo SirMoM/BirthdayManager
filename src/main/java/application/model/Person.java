@@ -1,6 +1,3 @@
-/**
- *
- */
 package application.model;
 
 import static java.time.LocalDate.parse;
@@ -20,120 +17,8 @@ import javafx.scene.control.Alert.AlertType;
  * @author Noah Ruben
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
-/**
- * @author Admin
- * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
- */
-/**
- * @author Admin
- * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
- */
 public class Person {
 	protected final static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-
-	/**
-	 * Parsing lines in the format: birthday;name;sonstiges
-	 * <ul>
-	 * <li>the name is expected like this: name, surname, misc
-	 * <li>the birthday is expected like this: dd.MM.yyyy
-	 * </ul>
-	 *
-	 * <p><b>The name and surname are mandatory</b></p>
-	 *
-	 * @param txtLine a read line from the file
-	 * @param line which line of the file is parsed right now
-	 * @return a new Person resulting from the given String
-	 */
-	public static Person parseFromCSVLine(final String txtLine, final int line) {
-		String name = null;
-		String surname = null;
-		String misc = null;
-		final LocalDate birthday;
-		String whatCouldNotBeParsed = null;
-		try {
-			final String[] splitLine = txtLine.split(",");
-			if (splitLine.length < 1) {
-				throw new IndexOutOfBoundsException("Could not split line");
-			}
-			whatCouldNotBeParsed = "birthday";
-			birthday = parse(splitLine[0], Person.DATE_FORMATTER);
-
-			whatCouldNotBeParsed = "full name";
-			final String[] nameAsArray = splitLine[1].split(";");
-
-			whatCouldNotBeParsed = "name";
-			name = nameAsArray[0];
-			whatCouldNotBeParsed = "surname";
-			surname = nameAsArray[1];
-
-			if (nameAsArray.length > 2) {
-				whatCouldNotBeParsed = "misc";
-				misc = nameAsArray[2];
-			} else {
-				misc = null;
-			}
-
-			whatCouldNotBeParsed = null;
-			return new Person(surname, name, misc, birthday);
-		} catch (final IndexOutOfBoundsException indexOutOfBoundsException) {
-			final Alert alert = new Alert(AlertType.WARNING);
-			alert.setTitle("ERROR: Parsing failed");
-			alert.setHeaderText("Line " + line + " could not be parsed: ");
-			alert.setContentText("This attribute could not be parsed: " + whatCouldNotBeParsed + "\n" + txtLine);
-			alert.showAndWait();
-			return null;
-		}
-
-	}
-
-	/**
-	 * @param txtLine a read line from the Text-file
-	 * @return a new Person resulting from the given String
-	 */
-	public static Person parseFromTXTLine(final String txtLine) {
-		String name = null;
-		String surname = null;
-		String misc = null;
-		LocalDate birthday = null;
-
-		try {
-			final String[] splitLine = txtLine.split("=");
-			if (splitLine.length < 1) {
-				throw new IndexOutOfBoundsException("Could not split line");
-			}
-			final String[] nameSplit = splitLine[0].split(" ");
-			try {
-				birthday = parse(splitLine[1], Person.DATE_FORMATTER);
-			} catch (final DateTimeParseException e) {
-				final Alert alert = new Alert(AlertType.WARNING);
-				alert.setTitle("Could not parse this birthday");
-				alert.setHeaderText("Birthday which could not be parsed: ");
-				alert.setContentText(splitLine[1]);
-				alert.showAndWait();
-				return null;
-			}
-
-			if (nameSplit.length == 3) {
-				name = nameSplit[0];
-				misc = nameSplit[1];
-				surname = nameSplit[2];
-			} else if (nameSplit.length == 2) {
-				name = nameSplit[0];
-				surname = nameSplit[1];
-			} else {
-				misc = splitLine[0];
-			}
-			return new Person(surname, name, misc, birthday);
-		} catch (final IndexOutOfBoundsException e) {
-			final Alert alert = new Alert(AlertType.WARNING);
-			alert.setTitle("Could not parse this line");
-			alert.setHeaderText("Line which could not be parsed: ");
-			alert.setContentText(txtLine);
-			alert.showAndWait();
-			return null;
-		}
-
-	}
 
 	private StringProperty surname;
 
@@ -250,6 +135,182 @@ public class Person {
 		this.surname.set(surname);
 	}
 
+
+
+
+	/**
+	 * Parsing lines in the format: birthday;name;sonstiges
+	 * <ul>
+	 * <li>the name is expected like this: name, surname, misc
+	 * <li>the birthday is expected like this: dd.MM.yyyy
+	 * </ul>
+	 *
+	 * <p><b>The name and surname are mandatory</b></p>
+	 *
+	 * @param txtLine a read line from the file
+	 * @param line which line of the file is parsed right now
+	 * @return a new Person resulting from the given String
+	 */
+	public static Person parseFromCSVLine(final String txtLine, final int line) {
+		String name = null;
+		String surname = null;
+		String misc = null;
+		final LocalDate birthday;
+		String whatCouldNotBeParsed = null;
+		try {
+			final String[] splitLine = txtLine.split(",");
+			if (splitLine.length < 1) {
+				throw new IndexOutOfBoundsException("Could not split line");
+			}
+			whatCouldNotBeParsed = "birthday";
+			birthday = parse(splitLine[0], Person.DATE_FORMATTER);
+
+			whatCouldNotBeParsed = "full name";
+			final String[] nameAsArray = splitLine[1].split(";");
+
+			whatCouldNotBeParsed = "name";
+			name = nameAsArray[0];
+			whatCouldNotBeParsed = "surname";
+			surname = nameAsArray[1];
+
+			if (nameAsArray.length > 2) {
+				whatCouldNotBeParsed = "misc";
+				misc = nameAsArray[2];
+			} else {
+				misc = null;
+			}
+
+			whatCouldNotBeParsed = null;
+			return new Person(surname, name, misc, birthday);
+		} catch (final IndexOutOfBoundsException indexOutOfBoundsException) {
+			final Alert alert = new Alert(AlertType.WARNING);
+			alert.setTitle("ERROR: Parsing failed");
+			alert.setHeaderText("Line " + line + " could not be parsed: ");
+			alert.setContentText("This attribute could not be parsed: " + whatCouldNotBeParsed + "\n" + txtLine);
+			alert.showAndWait();
+			return null;
+		}
+
+	}
+
+	/**
+	 * @param txtLine a read line from the Text-file
+	 * @return a new Person resulting from the given String
+	 */
+	public static Person parseFromTXTLine(final String txtLine) {
+		String name = null;
+		String surname = null;
+		String misc = null;
+		LocalDate birthday = null;
+
+		try {
+			final String[] splitLine = txtLine.split("=");
+			if (splitLine.length < 1) {
+				throw new IndexOutOfBoundsException("Could not split line");
+			}
+			final String[] nameSplit = splitLine[0].split(" ");
+			try {
+				birthday = parse(splitLine[1], Person.DATE_FORMATTER);
+			} catch (final DateTimeParseException e) {
+				final Alert alert = new Alert(AlertType.WARNING);
+				alert.setTitle("Could not parse this birthday");
+				alert.setHeaderText("Birthday which could not be parsed: ");
+				alert.setContentText(splitLine[1]);
+				alert.showAndWait();
+				return null;
+			}
+
+			if (nameSplit.length == 3) {
+				name = nameSplit[0];
+				misc = nameSplit[1];
+				surname = nameSplit[2];
+			} else if (nameSplit.length == 2) {
+				name = nameSplit[0];
+				surname = nameSplit[1];
+			} else {
+				misc = splitLine[0];
+			}
+			return new Person(surname, name, misc, birthday);
+		} catch (final IndexOutOfBoundsException e) {
+			final Alert alert = new Alert(AlertType.WARNING);
+			alert.setTitle("Could not parse this line");
+			alert.setHeaderText("Line which could not be parsed: ");
+			alert.setContentText(txtLine);
+			alert.showAndWait();
+			return null;
+		}
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		final StringBuilder builder = new StringBuilder();
+		if (this.name.get() != null) {
+			builder.append(this.name.get());
+		}
+		if (this.misc.get() != null) {
+			builder.append(" ");
+			builder.append(this.misc.get());
+		}
+		if (this.getSurname() != null) {
+			builder.append(" ");
+			builder.append(this.surname.get());
+		}
+		if (this.birthday.get() != null) {
+			builder.append("\n");
+			builder.append(DATE_FORMATTER.format(this.birthday.get()));
+		}
+		return builder.toString();
+	}
+
+	public String namesToString() {
+		final StringBuilder builder = new StringBuilder();
+		if (this.getName() != null) {
+			builder.append(this.name.get());
+		}
+		if (this.getMisc() != null) {
+			builder.append(" ");
+			builder.append(this.misc.get());
+		}
+		if (this.getSurname() != null) {
+			builder.append(" ");
+			builder.append(this.surname.get());
+		}
+		return builder.toString();
+	}
+
+	/**
+	 * String representation of the person with the formate: <br>
+	 * <code>name misc surname</code>=<code>dd.mm.yyyy</code>
+	 *
+	 * @return The String representation of the person for a TXT-file.
+	 */
+	public String toTXTString() {
+		final StringBuilder builder = new StringBuilder();
+		if (this.getName() != null && !this.getName().isEmpty()) {
+			builder.append(this.getName());
+			builder.append(" ");
+		}
+		if (this.getMisc() != null && !this.getMisc().isEmpty()) {
+			builder.append(this.getMisc());
+			builder.append(" ");
+		}
+		if (this.getSurname() != null && !this.getSurname().isEmpty()) {
+			builder.append(this.getSurname());
+		}
+		if (this.getBirthday() != null) {
+			builder.append("=");
+			builder.append(DATE_FORMATTER.format(this.birthday.get()));
+		}
+
+		return builder.toString();
+	}
+
 	/**
 	 * @return a CSV-String representation of the person.
 	 */
@@ -299,75 +360,6 @@ public class Person {
 		if (this.getBirthday() != null) {
 			builder.append("getBirthday()=");
 			builder.append(this.getBirthday());
-		}
-
-		return builder.toString();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		final StringBuilder builder = new StringBuilder();
-		if (this.name.get() != null) {
-			builder.append(this.name.get());
-		}
-		if (this.misc.get() != null) {
-			builder.append(" ");
-			builder.append(this.misc.get());
-		}
-		if (this.getSurname() != null) {
-			builder.append(" ");
-			builder.append(this.surname.get());
-		}
-		if (this.birthday.get() != null) {
-			builder.append("\n");
-			builder.append(DATE_FORMATTER.format(this.birthday.get()));
-		}
-		return builder.toString();
-	}
-
-	public String namesToString() {
-		final StringBuilder builder = new StringBuilder();
-		if (this.getName() != null) {
-			builder.append(this.name.get());
-		}
-		if (this.getMisc() != null) {
-			builder.append(" ");
-			builder.append(this.misc.get());
-		}
-		if (this.getSurname() != null) {
-			builder.append(" ");
-			builder.append(this.surname.get());
-		}
-		return builder.toString();
-	}
-
-	/**
-	 * String representation of the person with the formate: <br>
-	 * <code>name misc surname</code>=<code>dd.mm.yyyy</code>
-	 * 
-	 * @return The String representation of the person for a TXT-file.
-	 */
-	public String toTXTString() {
-		final StringBuilder builder = new StringBuilder();
-		if (this.getName() != null && !this.getName().isEmpty()) {
-			builder.append(this.getName());
-			builder.append(" ");
-		}
-		if (this.getMisc() != null && !this.getMisc().isEmpty()) {
-			builder.append(this.getMisc());
-			builder.append(" ");
-		}
-		if (this.getSurname() != null && !this.getSurname().isEmpty()) {
-			builder.append(this.getSurname());
-		}
-		if (this.getBirthday() != null) {
-			builder.append("=");
-			builder.append(DATE_FORMATTER.format(this.birthday.get()));
 		}
 
 		return builder.toString();
