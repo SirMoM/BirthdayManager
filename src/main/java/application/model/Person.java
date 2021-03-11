@@ -361,7 +361,7 @@ public class Person {
 
 		@Override
 		public String getMessage() {
-			return "Could not parse Person from line: " + line + "\n Could not parse field: " + whatCouldNotBeParsed + ".\nLine was: " + line;
+			return "Could not parse Person from line: " + lineNumber + "\n Could not parse field: " + whatCouldNotBeParsed + ".\nLine was: " + line;
 		}
 	}
 }
