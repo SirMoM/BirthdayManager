@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
+import javafx.scene.control.*;
 import org.apache.logging.log4j.Level;
 
 import application.model.Person;
@@ -33,18 +34,6 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -389,13 +378,17 @@ public class BirthdaysOverviewController extends Controller {
 			}
 			BirthdaysOverviewController.this.LOG.debug("Importing file:" + selectedFile.getAbsolutePath());
 			try {
-				final LoadPersonsTask loadPersonsTask = new LoadPersonsTask(selectedFile,
-						selectedFile.getAbsolutePath().endsWith(".csv"));
+				final LoadPersonsTask loadPersonsTask = new LoadPersonsTask(selectedFile, selectedFile.getAbsolutePath().endsWith(".csv"));
 				loadPersonsTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED,
 						new EventHandler<WorkerStateEvent>() {
+
 							@Override
 							public void handle(final WorkerStateEvent event) {
-								PersonManager.getInstance().getPersons().addAll(loadPersonsTask.getValue());
+								LoadPersonsTask.Result result = loadPersonsTask.getValue();
+								PersonManager.getInstance().getPersons().addAll(result.getPersons());
+								for (Person.PersonCouldNotBeParsedException error: result.getErrors()) {
+									logAndAlertParsingError(error);
+								}
 								BirthdaysOverviewController.this.LOG.debug("Imported birthdays from File");
 								getMainController().getSessionInfos().updateSubLists();
 							}
@@ -677,5 +670,13 @@ public class BirthdaysOverviewController extends Controller {
 	 */
 	public void setProgressbar(ProgressBar progressbar) {
 		this.progressbar = progressbar;
+	}
+
+	private void logAndAlertParsingError(Person.PersonCouldNotBeParsedException personCouldNotBeParsedException){
+		LOG.warn(personCouldNotBeParsedException);
+		final Alert alert = new Alert(Alert.AlertType.WARNING);
+		alert.setTitle("ERROR: Parsing failed");
+		alert.setContentText(personCouldNotBeParsedException.getMessage());
+		alert.showAndWait();
 	}
 }
