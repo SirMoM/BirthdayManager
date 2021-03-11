@@ -40,7 +40,7 @@ class PersonTest {
         // Wrong name
         assertThatThrownBy(() -> {
             Person.parseFromCSVLine("01.01.2000,Maxi", 1);
-        }).isInstanceOf(Person.PersonCouldNotBeParsedException.class).hasMessageContaining("Could not parse Person from line: 1\n Could not parse field: full name");
+        }).isInstanceOf(Person.PersonCouldNotBeParsedException.class).hasMessageContaining("Could not parse Person from line: 1\n Could not parse field: full name.\nLine was: 01.01.2000,Maxi");
         // Invalid Date
         assertThatThrownBy(() -> {
             Person.parseFromCSVLine("01.01.20000,Max; Mustermann", 1);
@@ -67,7 +67,7 @@ class PersonTest {
         // Wrong name
         assertThatThrownBy(() -> {
             Person.parseFromTXTLine("Maximilian=01.01.2000", 1);
-        }).isInstanceOf(Person.PersonCouldNotBeParsedException.class).hasMessageContaining("Could not parse Person from line: 1\n Could not parse field: full name");
+        }).isInstanceOf(Person.PersonCouldNotBeParsedException.class).hasMessageContaining("Could not parse Person from line: 1\n Could not parse field: full name.\nLine was: Maximilian=01.01.2000");
         // Invalid Date
         assertThatThrownBy(() -> {
             Person.parseFromTXTLine("Maximilian Maxi Mustermann=01.01.20000", 1);
