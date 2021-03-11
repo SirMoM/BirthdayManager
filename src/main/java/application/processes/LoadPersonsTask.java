@@ -7,19 +7,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import application.model.Person;
+import javafx.scene.control.Alert;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import application.model.Person;
+import application.model.Person.PersonCouldNotBeParsedException;
 import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
-import javafx.event.EventHandler;
 
 /**
  * @author Noah Ruben
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
-public class LoadPersonsTask extends Task<List<Person>> {
+public class LoadPersonsTask extends Task<LoadPersonsTask.Result> {
 	private final BufferedReader reader;
 	private final Logger LOG;
 	private int prozess = 0;
@@ -51,27 +51,54 @@ public class LoadPersonsTask extends Task<List<Person>> {
 	}
 
 	@Override
-	protected List<Person> call() throws Exception {
+	protected Result call() throws Exception {
 		LOG.debug("Started " + this.getClass().getName());
 		final ArrayList<Person> persons = new ArrayList<Person>((int) MAX_Prozess);
+		final ArrayList<PersonCouldNotBeParsedException> exceptions = new ArrayList<PersonCouldNotBeParsedException>();
 		if (this.reader == null) {
 			this.LOG.fatal("There is no reader to get the CSV Data from!");
 		}
 		String line = this.reader.readLine();
-		while (line != null) {
-			if (!this.csvFile) {
-				// @TODO use real line numbers
-				persons.add(Person.parseFromTXTLine(line, 0));
-				this.prozess++;
-			} else if (this.csvFile) {
-				persons.add(Person.parseFromCSVLine(line, this.prozess));
-				this.prozess++;
+			while (line != null) {
+				if (!this.csvFile) {
+						try {
+							persons.add(Person.parseFromTXTLine(line, prozess));
+							this.prozess++;
+						}catch (PersonCouldNotBeParsedException personCouldNotBeParsedException){
+							exceptions.add(personCouldNotBeParsedException);
+							System.out.println(personCouldNotBeParsedException);
+						}
+				} else if (this.csvFile) {
+					try {
+						persons.add(Person.parseFromCSVLine(line, prozess));
+						this.prozess++;
+					}catch (PersonCouldNotBeParsedException personCouldNotBeParsedException){
+						exceptions.add(personCouldNotBeParsedException);
+					}
+				}
+				this.updateProgress(this.prozess, this.MAX_Prozess);
+				line = this.reader.readLine();
 			}
-			this.updateValue(persons);
-			this.updateProgress(this.prozess, this.MAX_Prozess);
-			line = this.reader.readLine();
-		}
 		reader.close();
-		return persons;
+		return new Result(persons, exceptions);
+
+	}
+
+	public static class Result{
+		ArrayList<Person> persons;
+		ArrayList<PersonCouldNotBeParsedException> errors;
+
+		public Result(ArrayList<Person> persons, ArrayList<PersonCouldNotBeParsedException> errors){
+			this.persons = persons;
+			this.errors = errors;
+		}
+
+		public ArrayList<Person> getPersons() {
+			return persons;
+		}
+
+		public ArrayList<PersonCouldNotBeParsedException> getErrors() {
+			return errors;
+		}
 	}
 }
