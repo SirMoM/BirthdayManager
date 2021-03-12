@@ -16,6 +16,8 @@ def main_class = 'application.AppStart'
 
 static def getDate() { return new Date().format('dd.MM.yyyy HH:mm:ss') }
 
+verifyGoogleJavaFormat.enabled = false
+
 repositories {
     // Use JCenter for resolving dependencies.
     jcenter()
