@@ -259,8 +259,7 @@ public class PreferencesViewController extends Controller {
 
   /** Fills the {@link ComboBox} with the available languages. */
   private void fillComboBoxLanguages() {
-    final StringConverter<Locale> converter =
-        new StringConverter<>() {
+    final StringConverter<Locale> converter = new StringConverter<Locale>() {
 
           @Override
           public Locale fromString(final String string) {
@@ -272,6 +271,7 @@ public class PreferencesViewController extends Controller {
             return locale.getDisplayLanguage();
           }
         };
+
     this.language_CompoBox.setConverter(converter);
     this.language_CompoBox.getItems().addAll(Locale.GERMANY, Locale.UK);
 
@@ -280,7 +280,7 @@ public class PreferencesViewController extends Controller {
 
           @Override
           public ListCell<Locale> call(final ListView<Locale> param) {
-            return new ListCell<>() {
+            return new ListCell<Locale>() {
               {
                 this.setContentDisplay(ContentDisplay.TEXT_ONLY);
               }
