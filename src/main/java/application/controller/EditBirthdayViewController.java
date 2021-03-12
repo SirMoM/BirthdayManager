@@ -39,9 +39,9 @@ import javafx.scene.text.Font;
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
 public class EditBirthdayViewController extends Controller {
-	final static Logger LOG = LogManager.getLogger();
+	static final Logger LOG = LogManager.getLogger();
 
-	final private Person personToEdit;
+	private final  Person personToEdit;
 
 	private MenuItem recentFiles_MenuItem;
 
@@ -144,87 +144,63 @@ public class EditBirthdayViewController extends Controller {
 	@FXML
 	private Label date_label;
 
-	private final EventHandler<ActionEvent> savePersonHandler = new EventHandler<ActionEvent>() {
+	private final EventHandler<ActionEvent> savePersonHandler = actionEvent -> {
+		boolean anyChangeAtAll = false;
+		final String nameFromTextField = EditBirthdayViewController.this.name_TextField.getText();
+		final String middleNameFromTextField = EditBirthdayViewController.this.middleName_TextField.getText();
+		final String surnameFromTextfield = EditBirthdayViewController.this.surname_TextField.getText();
+		final LocalDate birthdayFromDatePicker = EditBirthdayViewController.this.birthday_DatePicker.getValue();
 
-		@Override
-		public void handle(final ActionEvent actionEvent) {
-			boolean anyChangeAtAll = false;
-			final String nameFromTextField = EditBirthdayViewController.this.name_TextField.getText();
-			final String middleNameFromTextField = EditBirthdayViewController.this.middleName_TextField.getText();
-			final String surnameFromTextfield = EditBirthdayViewController.this.surname_TextField.getText();
-			final LocalDate birthdayFromDatePicker = EditBirthdayViewController.this.birthday_DatePicker.getValue();
-
-			try {
-				if (!nameFromTextField.matches(EditBirthdayViewController.this.personToEdit.getName())) {
-					anyChangeAtAll = !anyChangeAtAll;
-				}
-				if (!middleNameFromTextField.matches(EditBirthdayViewController.this.personToEdit.getMisc())) {
-					anyChangeAtAll = !anyChangeAtAll;
-				}
-				if (!surnameFromTextfield.matches(EditBirthdayViewController.this.personToEdit.getSurname())) {
-					anyChangeAtAll = !anyChangeAtAll;
-				}
-				if (!(EditBirthdayViewController.this.birthday_DatePicker
-						.getValue() == EditBirthdayViewController.this.personToEdit.getBirthday())) {
-					anyChangeAtAll = !anyChangeAtAll;
-				}
-			} catch (final NullPointerException exception) {
-				LOG.catching(Level.INFO, exception);
-				if (EditBirthdayViewController.this.personToEdit != null) {
-					LOG.info(EditBirthdayViewController.this.personToEdit.toExtendedString());
-				}
+		try {
+			if (!nameFromTextField.matches(EditBirthdayViewController.this.personToEdit.getName())) {
 				anyChangeAtAll = true;
 			}
-			LOG.info("");
-			if (anyChangeAtAll) {
-				if (birthdayFromDatePicker == null || surnameFromTextfield.isEmpty() || nameFromTextField.isEmpty()) {
-					final LangResourceManager langResourceManager = new LangResourceManager();
-					final Alert alert = new Alert(AlertType.WARNING);
-					alert.setTitle(langResourceManager.getLocaleString(LangResourceKeys.person_not_valid_warning));
-					alert.setHeaderText(langResourceManager.getLocaleString(LangResourceKeys.person_not_valid_warning));
-					alert.showAndWait();
-					return;
+			if (!middleNameFromTextField.matches(EditBirthdayViewController.this.personToEdit.getMisc())) {
+				anyChangeAtAll = true;
+			}
+			if (!surnameFromTextfield.matches(EditBirthdayViewController.this.personToEdit.getSurname())) {
+				anyChangeAtAll = true;
+			}
+			if (EditBirthdayViewController.this.birthday_DatePicker.getValue() != EditBirthdayViewController.this.personToEdit.getBirthday()) {
+				anyChangeAtAll = true;
+			}
+		} catch (final NullPointerException exception) {
+			LOG.catching(Level.INFO, exception);
+			if (EditBirthdayViewController.this.personToEdit != null) {
+				LOG.info(EditBirthdayViewController.this.personToEdit.toExtendedString());
+			}
+			anyChangeAtAll = true;
+		}
+		if (anyChangeAtAll) {
+			if (birthdayFromDatePicker == null || surnameFromTextfield.isEmpty() || nameFromTextField.isEmpty()) {
+				final LangResourceManager langResourceManager = new LangResourceManager();
+				final Alert alert = new Alert(AlertType.WARNING);
+				alert.setTitle(langResourceManager.getLocaleString(LangResourceKeys.person_not_valid_warning));
+				alert.setHeaderText(langResourceManager.getLocaleString(LangResourceKeys.person_not_valid_warning));
+				alert.showAndWait();
+				return;
+			}
+			final Person updatedPerson = new Person(surnameFromTextfield, nameFromTextField, middleNameFromTextField, birthdayFromDatePicker);
+			PersonManager.getInstance().updatePerson(EditBirthdayViewController.this.indexPerson, updatedPerson);
+			EditBirthdayViewController.this.getMainController().goToBirthdaysOverview();
+		}
+		if (Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.WRITE_THRU))) {
+			SaveBirthdaysToFileTask task = new SaveBirthdaysToFileTask(getMainController().getSessionInfos().getSaveFile());
+			task.setOnSucceeded(event -> {
+				if (event.getEventType() == WorkerStateEvent.WORKER_STATE_SUCCEEDED) {
+					LOG.debug("Saved changes to file (via write thru)");
 				}
-				final Person updatedPerson = new Person(surnameFromTextfield, nameFromTextField,
-						middleNameFromTextField, birthdayFromDatePicker);
-				PersonManager.getInstance().updatePerson(EditBirthdayViewController.this.indexPerson, updatedPerson);
-				EditBirthdayViewController.this.getMainController().goToBirthdaysOverview();
-			}
-			if (new Boolean(PropertyManager.getProperty(PropertyFields.WRITE_THRU))) {
-				SaveBirthdaysToFileTask task = new SaveBirthdaysToFileTask(
-						getMainController().getSessionInfos().getSaveFile());
-				task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-
-					@Override
-					public void handle(WorkerStateEvent event) {
-						if (event.getEventType() == WorkerStateEvent.WORKER_STATE_SUCCEEDED) {
-							LOG.debug("Saved changes to file	(via write thru)");
-						}
-					}
-				});
-
-				new Thread(task).start();
-			}
-		}
-
-	};
-
-	private final EventHandler<ActionEvent> exitHandler = new EventHandler<ActionEvent>() {
-
-		@Override
-		public void handle(final ActionEvent event) {
-			EditBirthdayViewController.this.getMainController().goToBirthdaysOverview();
+			});
+			new Thread(task).start();
 		}
 	};
 
-	private final EventHandler<ActionEvent> deletePersonHandler = new EventHandler<ActionEvent>() {
-		@Override
-		public void handle(final ActionEvent event) {
-			PersonManager.getInstance().deletePerson(EditBirthdayViewController.this.personToEdit);
-//			EditBirthdayViewController.this.getMainController().getSessionInfos().updateSubLists(); TODO now in the overview
-			EditBirthdayViewController.this.getMainController().goToBirthdaysOverview();
+	private final EventHandler<ActionEvent> exitHandler = event -> EditBirthdayViewController.this.getMainController().goToBirthdaysOverview();
 
-		}
+	private final EventHandler<ActionEvent> deletePersonHandler = event -> {
+		PersonManager.getInstance().deletePerson(EditBirthdayViewController.this.personToEdit);
+		EditBirthdayViewController.this.getMainController().goToBirthdaysOverview();
+
 	};
 
 	private int indexPerson = -1;
@@ -286,22 +262,7 @@ public class EditBirthdayViewController extends Controller {
 		this.cancel_Button.addEventHandler(ActionEvent.ANY, this.exitHandler);
 		this.save_Button.addEventHandler(ActionEvent.ANY, this.savePersonHandler);
 		this.delete_Button.addEventHandler(ActionEvent.ANY, this.deletePersonHandler);
-
 		this.quit_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().closeAppHandler);
-
-//		final ChangeListener<String> textFieldChangeListener = new ChangeListener<String>() {
-//
-//			@Override
-//			public void changed(final ObservableValue<? extends String> observable, final String oldValue,
-//					final String newValue) {
-//				if (newValue.matches(oldValue)) {
-//					EditBirthdayViewController.this.hasChange = true;
-//				}
-//
-//			}
-//		};
-//
-//		this.name_TextField.textProperty().addListener(textFieldChangeListener);
 	}
 
 	/**

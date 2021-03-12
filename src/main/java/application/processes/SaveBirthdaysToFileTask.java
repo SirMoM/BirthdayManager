@@ -24,14 +24,6 @@ public class SaveBirthdaysToFileTask extends Task<Boolean> {
 	File saveFile;
 	private Logger LOG;
 
-//	/**
-//	 * Base constructor
-//	 */
-//	public SaveBirthdaysToFileTask() {
-//		this.LOG = LogManager.getLogger(this.getClass().getName());
-//		LOG.info("Save to standart file");
-//	}
-
 	/**
 	 * This is used to save the birthdays as.
 	 *

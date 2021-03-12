@@ -78,7 +78,7 @@ public class ExportToCalenderTask extends Task<Boolean> {
 			event.setDateStart(start, false);
 			event.setClassification(Classification.PUBLIC);
 
-			if (new Boolean(PropertyManager.getProperty(PropertyFields.EXPORT_WITH_ALARM))) {
+			if (Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.EXPORT_WITH_ALARM))) {
 				Duration dayBefore = Duration.builder().prior(true).days(1).build();
 				Duration onBirthday = Duration.builder().prior(false).hours(8).build();
 				event.addAlarm(new VAlarm(Action.display(), new Trigger(dayBefore, Related.START)));

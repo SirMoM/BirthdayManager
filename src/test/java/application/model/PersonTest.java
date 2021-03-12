@@ -81,7 +81,7 @@ class PersonTest {
 
     @Test
     void testToString() {
-        assertThat(actualPerson.toString()).isEqualTo("Mustermann Maxi Maximilian\n01.01.2000");
+        assertThat(actualPerson).hasToString("Mustermann Maxi Maximilian\n01.01.2000");
     }
 
     @Test

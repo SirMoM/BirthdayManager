@@ -22,7 +22,7 @@ public abstract class Controller implements Initializable{
 	/**
 	 * @param mainController The "MainController" for this application
 	 */
-	public Controller(final MainController mainController){
+	protected Controller(final MainController mainController){
 		this.mainController = mainController;
 		this.LOG = LogManager.getLogger(this.getClass().getName());
 	}

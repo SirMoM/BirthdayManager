@@ -6,13 +6,21 @@ import java.util.Arrays;
  *
  */
 public class LevenshteinDistanz {
+
+	private  LevenshteinDistanz() throws IllegalAccessException {
+		throw new IllegalAccessException("Utility class");
+	}
+
 	public static int calculate(String x, String y) {
 		// Check early break conditiones
 		if (x == null || y == null) {
 			throw new NullPointerException("String not filled!");
 		}
-		if(x.length() == 0) return y.length();
-	    if(y.length() == 0) return x.length();
+		if(x.length() == 0)
+			return y.length();
+
+		if(y.length() == 0)
+			return x.length();
 		
 		
 		// Erstellen der Matrix für die Berechnung der Levenshtein-Distanz
