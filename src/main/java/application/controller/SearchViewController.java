@@ -142,7 +142,7 @@ public class SearchViewController extends Controller {
           end = System.currentTimeMillis();
         }
 
-        SearchViewController.this.LOG.info("Started at {0} ended at {1}", start, end);
+        SearchViewController.this.LOG.info("Started at {} ended at {}", start, end);
         double searchTimeInSek = (end - start) * 1e-3;
         SearchViewController.this.LOG.debug(
             "Searching the data took: {} Seconds.", searchTimeInSek);

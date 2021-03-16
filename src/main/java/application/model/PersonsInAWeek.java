@@ -1,4 +1,3 @@
-/** */
 package application.model;
 
 import java.time.LocalDate;
@@ -18,6 +17,7 @@ public class PersonsInAWeek {
   private Person saturdayPerson;
   private Person sundayPerson;
   private Person fridayPerson;
+
   /**
    * @param mondayPerson the Person for the Monday slot.
    * @param tuesdayPerson the Person for the Tuesday slot.
@@ -66,6 +66,7 @@ public class PersonsInAWeek {
     for (int i = 0; i < personsToParse.size(); i++) {
       final LocalDate birthday = personsToParse.get(i).getBirthday();
       final LocalDate thisYearsBirthday = birthday.withYear(LocalDate.now().getYear());
+
       switch (thisYearsBirthday.getDayOfWeek()) {
         case MONDAY:
           if (mondayPerson == null) {
