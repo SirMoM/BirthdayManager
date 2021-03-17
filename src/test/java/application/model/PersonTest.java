@@ -1,6 +1,7 @@
 package application.model;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDate;
 import org.junit.jupiter.api.AfterEach;
@@ -36,26 +37,17 @@ class PersonTest {
   @Test
   void parseFromCSVLine_FailureTest() {
     // Wrong name
-    assertThatThrownBy(
-            () -> {
-              Person.parseFromCSVLine("01.01.2000,Maxi", 1);
-            })
+    assertThatThrownBy(() -> Person.parseFromCSVLine("01.01.2000,Maxi", 1))
         .isInstanceOf(Person.PersonCouldNotBeParsedException.class)
         .hasMessageContaining(
             "Could not parse Person from line: 1\n Could not parse field: full name.\nLine was: 01.01.2000,Maxi");
     // Invalid Date
-    assertThatThrownBy(
-            () -> {
-              Person.parseFromCSVLine("01.01.20000,Max; Mustermann", 1);
-            })
+    assertThatThrownBy(() -> Person.parseFromCSVLine("01.01.20000,Max; Mustermann", 1))
         .isInstanceOf(Person.PersonCouldNotBeParsedException.class)
         .hasMessageContaining(
             "Could not parse Person from line: 1\n Could not parse field: birthday");
     // Invalid line
-    assertThatThrownBy(
-            () -> {
-              Person.parseFromCSVLine("01.01.2000Max; Mustermann", 1);
-            })
+    assertThatThrownBy(() -> Person.parseFromCSVLine("01.01.2000Max; Mustermann", 1))
         .isInstanceOf(Person.PersonCouldNotBeParsedException.class)
         .hasMessageContaining(
             "Could not parse Person from line: 1\n Could not parse field: the whole line");
@@ -75,26 +67,17 @@ class PersonTest {
   @Test
   void parseFromTXTLine_FailureTest() throws Person.PersonCouldNotBeParsedException {
     // Wrong name
-    assertThatThrownBy(
-            () -> {
-              Person.parseFromTXTLine("Maximilian=01.01.2000", 1);
-            })
+    assertThatThrownBy(() -> Person.parseFromTXTLine("Maximilian=01.01.2000", 1))
         .isInstanceOf(Person.PersonCouldNotBeParsedException.class)
         .hasMessageContaining(
             "Could not parse Person from line: 1\n Could not parse field: full name.\nLine was: Maximilian=01.01.2000");
     // Invalid Date
-    assertThatThrownBy(
-            () -> {
-              Person.parseFromTXTLine("Maximilian Maxi Mustermann=01.01.20000", 1);
-            })
+    assertThatThrownBy(() -> Person.parseFromTXTLine("Maximilian Maxi Mustermann=01.01.20000", 1))
         .isInstanceOf(Person.PersonCouldNotBeParsedException.class)
         .hasMessageContaining(
             "Could not parse Person from line: 1\n Could not parse field: birthday");
     // Invalid line
-    assertThatThrownBy(
-            () -> {
-              Person.parseFromTXTLine("01.01.2000Max Mustermann", 1);
-            })
+    assertThatThrownBy(() -> Person.parseFromTXTLine("01.01.2000Max Mustermann", 1))
         .isInstanceOf(Person.PersonCouldNotBeParsedException.class)
         .hasMessageContaining(
             "Could not parse Person from line: 1\n Could not parse field: the whole line");

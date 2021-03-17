@@ -4,6 +4,7 @@ package application.controller;
 import application.model.Person;
 import application.model.PersonManager;
 import application.model.SessionInfos;
+import application.processes.CheckForUpdatesTask;
 import application.processes.ExportToCalenderTask;
 import application.processes.LoadPersonsTask;
 import application.processes.SaveBirthdaysToFileTask;
@@ -499,6 +500,7 @@ public class MainController {
   /** Starts the application with the BirthdaysOverview and possibly loaded file */
   public void start() {
     this.setActiveController(new BirthdaysOverviewController(this));
+    checkVersionAndAlert();
     try {
       this.replaceSceneContent(
           "/application/view/BirthdaysOverview.fxml", this.getActiveController());
@@ -520,6 +522,22 @@ public class MainController {
     } catch (final Exception exception) {
       this.LOG.catching(Level.ERROR, exception);
     }
+  }
+
+  private void checkVersionAndAlert() {
+    CheckForUpdatesTask checkForUpdatesTask = new CheckForUpdatesTask();
+    checkForUpdatesTask.addEventHandler(
+        WorkerStateEvent.WORKER_STATE_SUCCEEDED,
+        event -> {
+          String msg = checkForUpdatesTask.getValue();
+          if (msg != null) {
+            final Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("New version!");
+            alert.setContentText(msg);
+            alert.showAndWait();
+          }
+        });
+    new Thread(checkForUpdatesTask).start();
   }
 
   private void logAndAlertParsingError(

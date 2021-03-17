@@ -1,4 +1,3 @@
-/** */
 package application.controller;
 
 import application.model.Person;
@@ -44,206 +43,9 @@ public class BirthdaysOverviewController extends Controller {
 
   protected static final DateTimeFormatter DATE_FORMATTER =
       DateTimeFormatter.ofPattern("dd.MM.yyyy");
-
-  private MenuItem recentFiles_MenuItem;
-
-  @FXML private ResourceBundle resources;
-
-  @FXML private URL location;
-
-  @FXML private Menu file_menu;
-
-  @FXML private MenuItem openFile_MenuItem;
-
-  @FXML private Menu openRecent_MenuItem;
-
-  @FXML private MenuItem closeFile_MenuItem;
-
-  @FXML private MenuItem saveFile_MenuItem;
-
-  @FXML private MenuItem saveAsFile_MenuItem;
-
-  @FXML // fx:id="exportToCalendar_MenuItem"
-  private MenuItem exportToCalendar_MenuItem; // Value injected by FXMLLoader
-
-  @FXML private MenuItem preferences_MenuItem;
-
-  @FXML private MenuItem quit_MenuItem;
-
-  @FXML private Menu edit_menu;
-
-  @FXML private MenuItem showNextBirthdays_MenuItem;
-
-  @FXML private MenuItem showLastBirthdays_MenuItem;
-
-  @FXML private MenuItem newBirthday_MenuItem;
-
-  @FXML private MenuItem importBirthdays_MenuItem;
-
-  @FXML private MenuItem deleteBirthdays_MenuItem;
-
-  @FXML private Menu help_menu;
-
-  @FXML private MenuItem debug;
-
-  @FXML private MenuItem refresh_MenuItem;
-
-  @FXML private MenuItem openFileExternal_Button;
-
-  @FXML private Button expandRightSide_Button;
-
-  @FXML private Label nextBirthday_Label;
-
-  @FXML private ListView<Person> nextBdaysList;
-
-  @FXML private MenuItem openBirthday_MenuItem;
-
-  @FXML private TabPane rightSide_TapView;
-
-  @FXML private Tab week_tap;
-
-  @FXML private TableView<PersonsInAWeek> week_tableView;
-
-  @FXML private TableColumn<PersonsInAWeek, String> monday_column1;
-
-  @FXML private TableColumn<PersonsInAWeek, String> tuesday_column1;
-
-  @FXML private TableColumn<PersonsInAWeek, String> wednesday_column1;
-
-  @FXML private TableColumn<PersonsInAWeek, String> thursday_column1;
-
-  @FXML private TableColumn<PersonsInAWeek, String> friday_column1;
-
-  @FXML private TableColumn<PersonsInAWeek, String> saturday_column1;
-
-  @FXML private TableColumn<PersonsInAWeek, String> sunday_column1;
-
-  @FXML private Tab month_tap;
-
-  @FXML private TableColumn<PersonsInAWeek, String> monday_column2;
-
-  @FXML private TableColumn<PersonsInAWeek, String> tuesday_column2;
-
-  @FXML private TableColumn<PersonsInAWeek, String> wednesday_column2;
-
-  @FXML private TableColumn<PersonsInAWeek, String> thursday_column2;
-
-  @FXML private TableColumn<PersonsInAWeek, String> friday_column2;
-
-  @FXML private TableColumn<PersonsInAWeek, String> saturday_column2;
-
-  @FXML private TableColumn<PersonsInAWeek, String> sunday_column2;
-
-  @FXML private Label openedFile_label;
-
-  @FXML private Font x3;
-
-  @FXML private Color x4;
-
-  @FXML private Label date_label;
-
-  @FXML private ProgressBar progressbar;
-
-  private final EventHandler<ActionEvent> deletePersonHandler =
-      event -> {
-        final ObservableList<Person> selectedItems =
-            BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
-        if (!selectedItems.isEmpty()) {
-          final int indexOf =
-              PersonManager.getInstance().getPersons().indexOf(selectedItems.get(0));
-          PersonManager.getInstance()
-              .deletePerson(PersonManager.getInstance().getPersonFromIndex(indexOf));
-          BirthdaysOverviewController.this.getMainController().getSessionInfos().updateSubLists();
-
-          if (Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.WRITE_THRU))) {
-            final SaveBirthdaysToFileTask task =
-                new SaveBirthdaysToFileTask(getMainController().getSessionInfos().getSaveFile());
-            task.setOnSucceeded(
-                event1 -> {
-                  if (event1.getEventType() == WorkerStateEvent.WORKER_STATE_SUCCEEDED) {
-                    BirthdaysOverviewController.this.LOG.debug(
-                        "Saved changes to file (via write thru)");
-                  }
-                });
-
-            new Thread(task).start();
-          }
-
-          BirthdaysOverviewController.this.nextBdaysList.setStyle(null);
-          BirthdaysOverviewController.this.nextBdaysList.setCellFactory(null);
-          BirthdaysOverviewController.this.nextBdaysList.refresh();
-          BirthdaysOverviewController.this.nextBdaysList.setCellFactory(
-              BirthdaysOverviewController.this.colorCellFactory);
-          BirthdaysOverviewController.this.nextBdaysList.refresh();
-        }
-      };
-
-  final EventHandler<ActionEvent> openBirthday =
-      event -> {
-        final ObservableList<Person> selectedItems =
-            BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
-        if (!selectedItems.isEmpty()) {
-          final int indexOf =
-              PersonManager.getInstance().getPersons().indexOf(selectedItems.get(0));
-          BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(indexOf);
-        }
-      };
-
   final EventHandler<ActionEvent> newBirthdayHandler =
       event -> BirthdaysOverviewController.this.getMainController().goToEditBirthdayView();
-
-  final EventHandler<ActionEvent> showRecentBirthdaysHandler =
-      eventHandler -> {
-        BirthdaysOverviewController.this.nextBdaysList.setItems(
-            BirthdaysOverviewController.this
-                .getMainController()
-                .getSessionInfos()
-                .getRecentBirthdays());
-        BirthdaysOverviewController.this.nextBirthday_Label.setText(
-            new LangResourceManager().getLocaleString(LangResourceKeys.str_recentBirthday_Label));
-        BirthdaysOverviewController.this.nextBdaysList.setStyle(null);
-        BirthdaysOverviewController.this.nextBdaysList.setCellFactory(null);
-        BirthdaysOverviewController.this.nextBdaysList.refresh();
-      };
-
-  final EventHandler<ActionEvent> showNextBirthdaysHandler =
-      event -> {
-        BirthdaysOverviewController.this.nextBdaysList.setItems(
-            BirthdaysOverviewController.this
-                .getMainController()
-                .getSessionInfos()
-                .getNextBirthdays());
-        BirthdaysOverviewController.this.nextBirthday_Label.setText(
-            new LangResourceManager().getLocaleString(LangResourceKeys.str_nextBirthday_Label));
-        BirthdaysOverviewController.this.nextBdaysList.setStyle(null);
-        BirthdaysOverviewController.this.nextBdaysList.setCellFactory(
-            BirthdaysOverviewController.this.colorCellFactory);
-        BirthdaysOverviewController.this.nextBdaysList.refresh();
-      };
-
-  private final EventHandler<Event> birthdayDoubleClickHandler =
-      event -> {
-        if (event.getEventType().equals(MouseEvent.MOUSE_CLICKED)) {
-          if (((MouseEvent) event).getClickCount() >= 2) {
-            final ObservableList<Person> selectedItems =
-                BirthdaysOverviewController.this
-                    .nextBdaysList
-                    .getSelectionModel()
-                    .getSelectedItems();
-            final int indexOf =
-                PersonManager.getInstance().getPersons().indexOf(selectedItems.get(0));
-            BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(indexOf);
-          }
-        } else if (event.getEventType().equals(KeyEvent.KEY_PRESSED)
-            && ((KeyEvent) event).getCode() == KeyCode.ENTER) {
-          final ObservableList<Person> selectedItems =
-              BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
-          final int indexOf =
-              PersonManager.getInstance().getPersons().indexOf(selectedItems.get(0));
-          BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(indexOf);
-        }
-      };
-
+  protected boolean showNextBirthdays;
   Callback<ListView<Person>, ListCell<Person>> colorCellFactory =
       new Callback<ListView<Person>, ListCell<Person>>() {
 
@@ -306,9 +108,148 @@ public class BirthdaysOverviewController extends Controller {
           };
         }
       };
+  private MenuItem recentFiles_MenuItem;
+  @FXML private ResourceBundle resources;
+  @FXML private URL location;
+  @FXML private Menu file_menu;
+  @FXML private MenuItem openFile_MenuItem;
+  @FXML private Menu openRecent_MenuItem;
+  @FXML private MenuItem closeFile_MenuItem;
+  @FXML private MenuItem saveFile_MenuItem;
+  @FXML private MenuItem saveAsFile_MenuItem;
+  @FXML // fx:id="exportToCalendar_MenuItem"
+  private MenuItem exportToCalendar_MenuItem; // Value injected by FXMLLoader
+  @FXML private MenuItem preferences_MenuItem;
+  @FXML private MenuItem quit_MenuItem;
+  @FXML private Menu edit_menu;
+  @FXML private MenuItem showNextBirthdays_MenuItem;
+  @FXML private MenuItem showLastBirthdays_MenuItem;
+  @FXML private MenuItem newBirthday_MenuItem;
+  @FXML private MenuItem importBirthdays_MenuItem;
+  @FXML private MenuItem deleteBirthdays_MenuItem;
+  @FXML private Menu help_menu;
+  @FXML private MenuItem debug;
+  @FXML private MenuItem refresh_MenuItem;
+  @FXML private MenuItem openFileExternal_Button;
+  @FXML private Button expandRightSide_Button;
+  @FXML private Label nextBirthday_Label;
+  @FXML private ListView<Person> nextBdaysList;
+  final EventHandler<ActionEvent> openBirthday =
+      event -> {
+        final ObservableList<Person> selectedItems =
+            BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
+        if (!selectedItems.isEmpty()) {
+          final int indexOf =
+              PersonManager.getInstance().getPersons().indexOf(selectedItems.get(0));
+          BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(indexOf);
+        }
+      };
+  final EventHandler<ActionEvent> showRecentBirthdaysHandler =
+      eventHandler -> {
+        BirthdaysOverviewController.this.nextBdaysList.setItems(
+            BirthdaysOverviewController.this
+                .getMainController()
+                .getSessionInfos()
+                .getRecentBirthdays());
+        BirthdaysOverviewController.this.nextBirthday_Label.setText(
+            new LangResourceManager().getLocaleString(LangResourceKeys.str_recentBirthday_Label));
+        BirthdaysOverviewController.this.nextBdaysList.setStyle(null);
+        BirthdaysOverviewController.this.nextBdaysList.setCellFactory(null);
+        BirthdaysOverviewController.this.nextBdaysList.refresh();
+      };
+  final EventHandler<ActionEvent> showNextBirthdaysHandler =
+      event -> {
+        BirthdaysOverviewController.this.nextBdaysList.setItems(
+            BirthdaysOverviewController.this
+                .getMainController()
+                .getSessionInfos()
+                .getNextBirthdays());
+        BirthdaysOverviewController.this.nextBirthday_Label.setText(
+            new LangResourceManager().getLocaleString(LangResourceKeys.str_nextBirthday_Label));
+        BirthdaysOverviewController.this.nextBdaysList.setStyle(null);
+        BirthdaysOverviewController.this.nextBdaysList.setCellFactory(
+            BirthdaysOverviewController.this.colorCellFactory);
+        BirthdaysOverviewController.this.nextBdaysList.refresh();
+      };
+  private final EventHandler<Event> birthdayDoubleClickHandler =
+      event -> {
+        if (event.getEventType().equals(MouseEvent.MOUSE_CLICKED)) {
+          if (((MouseEvent) event).getClickCount() >= 2) {
+            final ObservableList<Person> selectedItems =
+                BirthdaysOverviewController.this
+                    .nextBdaysList
+                    .getSelectionModel()
+                    .getSelectedItems();
+            final int indexOf =
+                PersonManager.getInstance().getPersons().indexOf(selectedItems.get(0));
+            BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(indexOf);
+          }
+        } else if (event.getEventType().equals(KeyEvent.KEY_PRESSED)
+            && ((KeyEvent) event).getCode() == KeyCode.ENTER) {
+          final ObservableList<Person> selectedItems =
+              BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
+          final int indexOf =
+              PersonManager.getInstance().getPersons().indexOf(selectedItems.get(0));
+          BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(indexOf);
+        }
+      };
+  @FXML private MenuItem openBirthday_MenuItem;
+  @FXML private TabPane rightSide_TapView;
+  @FXML private Tab week_tap;
+  @FXML private TableView<PersonsInAWeek> week_tableView;
+  @FXML private TableColumn<PersonsInAWeek, String> monday_column1;
+  @FXML private TableColumn<PersonsInAWeek, String> tuesday_column1;
+  @FXML private TableColumn<PersonsInAWeek, String> wednesday_column1;
+  @FXML private TableColumn<PersonsInAWeek, String> thursday_column1;
+  @FXML private TableColumn<PersonsInAWeek, String> friday_column1;
+  @FXML private TableColumn<PersonsInAWeek, String> saturday_column1;
+  @FXML private TableColumn<PersonsInAWeek, String> sunday_column1;
+  @FXML private Tab month_tap;
+  @FXML private TableColumn<PersonsInAWeek, String> monday_column2;
+  @FXML private TableColumn<PersonsInAWeek, String> tuesday_column2;
+  @FXML private TableColumn<PersonsInAWeek, String> wednesday_column2;
+  @FXML private TableColumn<PersonsInAWeek, String> thursday_column2;
+  @FXML private TableColumn<PersonsInAWeek, String> friday_column2;
+  @FXML private TableColumn<PersonsInAWeek, String> saturday_column2;
+  @FXML private TableColumn<PersonsInAWeek, String> sunday_column2;
+  @FXML private Label openedFile_label;
+  @FXML private Font x3;
+  @FXML private Color x4;
+  @FXML private Label date_label;
+  @FXML private ProgressBar progressbar;
+  private final EventHandler<ActionEvent> deletePersonHandler =
+      event -> {
+        final ObservableList<Person> selectedItems =
+            BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
+        if (!selectedItems.isEmpty()) {
+          final int indexOf =
+              PersonManager.getInstance().getPersons().indexOf(selectedItems.get(0));
+          PersonManager.getInstance()
+              .deletePerson(PersonManager.getInstance().getPersonFromIndex(indexOf));
+          BirthdaysOverviewController.this.getMainController().getSessionInfos().updateSubLists();
 
-  protected boolean showNextBirthdays;
+          if (Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.WRITE_THRU))) {
+            final SaveBirthdaysToFileTask task =
+                new SaveBirthdaysToFileTask(getMainController().getSessionInfos().getSaveFile());
+            task.setOnSucceeded(
+                event1 -> {
+                  if (event1.getEventType() == WorkerStateEvent.WORKER_STATE_SUCCEEDED) {
+                    BirthdaysOverviewController.this.LOG.debug(
+                        "Saved changes to file (via write thru)");
+                  }
+                });
 
+            new Thread(task).start();
+          }
+
+          BirthdaysOverviewController.this.nextBdaysList.setStyle(null);
+          BirthdaysOverviewController.this.nextBdaysList.setCellFactory(null);
+          BirthdaysOverviewController.this.nextBdaysList.refresh();
+          BirthdaysOverviewController.this.nextBdaysList.setCellFactory(
+              BirthdaysOverviewController.this.colorCellFactory);
+          BirthdaysOverviewController.this.nextBdaysList.refresh();
+        }
+      };
   private final EventHandler<ActionEvent> importBirthdaysHandler =
       event -> {
         final FileChooser fileChooser = new FileChooser();

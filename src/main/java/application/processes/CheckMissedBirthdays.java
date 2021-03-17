@@ -20,7 +20,7 @@ import org.apache.logging.log4j.Logger;
 public class CheckMissedBirthdays extends Task<List<Person>> {
 
   private List<Person> personDB;
-  private Logger LOG;
+  private final Logger LOG;
   private int timeInWaiting;
 
   public CheckMissedBirthdays() {
@@ -29,6 +29,10 @@ public class CheckMissedBirthdays extends Task<List<Person>> {
         && !PersonManager.getInstance().getPersons().isEmpty()) {
       this.personDB = PersonManager.getInstance().getPersons();
     }
+  }
+
+  public void setPersonDB(List<Person> personDB) {
+    this.personDB = personDB;
   }
 
   /*

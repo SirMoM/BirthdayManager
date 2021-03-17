@@ -2,7 +2,7 @@ package application;
 
 import application.controller.MainController;
 import application.model.PersonManager;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import javafx.application.Application;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -64,7 +64,7 @@ public class AppStart extends Application {
   }
 
   @Override
-  public void start(final Stage stage) throws FileNotFoundException {
+  public void start(final Stage stage) throws IOException {
     final MainController mainController = new MainController(stage);
     mainController.start();
   }

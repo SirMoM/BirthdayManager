@@ -259,7 +259,8 @@ public class PreferencesViewController extends Controller {
 
   /** Fills the {@link ComboBox} with the available languages. */
   private void fillComboBoxLanguages() {
-    final StringConverter<Locale> converter = new StringConverter<Locale>() {
+    final StringConverter<Locale> converter =
+        new StringConverter<Locale>() {
 
           @Override
           public Locale fromString(final String string) {
