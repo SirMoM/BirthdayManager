@@ -31,10 +31,6 @@ public class CheckMissedBirthdays extends Task<List<Person>> {
         }
     }
 
-    public void setPersonDB(List<Person> personDB) {
-        this.personDB = personDB;
-    }
-
     /*
      * (non-Javadoc)
      *
@@ -75,7 +71,7 @@ public class CheckMissedBirthdays extends Task<List<Person>> {
         List<Person> skippedBirthdays = new ArrayList<>();
         for (Person person : personDB) {
             if (person.getBirthday().withYear(now.getYear()).isAfter(lastVisit) && person.getBirthday().withYear(now.getYear()).isBefore(now)) {
-                LOG.debug("{0} missed!", person.toExtendedString());
+                LOG.debug("{} missed!", person.toExtendedString());
                 skippedBirthdays.add(person);
             }
         }

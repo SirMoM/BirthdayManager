@@ -40,7 +40,6 @@ public class UpdateNextBirthdaysTask extends Task<List<Person>> {
         if (PersonManager.getInstance().getPersons() != null && !PersonManager.getInstance().getPersons().isEmpty()) {
             personDB = PersonManager.getInstance().getPersons();
         }
-        this.updateProgress(0, NEXT_BIRTHDAYS_COUNT);
     }
 
     /**
@@ -92,7 +91,6 @@ public class UpdateNextBirthdaysTask extends Task<List<Person>> {
         for (; i < NEXT_BIRTHDAYS_COUNT; i++) {
             try {
                 nextBirthdays.add(upcomming.get(i));
-                this.updateProgress(i, NEXT_BIRTHDAYS_COUNT);
             } catch (final IndexOutOfBoundsException indexOutOfBoundsException) {
                 this.LOG.debug("Probably not enought Persons to gather the 10 birthdays for next", indexOutOfBoundsException);
                 break;

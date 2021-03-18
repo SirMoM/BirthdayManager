@@ -23,8 +23,8 @@ import java.util.List;
 public class UpdateRecentBirthdaysTask extends Task<List<Person>> {
 
     private final int NEXT_BIRTHDAYS_COUNT;
-    private List<Person> personDB;
     private final Logger LOG;
+    private List<Person> personDB;
     private int timeInWaiting;
 
     /** */
@@ -82,7 +82,7 @@ public class UpdateRecentBirthdaysTask extends Task<List<Person>> {
             try {
                 recentBirthdays.add(after.get((after.size() - 1) - i));
             } catch (final IndexOutOfBoundsException indexOutOfBoundsException) {
-                LOG.debug("Probably not enought Persons to geather the 10 birthdays for recent", indexOutOfBoundsException);
+                LOG.debug("Probably not enough Persons to gather the birthdays to fill the recent List", indexOutOfBoundsException);
                 break;
             }
         }
@@ -91,7 +91,7 @@ public class UpdateRecentBirthdaysTask extends Task<List<Person>> {
             try {
                 recentBirthdays.add(upcomming.get((upcomming.size() - 1) - j));
             } catch (final IndexOutOfBoundsException indexOutOfBoundsException) {
-                LOG.debug("Probably not enought Persons to geather the 10 birthdays for recent", indexOutOfBoundsException);
+                LOG.debug("Probably not enough Persons to gather the 10 birthdays for recent", indexOutOfBoundsException);
                 break;
             }
         }
