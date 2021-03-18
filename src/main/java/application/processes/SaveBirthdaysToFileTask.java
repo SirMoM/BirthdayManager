@@ -1,6 +1,3 @@
-/**
- *
- */
 package application.processes;
 
 import application.model.Person;
@@ -12,6 +9,8 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -44,10 +43,12 @@ public class SaveBirthdaysToFileTask extends Task<Boolean> {
 
         List<Person> persons = PersonManager.getInstance().getPersons();
 
+        // Ensure constant safe file
+        persons.sort(Comparator.comparingInt(person -> person.getBirthday().getDayOfYear()));
+
         try (FileWriter fileWriter = new FileWriter(saveFile)) {
             if (this.saveFile.getAbsolutePath().endsWith(".csv")) {
                 LOG.debug("Saving to CSV");
-
                 for (Person person : persons) {
                     fileWriter.write(person.toCSVString());
                     fileWriter.write(System.lineSeparator());
