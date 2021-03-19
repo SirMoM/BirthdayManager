@@ -53,16 +53,16 @@ public class BirthdaysOverviewController extends Controller {
             return new ListCell<Person>() {
                 @Override
                 protected void updateItem(final Person item, final boolean empty) {
-                    Color firstColor = Color.web(PropertyManager.getProperty(PropertyFields.FIRST_HIGHLIGHT_COLOR));
-                    Color secoundColor = Color.web(PropertyManager.getProperty(PropertyFields.SECOND_HIGHLIGHT_COLOR));
+                    String firstColorString = PropertyManager.getProperty(PropertyFields.FIRST_HIGHLIGHT_COLOR);
+                    String secondColorString = PropertyManager.getProperty(PropertyFields.SECOND_HIGHLIGHT_COLOR);
                     super.updateItem(item, empty);
                     this.styleProperty().bind(new SimpleStringProperty(""));
                     if (!empty && item != null) {
                         if (item.getBirthday().isEqual(LocalDate.now().withYear(item.getBirthday().getYear()))) {
-                            this.styleProperty().bind(Bindings.when(this.selectedProperty()).then(new SimpleStringProperty("-fx-background-color: -fx-selection-bar;")).otherwise(new SimpleStringProperty("-fx-background-color: " + "#" + Integer.toHexString(firstColor.hashCode()))));
+                            this.styleProperty().bind(Bindings.when(this.selectedProperty()).then(new SimpleStringProperty("-fx-background-color: -fx-selection-bar;")).otherwise(new SimpleStringProperty("-fx-background-color: " + firstColorString)));
                         } else if (LocalDate.now().withYear(item.getBirthday().getYear()).isBefore(item.getBirthday()) && item.getBirthday().isBefore(LocalDate.now().withYear(item.getBirthday().getYear()).plusDays(7))) {
 
-                            this.styleProperty().bind(Bindings.when(this.selectedProperty()).then(new SimpleStringProperty("-fx-background-color: -fx-selection-bar;")).otherwise(new SimpleStringProperty("-fx-background-color: " + "#" + Integer.toHexString(secoundColor.hashCode()))));
+                            this.styleProperty().bind(Bindings.when(this.selectedProperty()).then(new SimpleStringProperty("-fx-background-color: -fx-selection-bar;")).otherwise(new SimpleStringProperty("-fx-background-color: " + secondColorString)));
                         }
                         this.setText(item.toString() + "\t \t \t " + (new LangResourceManager().getLocaleString(LangResourceKeys.age)) + ":\t" + (LocalDate.now().getYear() - item.getBirthday().getYear()));
 
