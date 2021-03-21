@@ -31,7 +31,7 @@ public class AppStart extends Application {
             LogManager.getLogger(PersonManager.class).catching(Level.FATAL, throwable);
             LogManager.getLogger(PersonManager.class).catching(Level.FATAL, throwable.getCause());
 
-            final Alert alert = new Alert(AlertType.WARNING);
+            final Alert alert = new Alert(AlertType.ERROR);
             alert.setTitle("ERROR");
             alert.setHeaderText("Someting went wrong! \n Consider sending me the log.");
 
