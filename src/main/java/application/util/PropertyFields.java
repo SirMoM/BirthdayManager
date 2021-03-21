@@ -22,4 +22,6 @@ public interface PropertyFields {
     String FIRST_HIGHLIGHT_COLOR = "first_highlight_color";
     String SECOND_HIGHLIGHT_COLOR = "second_highlight_color";
     String LAST_VISIT = "lastVisit";
+    String DARK_MODE = "darkMode";
+    String NEW_VERSION_REMINDER = "newVersionReminder";
 }
