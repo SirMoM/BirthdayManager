@@ -22,7 +22,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8.0.191" xmlns:fx="http://javafx.com/fxml/1">
+<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -45,6 +45,7 @@
           <items>
             <MenuItem fx:id="showNextBirthdays_MenuItem" mnemonicParsing="false" text="Zeige nächste Geburtstage" />
             <MenuItem fx:id="showLastBirthdays_MenuItem" mnemonicParsing="false" text="Zeige die letzten Geburtstage" />
+                  <MenuItem fx:id="searchBirthdayMenuItem" mnemonicParsing="false" text="Geburtstag suchen" />
             <SeparatorMenuItem mnemonicParsing="false" />
             <MenuItem fx:id="newBirthday_MenuItem" mnemonicParsing="false" text="New Birthday" />
             <MenuItem fx:id="importBirthdays_MenuItem" mnemonicParsing="false" text="Import Birthdays" />
@@ -163,7 +164,7 @@
             <Font size="11.0" fx:id="x3" />
           </font>
           <textFill>
-            <Color blue="0.625" green="0.625" red="0.625" fx:id="x4" />
+            <Color red="0.625" green="0.625" blue="0.625" fx:id="x4" />
           </textFill>
         </Label>
         <Pane prefHeight="-1.0" prefWidth="-1.0" HBox.hgrow="ALWAYS">

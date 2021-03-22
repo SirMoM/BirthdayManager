@@ -36,20 +36,21 @@ import java.util.regex.Pattern;
 public class SearchViewController extends Controller {
 
     private final ObservableList<Person> searchResults;
-    @FXML // ResourceBundle that was given to the FXMLLoader
-    private ResourceBundle resources;
-    @FXML // URL location of the FXML file that was given to the FXMLLoader
-    private URL location;
-    @FXML // fx:id="search_Label"
-    private Label search_Label; // Value injected by FXMLLoader
-    @FXML // fx:id="searchText_TextField"
-    private TextField searchText_TextField; // Value injected by FXMLLoader
-    @FXML // fx:id="search_Button"
-    private Button search_Button; // Value injected by FXMLLoader
-    @FXML // fx:id="advancedSettings_TitledPane"
-    private TitledPane advancedSettings_TitledPane; // Value injected by FXMLLoader
-    @FXML // fx:id="dateSearch_DatePicker"
-    private DatePicker dateSearch_DatePicker; // Value injected by FXMLLoader
+
+    @FXML
+    private Label search_Label;
+
+    @FXML
+    private TextField searchText_TextField;
+
+    @FXML
+    private Button search_Button;
+
+    @FXML
+    private TitledPane advancedSettings_TitledPane;
+
+    @FXML
+    private DatePicker dateSearch_DatePicker;
     private final EventHandler<ActionEvent> searchDateEventHandler = event -> {
         if (SearchViewController.this.dateSearch_DatePicker.getValue() == null) {
             return;
@@ -68,10 +69,10 @@ public class SearchViewController extends Controller {
         }
         getSearchResults().sort(new BirthdayComparator(false));
     };
-    @FXML // fx:id="enableFuzzy_RadioButton"
-    private RadioButton enableFuzzy_RadioButton; // Value injected by FXMLLoader
-    @FXML // fx:id="enableRegEx_RadioButton"
-    private RadioButton enableRegEx_RadioButton; // Value injected by FXMLLoader
+    @FXML
+    private RadioButton enableFuzzy_RadioButton;
+    @FXML
+    private RadioButton enableRegEx_RadioButton;
     private final EventHandler<Event> searchEventHandler = event -> {
         if (event instanceof KeyEvent) {
             KeyEvent keyEvent = (KeyEvent) event;
@@ -138,10 +139,10 @@ public class SearchViewController extends Controller {
             }
         }
     };
-    @FXML // fx:id="dateSearch_Button"
-    private Button dateSearch_Button; // Value injected by FXMLLoader
-    @FXML // fx:id="searchResults_ListView"
-    private ListView<Person> searchResults_ListView; // Value injected by FXMLLoader
+    @FXML
+    private Button dateSearch_Button;
+    @FXML
+    private ListView<Person> searchResults_ListView;
     final EventHandler<ActionEvent> openBirthday = event -> {
         final ObservableList<Person> selectedItems = SearchViewController.this.searchResults_ListView.getSelectionModel().getSelectedItems();
         if (!selectedItems.isEmpty()) {
@@ -149,8 +150,16 @@ public class SearchViewController extends Controller {
             SearchViewController.this.getMainController().goToEditBirthdayView(indexOf);
         }
     };
-    @FXML // fx:id="openBirthday_MenuItem"
-    private MenuItem openBirthday_MenuItem; // Value injected by FXMLLoader
+    @FXML
+    private MenuItem openBirthday_MenuItem;
+    @FXML
+    private Button openBirthday_Button;
+    @FXML
+    private Button closeSearch_Button;
+
+    private final EventHandler<ActionEvent> returnToPreviousView = actionEvent -> {
+        SearchViewController.this.getMainController().goToBirthdaysOverview();
+    };
 
     public SearchViewController(MainController mainController) {
         super(mainController);
@@ -201,6 +210,8 @@ public class SearchViewController extends Controller {
         assert dateSearch_Button != null : "fx:id=\"dateSearch_Button\" was not injected: check your FXML file 'SearchView.fxml'.";
         assert searchResults_ListView != null : "fx:id=\"searchResults_ListView\" was not injected: check your FXML file 'SearchView.fxml'.";
         assert openBirthday_MenuItem != null : "fx:id=\"openBirthday_MenuItem\" was not injected: check your FXML file 'SearchView.fxml'.";
+        assert openBirthday_Button != null : "fx:id=\"openBirthday_Button\" was not injected: check your FXML file 'SearchView.fxml'.";
+        assert closeSearch_Button != null : "fx:id=\"closeSearch_Button\" was not injected: check your FXML file 'SearchView.fxml'.";
     }
 
     /** Bind EventHandlers and JavaFX-Components */
@@ -212,6 +223,8 @@ public class SearchViewController extends Controller {
         this.enableFuzzy_RadioButton.addEventHandler(ActionEvent.ANY, this.switchFuzzyRegExEventHandler);
         this.enableRegEx_RadioButton.addEventHandler(ActionEvent.ANY, this.switchFuzzyRegExEventHandler);
         this.dateSearch_Button.addEventHandler(ActionEvent.ANY, this.searchDateEventHandler);
+        this.openBirthday_Button.addEventHandler(ActionEvent.ANY, this.openBirthday);
+        this.closeSearch_Button.addEventHandler(ActionEvent.ANY, this.returnToPreviousView);
     }
 
     @Override
