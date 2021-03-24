@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import javax.swing.*;
 import java.util.concurrent.CountDownLatch;
 
-public class TaskTest {
+abstract public class TaskTest {
     private boolean jfxIsSetup;
 
     @BeforeEach

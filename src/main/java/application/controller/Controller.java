@@ -4,8 +4,6 @@
 package application.controller;
 
 import javafx.fxml.Initializable;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * @author Noah Ruben
@@ -13,14 +11,11 @@ import org.apache.logging.log4j.Logger;
  */
 public abstract class Controller implements Initializable {
 
-    final Logger LOG;
-
     private final MainController mainController;
 
     /** @param mainController The "MainController" for this application */
     protected Controller(final MainController mainController) {
         this.mainController = mainController;
-        this.LOG = LogManager.getLogger(this.getClass().getName());
     }
 
     /** @return the MainController */

@@ -27,6 +27,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.Callback;
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +43,7 @@ import java.util.ResourceBundle;
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
 public class BirthdaysOverviewController extends Controller {
-
+    private static final Logger LOG = LogManager.getLogger(BirthdaysOverviewController.class.getName());
     protected static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
     final EventHandler<ActionEvent> newBirthdayHandler = event -> BirthdaysOverviewController.this.getMainController().goToEditBirthdayView();
     protected boolean showNextBirthdays;
@@ -219,7 +221,7 @@ public class BirthdaysOverviewController extends Controller {
                 final SaveBirthdaysToFileTask task = new SaveBirthdaysToFileTask(getMainController().getSessionInfos().getSaveFile());
                 task.setOnSucceeded(event1 -> {
                     if (event1.getEventType() == WorkerStateEvent.WORKER_STATE_SUCCEEDED) {
-                        BirthdaysOverviewController.this.LOG.debug("Saved changes to file (via write thru)");
+                        LOG.debug("Saved changes to file (via write thru)");
                     }
                 });
 
@@ -246,22 +248,23 @@ public class BirthdaysOverviewController extends Controller {
         if (selectedFile == null) {
             return;
         }
-        BirthdaysOverviewController.this.LOG.debug("Importing file:" + selectedFile.getAbsolutePath());
+        LOG.debug("Importing file: {}", selectedFile.getAbsolutePath());
 
         try {
             final LoadPersonsTask loadPersonsTask = new LoadPersonsTask(selectedFile, selectedFile.getAbsolutePath().endsWith(".csv"));
             loadPersonsTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, workerStateEvent -> {
                 LoadPersonsTask.Result result = loadPersonsTask.getValue();
                 PersonManager.getInstance().getPersons().addAll(result.getPersons());
+                getMainController().getSessionInfos().updateSubLists();
+
                 for (Person.PersonCouldNotBeParsedException error : result.getErrors()) {
                     logAndAlertParsingError(error);
                 }
-                BirthdaysOverviewController.this.LOG.debug("Imported birthdays from File");
-                getMainController().getSessionInfos().updateSubLists();
+                LOG.debug("Imported birthdays from File");
             });
             new Thread(loadPersonsTask).start();
         } catch (IOException ioException) {
-            BirthdaysOverviewController.this.LOG.catching(Level.ERROR, ioException);
+            LOG.catching(Level.ERROR, ioException);
         }
     };
 
@@ -384,13 +387,9 @@ public class BirthdaysOverviewController extends Controller {
         this.saturday_column1.setCellValueFactory(new WeekTableCallback(DayOfWeek.SATURDAY));
         this.sunday_column1.setCellValueFactory(new WeekTableCallback(DayOfWeek.SUNDAY));
 
-        this.refresh_MenuItem.setOnAction(actionEvent -> {
-            this.refreshBirthdayTableView();
-        });
+        this.refresh_MenuItem.setOnAction(actionEvent -> this.refreshBirthdayTableView());
 
-        this.searchBirthdayMenuItem.setOnAction(actionEvent -> {
-            this.getMainController().goToSearchView();
-        });
+        this.searchBirthdayMenuItem.setOnAction(actionEvent -> this.getMainController().goToSearchView());
 
         this.expandRightSide_Button.setOnAction(actionEvent -> {
             if (this.expandRightSide_Button.getText().matches(">")) {

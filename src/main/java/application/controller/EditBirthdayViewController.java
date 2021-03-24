@@ -5,7 +5,6 @@ package application.controller;
 
 import application.model.Person;
 import application.model.PersonManager;
-import application.model.SessionInfos;
 import application.processes.SaveBirthdaysToFileTask;
 import application.util.PropertyFields;
 import application.util.PropertyManager;
@@ -33,7 +32,7 @@ import java.util.ResourceBundle;
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
 public class EditBirthdayViewController extends Controller {
-    static final Logger LOG = LogManager.getLogger();
+    private static final Logger LOG = LogManager.getLogger(EditBirthdayViewController.class.getName());
 
     private final Person personToEdit;
     private final EventHandler<ActionEvent> exitHandler = event -> EditBirthdayViewController.this.getMainController().goToLastScene();

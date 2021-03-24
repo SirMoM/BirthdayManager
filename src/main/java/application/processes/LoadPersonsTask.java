@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class LoadPersonsTask extends Task<LoadPersonsTask.Result> {
     private final BufferedReader reader;
-    private final Logger LOG;
+    private static final Logger LOG = LogManager.getLogger(LoadPersonsTask.class.getName());
     private final boolean csvFile;
 
     /**
@@ -31,8 +31,6 @@ public class LoadPersonsTask extends Task<LoadPersonsTask.Result> {
      */
     public LoadPersonsTask(final File file, final boolean csvFile) throws IOException {
         super();
-        this.LOG = LogManager.getLogger();
-
         this.reader = new BufferedReader(new FileReader(file));
         this.csvFile = csvFile;
     }

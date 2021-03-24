@@ -4,36 +4,30 @@
 package application.processes;
 
 import application.model.Person;
-import application.model.PersonManager;
 import application.util.BirthdayComparator;
 import application.util.PropertyFields;
 import application.util.PropertyManager;
-import javafx.concurrent.Task;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * @author Admin
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
-public class UpdateRecentBirthdaysTask extends Task<List<Person>> {
+public class UpdateRecentBirthdaysTask extends PersonTasks<List<Person>> {
 
     private final int NEXT_BIRTHDAYS_COUNT;
-    private final Logger LOG;
-    private List<Person> personDB;
-    private int timeInWaiting;
+    private static final Logger LOG =LogManager.getLogger(UpdateRecentBirthdaysTask.class.getName());
 
     /** */
     public UpdateRecentBirthdaysTask() {
-        this.LOG = LogManager.getLogger(this.getClass().getName());
-        NEXT_BIRTHDAYS_COUNT = Integer.parseInt(PropertyManager.getProperty(PropertyFields.SHOW_BIRTHDAYS_COUNT));
-        if (PersonManager.getInstance().getPersons() != null && !(PersonManager.getInstance().getPersons().isEmpty())) {
-            personDB = PersonManager.getInstance().getPersons();
-        }
+        String showBirthdaysCountProperty = PropertyManager.getProperty(PropertyFields.SHOW_BIRTHDAYS_COUNT);
+        NEXT_BIRTHDAYS_COUNT = Integer.parseInt(showBirthdaysCountProperty);
     }
 
     /*
@@ -43,17 +37,7 @@ public class UpdateRecentBirthdaysTask extends Task<List<Person>> {
      */
     @Override
     protected List<Person> call() throws Exception {
-        LOG.debug("Started " + this.getClass().getName());
-        while (personDB == null || PersonManager.getInstance().getPersons().isEmpty()) {
-            personDB = PersonManager.getInstance().getPersons();
-            LOG.info("Waiting for personenDB to be filled!");
-            Thread.sleep(500);
-            this.timeInWaiting += 500;
-            if (this.timeInWaiting > 10000) {
-                this.cancel();
-                LOG.debug("Thread canceled because it took too long to wait for the list of people!");
-            }
-        }
+        LOG.debug("Started {}", this.getClass().getName());
 
         /** All upcomming persons / birthdays */
         final List<Person> upcomming = new ArrayList<>();
@@ -63,6 +47,8 @@ public class UpdateRecentBirthdaysTask extends Task<List<Person>> {
 
         /** Final recent persons / birthdays */
         final List<Person> recentBirthdays = new ArrayList<>();
+
+        List<Person> personDB = getPersons();
 
         // Fill upcomming and after based on today
         for (int i = 0; i < personDB.size(); i++) {

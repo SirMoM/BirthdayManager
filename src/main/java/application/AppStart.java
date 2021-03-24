@@ -19,7 +19,7 @@ import java.io.IOException;
 
 public class AppStart extends Application {
 
-    Logger LOG = LogManager.getLogger(AppStart.class.getName());
+    private static final Logger LOG = LogManager.getLogger(AppStart.class.getName());
 
     public static void main(final String[] args) {
         launch(args);

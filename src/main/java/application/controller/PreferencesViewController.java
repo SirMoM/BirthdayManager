@@ -21,6 +21,8 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +37,7 @@ import java.util.ResourceBundle;
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
 public class PreferencesViewController extends Controller {
-
+    private static final Logger LOG = LogManager.getLogger(PreferencesViewController.class.getName());
     @FXML
     private ResourceBundle resources;
 
@@ -80,52 +82,16 @@ public class PreferencesViewController extends Controller {
 
     @FXML
     private Button chooseFile_button;
-
-    @FXML
-    private Button cancel_button;
-
-    @FXML
-    private Button save_button;
-
-    @FXML
-    private CheckBox iCalNotification_CheckBox;
-
-    @FXML
-    private ColorPicker first_ColorPicker;
-
-    @FXML
-    private ColorPicker second_ColorPicker;
-
-    @FXML
-    private Label firstHighlightingColor_Label;
-
-    @FXML
-    private Label secondHighlightingColor_Label;
-
-    @FXML
-    private Label appearanceOptions_Label;
-
-    @FXML
-    private Spinner<Integer> countBirthdaysShown_Spinner;
-
-    @FXML
-    private Label countBirthdaysShown_Label;
-
-    @FXML
-    private ToggleButton darkMode_ToggleButton;
-
-    @FXML
-    private CheckBox reminder_CheckBox;
-
     ChangeListener<Boolean> openFileOnStartCheckboxChangeListener = (observable, oldValue, newValue) -> {
         PreferencesViewController.this.startupFile_textField.setDisable(!newValue);
         PreferencesViewController.this.chooseFile_button.setDisable(!newValue);
     };
-
+    @FXML
+    private Button cancel_button;
     private final EventHandler<ActionEvent> exitHandler = event -> {
         final Stage stage = (Stage) PreferencesViewController.this.cancel_button.getScene().getWindow();
         stage.close();
-        PreferencesViewController.this.LOG.trace("Close preferences");
+        LOG.trace("Close preferences");
     };
     private final EventHandler<ActionEvent> chooseFileHandler = event -> {
         final FileChooser fileChooser = new FileChooser();
@@ -144,6 +110,28 @@ public class PreferencesViewController extends Controller {
         PreferencesViewController.this.startupFile_textField.setText(saveFile.getAbsolutePath());
         ((Stage) PreferencesViewController.this.cancel_button.getParent().getScene().getWindow()).toFront();
     };
+    @FXML
+    private Button save_button;
+    @FXML
+    private CheckBox iCalNotification_CheckBox;
+    @FXML
+    private ColorPicker first_ColorPicker;
+    @FXML
+    private ColorPicker second_ColorPicker;
+    @FXML
+    private Label firstHighlightingColor_Label;
+    @FXML
+    private Label secondHighlightingColor_Label;
+    @FXML
+    private Label appearanceOptions_Label;
+    @FXML
+    private Spinner<Integer> countBirthdaysShown_Spinner;
+    @FXML
+    private Label countBirthdaysShown_Label;
+    @FXML
+    private ToggleButton darkMode_ToggleButton;
+    @FXML
+    private CheckBox reminder_CheckBox;
     private final EventHandler<ActionEvent> savePropertiesHandler = event -> {
         Properties properties = PropertyManager.getInstance().getProperties();
         properties.setProperty(PropertyFields.SAVED_LOCALE, PreferencesViewController.this.language_CompoBox.getValue().toString());
@@ -153,14 +141,14 @@ public class PreferencesViewController extends Controller {
         properties.setProperty(PropertyFields.EXPORT_WITH_ALARM, PreferencesViewController.this.iCalNotification_CheckBox.selectedProperty().getValue().toString());
         try {
             if (!PreferencesViewController.this.startupFile_textField.getText().endsWith(".csv")) {
-                PreferencesViewController.this.LOG.debug("1");
+                LOG.debug("1");
                 new Alert(AlertType.WARNING).setContentText("Tried to set the file to be opened automatically so that it is not CSV!");
             } else {
                 properties.setProperty(PropertyFields.FILE_ON_START, PreferencesViewController.this.startupFile_textField.getText());
             }
         } catch (final NullPointerException nullPointerException) {
-            PreferencesViewController.this.LOG.catching(Level.INFO, nullPointerException);
-            PreferencesViewController.this.LOG.info("startupFile_textField was not properly set ?");
+            LOG.catching(Level.INFO, nullPointerException);
+            LOG.info("startupFile_textField was not properly set ?");
         }
         properties.setProperty(PropertyFields.FIRST_HIGHLIGHT_COLOR, PreferencesViewController.this.first_ColorPicker.getValue().toString().replace("0x", "#"));
         properties.setProperty(PropertyFields.SECOND_HIGHLIGHT_COLOR, PreferencesViewController.this.second_ColorPicker.getValue().toString().replace("0x", "#"));
@@ -172,10 +160,10 @@ public class PreferencesViewController extends Controller {
             PropertyManager.getInstance().storeProperties("Saved properies" + LocalDateTime.now().toString());
             PreferencesViewController.this.updateLocalisation();
         } catch (final IOException ioException) {
-            PreferencesViewController.this.LOG.catching(ioException);
+            LOG.catching(ioException);
         } catch (final NullPointerException nullPointerException) {
-            PreferencesViewController.this.LOG.catching(Level.INFO, nullPointerException);
-            PreferencesViewController.this.LOG.info("A field was not properly set ?");
+            LOG.catching(Level.INFO, nullPointerException);
+            LOG.info("A field was not properly set ?");
         }
         PreferencesViewController.this.getMainController().settingsChanged();
         ((Stage) save_button.getScene().getWindow()).close();
@@ -254,7 +242,7 @@ public class PreferencesViewController extends Controller {
                         super.updateItem(item, empty);
                         if (item == null || empty) {
                             this.setGraphic(null);
-                            PreferencesViewController.this.LOG.info("empty dropbox item");
+                            LOG.info("empty dropbox item");
                         } else {
                             this.setText(item.getDisplayLanguage());
                         }
@@ -282,27 +270,24 @@ public class PreferencesViewController extends Controller {
     private void loadPreferences() {
         this.fillComboBoxLanguages();
         final String displayLanguage = new Locale(PropertyManager.getProperty(PropertyFields.SAVED_LOCALE)).getDisplayLanguage();
-        this.LOG.info(new Locale(displayLanguage).getDisplayLanguage());
+        LOG.info(new Locale(displayLanguage).getDisplayLanguage());
         this.language_CompoBox.getSelectionModel().select(new Locale(displayLanguage));
         this.writeThru_CheckBox.selectedProperty().set(Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.WRITE_THRU)));
         this.autoSave_CheckBox.selectedProperty().set(Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.AUTOSAVE)));
 
-        final Boolean openFileOnStart = Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.OPEN_FILE_ON_START));
+        final boolean openFileOnStart = Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.OPEN_FILE_ON_START));
 
         this.openFileOnStart_Checkbox.selectedProperty().set(openFileOnStart);
         try {
-            PropertyManager.getInstance();
             this.startupFile_textField.setText(PropertyManager.getProperty(PropertyFields.LAST_OPEND));
         } catch (final NullPointerException nullPointerException) {
-            this.LOG.catching(Level.INFO, nullPointerException);
+            LOG.catching(Level.INFO, nullPointerException);
         }
-        if (openFileOnStart) {
-            if (PropertyManager.getProperty(PropertyFields.FILE_ON_START) != null) {
-                if (PropertyManager.getProperty(PropertyFields.FILE_ON_START).endsWith(".csv")) {
-                    this.startupFile_textField.setText(PropertyManager.getProperty(PropertyFields.FILE_ON_START));
-                } else {
-                    PropertyManager.getInstance().getProperties().setProperty(PropertyFields.FILE_ON_START, "");
-                }
+        if (openFileOnStart && PropertyManager.getProperty(PropertyFields.FILE_ON_START) != null) {
+            if (PropertyManager.getProperty(PropertyFields.FILE_ON_START).endsWith(".csv")) {
+                this.startupFile_textField.setText(PropertyManager.getProperty(PropertyFields.FILE_ON_START));
+            } else {
+                PropertyManager.getInstance().getProperties().setProperty(PropertyFields.FILE_ON_START, "");
             }
         }
         this.startupFile_textField.setDisable(!openFileOnStart);
