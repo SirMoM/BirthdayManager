@@ -330,4 +330,9 @@ public class PreferencesViewController extends Controller {
         this.countBirthdaysShown_Label.setText(resourceManager.getLocaleString(LangResourceKeys.countBirthdaysShown_Label));
         this.iCalNotification_CheckBox.setText(resourceManager.getLocaleString(LangResourceKeys.iCalNotification_checkBox));
     }
+
+    @Override
+    public void placeFocus() {
+        save_button.requestFocus();
+    }
 }

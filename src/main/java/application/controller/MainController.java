@@ -287,24 +287,27 @@ public class MainController {
         this.setActiveController(new BirthdaysOverviewController(this));
         try {
             this.replaceSceneContent("/application/view/BirthdaysOverview.fxml", this.getActiveController());
-
+            this.stage.setTitle("Birthday Manager");
         } catch (final Exception exception) {
             LOG.catching(Level.ERROR, exception);
         }
+        getActiveController().placeFocus();
     }
 
     /**
-     * Swiches scenes to the BirthdayOverview. Generates a new Controller.
+     * Switches scenes to the EditBirthdayView. Generates a new Controller.
      *
      * @see EditBirthdayViewController
      */
     public void goToEditBirthdayView() {
         this.setActiveController(new NewBirthdayViewController(this));
+
         try {
             this.replaceSceneContent("/application/view/EditBirthdayView.fxml", this.getActiveController());
         } catch (final Exception exception) {
             LOG.catching(Level.ERROR, exception);
         }
+        getActiveController().placeFocus();
     }
 
     /**
@@ -321,6 +324,7 @@ public class MainController {
         } catch (final Exception exception) {
             LOG.catching(Level.ERROR, exception);
         }
+        getActiveController().placeFocus();
     }
 
     /**
@@ -335,6 +339,7 @@ public class MainController {
         } catch (final Exception exception) {
             LOG.catching(Level.ERROR, exception);
         }
+        getActiveController().placeFocus();
     }
 
     /**

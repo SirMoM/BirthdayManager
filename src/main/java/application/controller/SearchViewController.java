@@ -236,6 +236,11 @@ public class SearchViewController extends Controller {
         this.advancedSettings_TitledPane.setText(lrm.getLocaleString(LangResourceKeys.advancedSettings_TitledPane));
     }
 
+    @Override
+    public void placeFocus() {
+        searchText_TextField.requestFocus();
+    }
+
     public ObservableList<Person> getSearchResults() {
         return searchResults;
     }

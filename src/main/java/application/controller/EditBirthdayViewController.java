@@ -285,4 +285,13 @@ public class EditBirthdayViewController extends Controller {
         this.recentFiles_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromRecentHandler);
         this.openRecent_MenuItem.getItems().add(this.recentFiles_MenuItem);
     }
+
+    @Override
+    public void placeFocus() {
+        name_TextField.requestFocus();
+
+        this.name_TextField.setFocusTraversable(true);
+        this.middleName_TextField.setFocusTraversable(true);
+        this.surname_TextField.setFocusTraversable(true);
+    }
 }

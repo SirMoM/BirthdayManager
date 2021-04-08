@@ -503,6 +503,21 @@ public class BirthdaysOverviewController extends Controller {
         this.sunday_column2.setText(resourceManager.getLocaleString(LangResourceKeys.sunday_column2));
     }
 
+    @Override
+    public void placeFocus() {
+        nextBdaysList.requestFocus();
+
+        if (this.expandRightSide_Button.getText().matches(">")) {
+            this.rightSide_TapView.visibleProperty().set(false);
+            this.getMainController().getStage().setWidth(550);
+            System.out.println("Set size 550");
+        } else {
+            this.rightSide_TapView.visibleProperty().set(true);
+            this.getMainController().getStage().setWidth(1200);
+            System.out.println("Set size 1200");
+        }
+    }
+
     /**
      * @return the progressbar
      */
