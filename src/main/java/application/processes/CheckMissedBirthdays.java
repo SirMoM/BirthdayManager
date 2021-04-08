@@ -1,10 +1,8 @@
 package application.processes;
 
 import application.model.Person;
-import application.model.PersonManager;
 import application.util.PropertyFields;
 import application.util.PropertyManager;
-import javafx.concurrent.Task;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -12,7 +10,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**

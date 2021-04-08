@@ -3,7 +3,6 @@
  */
 package application.model;
 
-import application.controller.BirthdaysOverviewController;
 import application.controller.MainController;
 import application.processes.CheckMissedBirthdays;
 import application.processes.UpdateBirthdaysThisWeekTask;
@@ -20,7 +19,6 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -29,7 +27,10 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.IllegalFormatException;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * This holds a lot of information for the app.
@@ -46,8 +47,8 @@ public class SessionInfos {
     private final List<Person> birthdaysThisWeek = new ArrayList<>();
     private final ObservableList<Person> recentBirthdays = FXCollections.observableArrayList();
     private final ObservableList<Person> nextBirthdays = FXCollections.observableArrayList();
-    private final ObservableList<Person> birthdaysThisMonth = FXCollections.observableArrayList();
     private final ObservableList<PersonsInAWeek> personsInAWeekList = FXCollections.observableArrayList();
+
     private StringProperty recentFileName = new SimpleStringProperty();
     private Locale appLocale;
     private File saveFile;
@@ -81,11 +82,6 @@ public class SessionInfos {
     /** @param appLocale the appLocale to set */
     public void setAppLocale(final Locale appLocale) {
         this.appLocale = appLocale;
-    }
-
-    /** @return the birthdaysThisMonat */
-    public ObservableList<Person> getBirthdaysThisMonth() {
-        return this.birthdaysThisMonth;
     }
 
     /** @return the birthdaysThisWeek */
@@ -151,49 +147,17 @@ public class SessionInfos {
      */
     public void updateSubLists() {
         final String endMessage = "{} ENDED ";
-
         this.resetSubLists();
 
-        final ProgressBar progressBar;
-
-        if (this.mainController.getActiveController() instanceof BirthdaysOverviewController) {
-            progressBar = ((BirthdaysOverviewController) this.mainController.getActiveController()).getProgressbar();
-        } else {
-            progressBar = null;
-        }
-        if (progressBar != null) {
-            // Unbind progress property
-            progressBar.progressProperty().unbind();
-        }
-
+        // Worker for the next Birthdays
         final UpdateNextBirthdaysTask updateNextBirthdaysTask = new UpdateNextBirthdaysTask();
-
         updateNextBirthdaysTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, workerStateEvent -> {
             LOG.debug(endMessage, workerStateEvent.getSource().getClass().getName());
             SessionInfos.this.getNextBirthdays().setAll(updateNextBirthdaysTask.getValue());
-            System.out.println(Arrays.toString(getNextBirthdays().toArray()));
-            if (progressBar != null) {
-                // Unbind progress property
-                progressBar.progressProperty().unbind();
-                progressBar.setProgress(0);
-            }
         });
+        new Thread(updateNextBirthdaysTask).start();
 
-        if (progressBar != null) {
-            // Bind progress property
-            progressBar.progressProperty().bind(updateNextBirthdaysTask.progressProperty());
-        }
-        Thread t = new Thread(updateNextBirthdaysTask);
-        t.setUncaughtExceptionHandler((thread, throwable) -> throwable.printStackTrace());
-        t.start();
-
-        final UpdateBirthdaysThisWeekTask updateBirthdaysThisWeekTask = new UpdateBirthdaysThisWeekTask();
-        updateBirthdaysThisWeekTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, workerStateEvent -> {
-            SessionInfos.this.personsInAWeekList.setAll(updateBirthdaysThisWeekTask.getValue());
-            LOG.debug(endMessage, workerStateEvent.getSource().getClass().getName());
-        });
-        new Thread(updateBirthdaysThisWeekTask).start();
-
+        // Worker for the recent Birthdays
         final UpdateRecentBirthdaysTask updateRecentBirthdaysTask = new UpdateRecentBirthdaysTask();
         updateRecentBirthdaysTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, workerStateEvent -> {
             SessionInfos.this.recentBirthdays.setAll(updateRecentBirthdaysTask.getValue());
@@ -201,6 +165,16 @@ public class SessionInfos {
         });
         new Thread(updateRecentBirthdaysTask).start();
 
+        // Worker for the Birthdays this Week
+        final UpdateBirthdaysThisWeekTask updateBirthdaysThisWeekTask = new UpdateBirthdaysThisWeekTask();
+        updateBirthdaysThisWeekTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, workerStateEvent -> {
+            SessionInfos.this.personsInAWeekList.setAll(updateBirthdaysThisWeekTask.getValue());
+            LOG.debug(endMessage, workerStateEvent.getSource().getClass().getName());
+        });
+        new Thread(updateBirthdaysThisWeekTask).start();
+
+
+        // FIXME: This should not be executed everytime we rebuild the sublists!
         CheckMissedBirthdays missedBirthdays = new CheckMissedBirthdays();
         missedBirthdays.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, workerStateEvent -> {
             List<Person> value = missedBirthdays.getValue();

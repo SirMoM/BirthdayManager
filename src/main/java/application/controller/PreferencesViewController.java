@@ -157,7 +157,7 @@ public class PreferencesViewController extends Controller {
         properties.setProperty(PropertyFields.NEW_VERSION_REMINDER, String.valueOf(PreferencesViewController.this.reminder_CheckBox.isSelected()));
 
         try {
-            PropertyManager.getInstance().storeProperties("Saved properies" + LocalDateTime.now().toString());
+            PropertyManager.getInstance().storeProperties("Saved properies" + LocalDateTime.now());
             PreferencesViewController.this.updateLocalisation();
         } catch (final IOException ioException) {
             LOG.catching(ioException);

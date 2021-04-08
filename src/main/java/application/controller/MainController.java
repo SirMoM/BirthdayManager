@@ -206,7 +206,7 @@ public class MainController {
             LOG.catching(ioException);
         }
     };
-    private final Stack<Scene> lastScenes;
+    private final Stack<SceneAndController> lastScenes;
     private Controller activeController = null;
     final EventHandler<ActionEvent> exportToCalendarHandler = event -> {
         final FileChooser fileChooser = new FileChooser();
@@ -426,7 +426,7 @@ public class MainController {
         loader.setController(controller);
         final Parent root = loader.load();
         final Scene scene = new Scene(root);
-        lastScenes.push(scene);
+        lastScenes.push(new SceneAndController((Controller) controller, scene));
         this.stage.setScene(scene);
         setStyle();
 
@@ -435,10 +435,17 @@ public class MainController {
     }
 
     public void goToLastScene() {
-        Scene scene = lastScenes.pop();
-        this.stage.setScene(scene);
+        SceneAndController currentSceneAndController = lastScenes.pop();
+        SceneAndController sceneAndController = lastScenes.peek();
+        LOG.info("Going back to {} view.", sceneAndController.scene);
+
+        this.stage.setScene(sceneAndController.scene);
+        this.setActiveController(sceneAndController.controller);
         setStyle();
+
         this.stage.show();
+
+        getActiveController().placeFocus();
     }
 
     public void settingsChanged() {
@@ -447,33 +454,37 @@ public class MainController {
     }
 
     /**
-     * Starts the application with the BirthdaysOverview and possibly loaded file
+     * Starts the application with the BirthdaysOverview and possibly load a file
      */
     public void start() {
         this.setActiveController(new BirthdaysOverviewController(this));
+
         boolean openFileOnStart = Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.OPEN_FILE_ON_START));
 
         try {
             this.replaceSceneContent("/application/view/BirthdaysOverview.fxml", this.getActiveController());
 
             if (openFileOnStart) {
-                String file = PropertyManager.getProperty(PropertyFields.FILE_ON_START);
-                assert file != null;
-                // If it is not an csv file remove from auto start!
-                if (!file.endsWith(".csv")) {
-                    PropertyManager.getInstance().getProperties().setProperty(PropertyFields.FILE_ON_START, "");
-                    file = null;
-                }
-                if (file != null && !file.isEmpty()) {
-                    this.openFile(new File(file));
+                LOG.info("Try to open file on start!");
+                String filePathString = PropertyManager.getProperty(PropertyFields.FILE_ON_START);
+
+                if (filePathString == null) {
+                    LOG.debug("Should have opened a file upon start but no file to open was found!");
+                } else if (filePathString.isEmpty()) {
+                    LOG.debug("Empty file path can't open!");
+                    // If it is not an csv file remove from auto start!
+                } else if (filePathString.endsWith(".csv")) {
+                    this.openFile(new File(filePathString));
+                    LOG.debug("Opening File {}", filePathString);
                 } else {
-                    LOG.warn("Should have opened a file upon start but no file to open was found!");
+                    PropertyManager.getInstance().getProperties().setProperty(PropertyFields.FILE_ON_START, "");
+                    LOG.warn("Should have opened a file upon start but file to open was wasn't a csv file!");
                 }
             }
-
         } catch (final Exception exception) {
             LOG.catching(Level.ERROR, exception);
         }
+        getActiveController().placeFocus();
         checkVersionAndAlert();
     }
 
@@ -528,5 +539,15 @@ public class MainController {
         alert.setTitle("ERROR: Parsing failed");
         alert.setContentText(personCouldNotBeParsedException.getMessage());
         alert.showAndWait();
+    }
+
+    private class SceneAndController {
+        final Controller controller;
+        final Scene scene;
+
+        public SceneAndController(Controller controller, Scene scene) {
+            this.scene = scene;
+            this.controller = controller;
+        }
     }
 }

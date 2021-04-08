@@ -12,8 +12,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -55,7 +53,8 @@ public class UpdateNextBirthdaysTask extends PersonTasks<List<Person>> {
         final List<Person> nextBirthdays = new ArrayList<>();
 
         // Fill upcoming and after based on today
-        for (final Person person : personDB) {
+        for (int i = 0; i < personDB.size(); i++) {
+            final Person person = personDB.get(i);
             int dayOfYear = person.getBirthday().withYear(LocalDate.now().getYear()).getDayOfYear();
             if (dayOfYear >= LocalDate.now().getDayOfYear()) {
                 upcoming.add(person);
@@ -86,7 +85,6 @@ public class UpdateNextBirthdaysTask extends PersonTasks<List<Person>> {
                 break;
             }
         }
-        System.out.println(Arrays.toString(nextBirthdays.toArray()));
         return nextBirthdays;
     }
 }

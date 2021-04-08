@@ -43,9 +43,41 @@ import java.util.ResourceBundle;
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
 public class BirthdaysOverviewController extends Controller {
-    private static final Logger LOG = LogManager.getLogger(BirthdaysOverviewController.class.getName());
     protected static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+    private static final Logger LOG = LogManager.getLogger(BirthdaysOverviewController.class.getName());
     final EventHandler<ActionEvent> newBirthdayHandler = event -> BirthdaysOverviewController.this.getMainController().goToEditBirthdayView();
+    private final EventHandler<ActionEvent> importBirthdaysHandler = event -> {
+        final FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
+        fileChooser.getExtensionFilters().add(new ExtensionFilter(new LangResourceManager().getLocaleString(LangResourceKeys.txt_file), "*.txt"));
+        fileChooser.getExtensionFilters().add(new ExtensionFilter(new LangResourceManager().getLocaleString(LangResourceKeys.csv_file), "*.csv"));
+        fileChooser.getExtensionFilters().add(new ExtensionFilter(new LangResourceManager().getLocaleString(LangResourceKeys.all_files), "*.*"));
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+
+        // if the chooser is "x'ed" the file is null
+        final File selectedFile = fileChooser.showOpenDialog(getMainController().getStage().getScene().getWindow());
+        if (selectedFile == null) {
+            return;
+        }
+        LOG.debug("Importing file: {}", selectedFile.getAbsolutePath());
+
+        try {
+            final LoadPersonsTask loadPersonsTask = new LoadPersonsTask(selectedFile, selectedFile.getAbsolutePath().endsWith(".csv"));
+            loadPersonsTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, workerStateEvent -> {
+                LoadPersonsTask.Result result = loadPersonsTask.getValue();
+                PersonManager.getInstance().getPersons().addAll(result.getPersons());
+                getMainController().getSessionInfos().updateSubLists();
+
+                for (Person.PersonCouldNotBeParsedException error : result.getErrors()) {
+                    logAndAlertParsingError(error);
+                }
+                LOG.debug("Imported birthdays from File");
+            });
+            new Thread(loadPersonsTask).start();
+        } catch (IOException ioException) {
+            LOG.catching(Level.ERROR, ioException);
+        }
+    };
     protected boolean showNextBirthdays;
     Callback<ListView<Person>, ListCell<Person>> colorCellFactory = new Callback<ListView<Person>, ListCell<Person>>() {
 
@@ -66,7 +98,7 @@ public class BirthdaysOverviewController extends Controller {
 
                             this.styleProperty().bind(Bindings.when(this.selectedProperty()).then(new SimpleStringProperty("-fx-background-color: -fx-selection-bar;")).otherwise(new SimpleStringProperty("-fx-background-color: " + secondColorString)));
                         }
-                        this.setText(item.toString() + "\t \t \t " + (new LangResourceManager().getLocaleString(LangResourceKeys.age)) + ":\t" + (LocalDate.now().getYear() - item.getBirthday().getYear()));
+                        this.setText(item + "\t \t \t " + (new LangResourceManager().getLocaleString(LangResourceKeys.age)) + ":\t" + (LocalDate.now().getYear() - item.getBirthday().getYear()));
 
                     } else {
                         this.setText(null);
@@ -76,7 +108,6 @@ public class BirthdaysOverviewController extends Controller {
         }
     };
     private MenuItem recentFiles_MenuItem;
-
     @FXML
     private ResourceBundle resources;
     @FXML
@@ -161,6 +192,31 @@ public class BirthdaysOverviewController extends Controller {
             BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(indexOf);
         }
     };
+    private final EventHandler<ActionEvent> deletePersonHandler = event -> {
+        final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
+        if (!selectedItems.isEmpty()) {
+            final int indexOf = PersonManager.getInstance().getPersons().indexOf(selectedItems.get(0));
+            PersonManager.getInstance().deletePerson(PersonManager.getInstance().getPersonFromIndex(indexOf));
+            BirthdaysOverviewController.this.getMainController().getSessionInfos().updateSubLists();
+
+            if (Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.WRITE_THRU))) {
+                final SaveBirthdaysToFileTask task = new SaveBirthdaysToFileTask(getMainController().getSessionInfos().getSaveFile());
+                task.setOnSucceeded(event1 -> {
+                    if (event1.getEventType() == WorkerStateEvent.WORKER_STATE_SUCCEEDED) {
+                        LOG.debug("Saved changes to file (via write thru)");
+                    }
+                });
+
+                new Thread(task).start();
+            }
+
+            BirthdaysOverviewController.this.nextBdaysList.setStyle(null);
+            BirthdaysOverviewController.this.nextBdaysList.setCellFactory(null);
+            BirthdaysOverviewController.this.nextBdaysList.refresh();
+            BirthdaysOverviewController.this.nextBdaysList.setCellFactory(BirthdaysOverviewController.this.colorCellFactory);
+            BirthdaysOverviewController.this.nextBdaysList.refresh();
+        }
+    };
     @FXML
     private MenuItem openBirthday_MenuItem;
     @FXML
@@ -209,64 +265,6 @@ public class BirthdaysOverviewController extends Controller {
     private Label date_label;
     @FXML
     private ProgressBar progressbar;
-
-    private final EventHandler<ActionEvent> deletePersonHandler = event -> {
-        final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
-        if (!selectedItems.isEmpty()) {
-            final int indexOf = PersonManager.getInstance().getPersons().indexOf(selectedItems.get(0));
-            PersonManager.getInstance().deletePerson(PersonManager.getInstance().getPersonFromIndex(indexOf));
-            BirthdaysOverviewController.this.getMainController().getSessionInfos().updateSubLists();
-
-            if (Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.WRITE_THRU))) {
-                final SaveBirthdaysToFileTask task = new SaveBirthdaysToFileTask(getMainController().getSessionInfos().getSaveFile());
-                task.setOnSucceeded(event1 -> {
-                    if (event1.getEventType() == WorkerStateEvent.WORKER_STATE_SUCCEEDED) {
-                        LOG.debug("Saved changes to file (via write thru)");
-                    }
-                });
-
-                new Thread(task).start();
-            }
-
-            BirthdaysOverviewController.this.nextBdaysList.setStyle(null);
-            BirthdaysOverviewController.this.nextBdaysList.setCellFactory(null);
-            BirthdaysOverviewController.this.nextBdaysList.refresh();
-            BirthdaysOverviewController.this.nextBdaysList.setCellFactory(BirthdaysOverviewController.this.colorCellFactory);
-            BirthdaysOverviewController.this.nextBdaysList.refresh();
-        }
-    };
-    private final EventHandler<ActionEvent> importBirthdaysHandler = event -> {
-        final FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
-        fileChooser.getExtensionFilters().add(new ExtensionFilter(new LangResourceManager().getLocaleString(LangResourceKeys.txt_file), "*.txt"));
-        fileChooser.getExtensionFilters().add(new ExtensionFilter(new LangResourceManager().getLocaleString(LangResourceKeys.csv_file), "*.csv"));
-        fileChooser.getExtensionFilters().add(new ExtensionFilter(new LangResourceManager().getLocaleString(LangResourceKeys.all_files), "*.*"));
-        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-
-        // if the chooser is "x'ed" the file is null
-        final File selectedFile = fileChooser.showOpenDialog(getMainController().getStage().getScene().getWindow());
-        if (selectedFile == null) {
-            return;
-        }
-        LOG.debug("Importing file: {}", selectedFile.getAbsolutePath());
-
-        try {
-            final LoadPersonsTask loadPersonsTask = new LoadPersonsTask(selectedFile, selectedFile.getAbsolutePath().endsWith(".csv"));
-            loadPersonsTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, workerStateEvent -> {
-                LoadPersonsTask.Result result = loadPersonsTask.getValue();
-                PersonManager.getInstance().getPersons().addAll(result.getPersons());
-                getMainController().getSessionInfos().updateSubLists();
-
-                for (Person.PersonCouldNotBeParsedException error : result.getErrors()) {
-                    logAndAlertParsingError(error);
-                }
-                LOG.debug("Imported birthdays from File");
-            });
-            new Thread(loadPersonsTask).start();
-        } catch (IOException ioException) {
-            LOG.catching(Level.ERROR, ioException);
-        }
-    };
 
     public BirthdaysOverviewController(final MainController mainController) {
         super(mainController);
@@ -441,11 +439,12 @@ public class BirthdaysOverviewController extends Controller {
      * @see javafx.fxml.Initializable#initialize(java.net.URL,
      * java.util.ResourceBundle)
      */
-    @Override
+    @FXML
     public void initialize(final URL location, final ResourceBundle resources) {
         this.getMainController().getStage().setWidth(550);
 
         this.assertion();
+
         // Localisation
         this.updateLocalisation();
 
@@ -505,16 +504,14 @@ public class BirthdaysOverviewController extends Controller {
 
     @Override
     public void placeFocus() {
+        System.out.println("Focus BOvC");
         nextBdaysList.requestFocus();
-
         if (this.expandRightSide_Button.getText().matches(">")) {
             this.rightSide_TapView.visibleProperty().set(false);
             this.getMainController().getStage().setWidth(550);
-            System.out.println("Set size 550");
         } else {
             this.rightSide_TapView.visibleProperty().set(true);
             this.getMainController().getStage().setWidth(1200);
-            System.out.println("Set size 1200");
         }
     }
 
