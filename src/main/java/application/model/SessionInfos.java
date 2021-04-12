@@ -1,6 +1,3 @@
-/**
- *
- */
 package application.model;
 
 import application.controller.MainController;
@@ -49,7 +46,7 @@ public class SessionInfos {
     private final ObservableList<Person> nextBirthdays = FXCollections.observableArrayList();
     private final ObservableList<PersonsInAWeek> personsInAWeekList = FXCollections.observableArrayList();
 
-    private StringProperty recentFileName = new SimpleStringProperty();
+    private final RecentItems recentFileNames = new RecentItems(5);
     private Locale appLocale;
     private File saveFile;
 
@@ -67,11 +64,15 @@ public class SessionInfos {
         LOG.debug("Loaded locale propertie {}", localePropertieString);
 
         try {
-            this.getRecentFileName().set(new File(PropertyManager.getProperty(PropertyFields.LAST_OPEND)).getName());
+            recentFileNames.loadFromProperties(PropertyManager.getProperty(PropertyFields.LAST_OPEND));
         } catch (final NullPointerException nullPointerException) {
             LOG.catching(Level.WARN, nullPointerException);
-            LOG.warn("\nDon't worry just could not load recent File");
+            LOG.warn("Don't worry just could not load recent File");
         }
+    }
+
+    public RecentItems getRecentFileNames() {
+        return recentFileNames;
     }
 
     /** @return the appLocale */
@@ -107,16 +108,6 @@ public class SessionInfos {
     /** @return the recentBirthdays */
     public ObservableList<Person> getRecentBirthdays() {
         return this.recentBirthdays;
-    }
-
-    /** @return the recentFileName */
-    public StringProperty getRecentFileName() {
-        return this.recentFileName;
-    }
-
-    /** @param recentFileName the recentFileName to set */
-    public void setRecentFileName(final StringProperty recentFileName) {
-        this.recentFileName = recentFileName;
     }
 
     /** resets the nextBirthdays and recentBirthdays */
