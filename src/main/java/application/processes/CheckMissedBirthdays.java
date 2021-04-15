@@ -37,15 +37,15 @@ public class CheckMissedBirthdays extends PersonTasks<List<Person>> {
         PropertyManager.getInstance().getProperties().setProperty(PropertyFields.LAST_VISIT, LocalDate.now().format(dateTimeFormatter));
         PropertyManager.getInstance().storeProperties("Change last visit");
 
-        long daysScinceLastVisit = ChronoUnit.DAYS.between(lastVisit, LocalDate.now());
-        if (daysScinceLastVisit >= 2) {
-            return getBrithdaysSince(lastVisit, LocalDate.now());
+        long daysSinceLastVisit = ChronoUnit.DAYS.between(lastVisit, LocalDate.now());
+        if (daysSinceLastVisit >= 2) {
+            return getBirthdaysSince(lastVisit, LocalDate.now());
         }
         failed();
         return new ArrayList<>();
     }
 
-    private List<Person> getBrithdaysSince(LocalDate lastVisit, LocalDate now) {
+    private List<Person> getBirthdaysSince(LocalDate lastVisit, LocalDate now) {
         List<Person> skippedBirthdays = new ArrayList<>();
         for (Person person : personDB) {
             if (person.getBirthday().withYear(now.getYear()).isAfter(lastVisit) && person.getBirthday().withYear(now.getYear()).isBefore(now)) {

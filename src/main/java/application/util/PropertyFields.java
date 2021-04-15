@@ -4,14 +4,14 @@
 package application.util;
 
 /**
- * All propertie keys
+ * All property keys
  *
  * @author Noah Ruben
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
 public interface PropertyFields {
 
-    String LAST_OPEND = "last_opend";
+    String LAST_OPENED = "last_opened";
     String SAVED_LOCALE = "saved_locale";
     String WRITE_THRU = "write_thru";
     String AUTOSAVE = "autosave";

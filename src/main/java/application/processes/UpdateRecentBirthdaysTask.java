@@ -38,8 +38,8 @@ public class UpdateRecentBirthdaysTask extends PersonTasks<List<Person>> {
     protected List<Person> call() throws Exception {
         LOG.debug("Started {}", this.getClass().getName());
 
-        /** All upcomming persons / birthdays */
-        final List<Person> upcomming = new ArrayList<>();
+        /** All upcoming persons / birthdays */
+        final List<Person> upcoming = new ArrayList<>();
 
         /** All passed persons / birthdays */
         final List<Person> after = new ArrayList<>();
@@ -54,13 +54,13 @@ public class UpdateRecentBirthdaysTask extends PersonTasks<List<Person>> {
             final Person person = personDB.get(i);
             int dayOfYear = person.getBirthday().withYear(LocalDate.now().getYear()).getDayOfYear();
             if (dayOfYear >= LocalDate.now().getDayOfYear()) {
-                upcomming.add(person);
+                upcoming.add(person);
             } else {
                 after.add(person);
             }
         }
 
-        upcomming.sort(new BirthdayComparator(false));
+        upcoming.sort(new BirthdayComparator(false));
         after.sort(new BirthdayComparator(false));
         int i = 0;
         for (; i < NEXT_BIRTHDAYS_COUNT; i++) {
@@ -74,7 +74,7 @@ public class UpdateRecentBirthdaysTask extends PersonTasks<List<Person>> {
         int j = 0;
         for (; j < NEXT_BIRTHDAYS_COUNT - i; j++) {
             try {
-                recentBirthdays.add(upcomming.get((upcomming.size() - 1) - j));
+                recentBirthdays.add(upcoming.get((upcoming.size() - 1) - j));
             } catch (final IndexOutOfBoundsException indexOutOfBoundsException) {
                 LOG.debug("Probably not enough Persons to gather the 10 birthdays for recent", indexOutOfBoundsException);
                 break;

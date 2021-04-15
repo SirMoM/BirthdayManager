@@ -15,7 +15,7 @@ class PersonsInAWeekTest {
 
     void setup() {
         for (int i = 0; i < 8; i++) {
-            Person tempPerson = new Person("Max", "Musterman", String.valueOf(i), LocalDate.now().plusDays(i));
+            Person tempPerson = new Person("Max", "Mustermann", String.valueOf(i), LocalDate.now().plusDays(i));
             persons.add(tempPerson);
         }
     }

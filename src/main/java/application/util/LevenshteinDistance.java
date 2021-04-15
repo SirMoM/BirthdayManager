@@ -2,14 +2,14 @@ package application.util;
 
 import java.util.Arrays;
 
-public class LevenshteinDistanz {
+public class LevenshteinDistance {
 
-    private LevenshteinDistanz() throws IllegalAccessException {
+    private LevenshteinDistance() throws IllegalAccessException {
         throw new IllegalAccessException("Utility class");
     }
 
     public static int calculate(String strA, String strB) {
-        // Check early break conditiones
+        // Check early break conditions
         if (strA == null || strB == null) {
             throw new NullPointerException("String not filled!");
         }

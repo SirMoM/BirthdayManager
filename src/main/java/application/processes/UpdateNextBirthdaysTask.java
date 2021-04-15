@@ -81,7 +81,7 @@ public class UpdateNextBirthdaysTask extends PersonTasks<List<Person>> {
                 nextBirthdays.add(after.get(j));
                 this.updateProgress(j, NEXT_BIRTHDAYS_COUNT);
             } catch (final IndexOutOfBoundsException indexOutOfBoundsException) {
-                LOG.debug("Probably not enought Persons to gather the 10 birthdays for next", indexOutOfBoundsException);
+                LOG.debug("Probably not enough Persons to gather the 10 birthdays for next", indexOutOfBoundsException);
                 break;
             }
         }

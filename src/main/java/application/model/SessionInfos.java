@@ -62,12 +62,12 @@ public class SessionInfos {
         LOG.info("SessionInfos created");
 
         this.mainController = mainController;
-        final String localePropertieString = PropertyManager.getProperty(PropertyFields.SAVED_LOCALE);
+        final String localePropertyString = PropertyManager.getProperty(PropertyFields.SAVED_LOCALE);
 
-        LOG.debug("Loaded locale propertie {}", localePropertieString);
+        LOG.debug("Loaded locale property {}", localePropertyString);
 
         try {
-            this.getRecentFileName().set(new File(PropertyManager.getProperty(PropertyFields.LAST_OPEND)).getName());
+            this.getRecentFileName().set(new File(PropertyManager.getProperty(PropertyFields.LAST_OPENED)).getName());
         } catch (final NullPointerException nullPointerException) {
             LOG.catching(Level.WARN, nullPointerException);
             LOG.warn("\nDon't worry just could not load recent File");

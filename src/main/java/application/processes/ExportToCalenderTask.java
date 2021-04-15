@@ -32,7 +32,7 @@ public class ExportToCalenderTask extends PersonTasks<Boolean> {
 
     ICalendar ical;
     ICalWriter writer;
-    Boolean succsessfull = true;
+    Boolean successful = true;
     List<Person> persons;
 
     public ExportToCalenderTask(File file) throws IOException {
@@ -52,17 +52,17 @@ public class ExportToCalenderTask extends PersonTasks<Boolean> {
         if (writer != null && ical != null) {
             writer.write(ical);
         } else {
-            succsessfull = false;
+            successful = false;
         }
         close();
-        return succsessfull;
+        return successful;
     }
 
     private void close() {
         try {
             writer.close();
         } catch (IOException ioException) {
-            succsessfull = false;
+            successful = false;
         }
     }
 

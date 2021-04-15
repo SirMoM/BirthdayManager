@@ -61,7 +61,7 @@ public class Person {
     }
 
     /**
-     * Parsing lines in the format: birthday;name;sonstiges
+     * Parsing lines in the format: birthday;name
      *
      * <ul>
      *   <li>the name is expected like this: name, surname, misc
@@ -258,7 +258,7 @@ public class Person {
     }
 
     /**
-     * String representation of the person with the formate: <br>
+     * String representation of the person with the format: <br>
      * <code>name misc surname</code>=<code>dd.mm.yyyy</code>
      *
      * @return The String representation of the person for a TXT-file.

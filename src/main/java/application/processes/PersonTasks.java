@@ -38,14 +38,14 @@ public abstract class PersonTasks<G> extends Task<G> {
 
             timeToWait += timeToWait;
             timeInWaiting += timeToWait;
-            LOG.info("Waiting for personenDB to be filled! Waiting since {} ms", timeInWaiting);
+            LOG.info("Waiting for personDB to be filled! Waiting since {} ms", timeInWaiting);
             if (timeInWaiting > waitTimeLimit) {
                 LOG.info("Thread canceled because it took too long to wait for the list of people!");
                 this.cancel();
             }
             isEmpty = PersonManager.getInstance().getPersons().isEmpty();
         }
-        LOG.info("PersonenDB filled! Wait time was {} ms", timeInWaiting);
+        LOG.info("PersonDB filled! Wait time was {} ms", timeInWaiting);
         return PersonManager.getInstance().getPersons();
     }
 }

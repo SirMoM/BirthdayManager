@@ -33,7 +33,7 @@ public class AppStart extends Application {
 
             final Alert alert = new Alert(AlertType.ERROR);
             alert.setTitle("ERROR");
-            alert.setHeaderText("Someting went wrong! \n Consider sending me the log.");
+            alert.setHeaderText("Something went wrong! \n Consider sending me the log.");
 
             final StringBuilder stringBuilder = new StringBuilder("Stacktrace: \n");
             for (int i = 0; i < throwable.getStackTrace().length; i++) {

@@ -332,7 +332,7 @@ public class BirthdaysOverviewController extends Controller {
         this.openFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromFileChooserHandler);
         this.openFile_MenuItem.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN));
 
-        this.createRecentFilesMenueItems();
+        this.createRecentFilesMenuItems();
 
         this.closeFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().closeFileHandler);
         this.saveFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().saveToFileHandler);
@@ -340,7 +340,7 @@ public class BirthdaysOverviewController extends Controller {
         this.saveAsFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().exportToFileHandler);
 
         this.exportToCalendar_MenuItem.addEventHandler(ActionEvent.ANY, getMainController().exportToCalendarHandler);
-        this.preferences_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openPreferencesHander);
+        this.preferences_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openPreferencesHandler);
 
         this.quit_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().closeAppHandler);
 
@@ -425,8 +425,8 @@ public class BirthdaysOverviewController extends Controller {
     /**
      *
      */
-    private void createRecentFilesMenueItems() {
-        // create Menue Items and adding them
+    private void createRecentFilesMenuItems() {
+        // create Menu Items and adding them
         this.recentFiles_MenuItem = new MenuItem();
         this.recentFiles_MenuItem.textProperty().bind(this.getMainController().getSessionInfos().getRecentFileName());
         this.recentFiles_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromRecentHandler);
@@ -504,7 +504,6 @@ public class BirthdaysOverviewController extends Controller {
 
     @Override
     public void placeFocus() {
-        System.out.println("Focus BOvC");
         nextBdaysList.requestFocus();
         if (this.expandRightSide_Button.getText().matches(">")) {
             this.rightSide_TapView.visibleProperty().set(false);

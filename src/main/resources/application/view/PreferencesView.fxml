@@ -33,7 +33,7 @@
                 <CheckBox fx:id="autoSave_CheckBox" layoutX="190.0" layoutY="175.0" mnemonicParsing="false"
                           text="Autosave" AnchorPane.leftAnchor="225.0" AnchorPane.topAnchor="155.0">
                     <tooltip>
-                        <Tooltip fx:id="autsave_Tooltipp"/>
+                        <Tooltip fx:id="autsave_Tooltip"/>
                     </tooltip>
                 </CheckBox>
                 <Separator layoutX="10.0" layoutY="310.0" maxHeight="1.7976931348623157E308"
@@ -48,7 +48,7 @@
                 <CheckBox fx:id="openFileOnStart_Checkbox" layoutX="75.0" layoutY="463.0" mnemonicParsing="false"
                           text="Open file on startup" AnchorPane.bottomAnchor="143.0" AnchorPane.leftAnchor="75.0">
                     <tooltip>
-                        <Tooltip fx:id="openFileOnStartUp_ToolTipp"/>
+                        <Tooltip fx:id="openFileOnStartUp_ToolTip"/>
                     </tooltip>
                 </CheckBox>
                 <TextField fx:id="startupFile_textField" layoutX="75.0" layoutY="490.0" AnchorPane.bottomAnchor="108.0"
@@ -66,7 +66,7 @@
                            minWidth="0.0" prefWidth="600.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
                            AnchorPane.topAnchor="225.0"/>
                 <CheckBox fx:id="iCalNotification_CheckBox" layoutX="75.0" layoutY="200.0" mnemonicParsing="false"
-                          text="Export to iCal with notificationes" AnchorPane.leftAnchor="75.0"
+                          text="Export to iCal with notifications" AnchorPane.leftAnchor="75.0"
                           AnchorPane.topAnchor="195.0"/>
                 <ColorPicker fx:id="first_ColorPicker" editable="true" layoutX="75.0" layoutY="297.0" prefHeight="25.0"
                              prefWidth="176.0" promptText="asd" AnchorPane.leftAnchor="75.0"
