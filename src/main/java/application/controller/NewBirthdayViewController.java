@@ -137,8 +137,6 @@ public class NewBirthdayViewController extends Controller {
     @FXML
     private Label date_label;
 
-    private MenuItem recentFiles_MenuItem;
-
     public NewBirthdayViewController(final MainController mainController) {
         super(mainController);
         this.newPerson = new Person();
@@ -215,9 +213,9 @@ public class NewBirthdayViewController extends Controller {
 
         this.openFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromFileChooserHandler);
         try {
-            this.recentFiles_MenuItem = new MenuItem(new File(PropertyManager.getProperty(PropertyFields.LAST_OPENED)).getName());
-            this.recentFiles_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromRecentHandler);
-            this.openRecent_MenuItem.getItems().add(this.recentFiles_MenuItem);
+            MenuItem recentFiles_MenuItem = new MenuItem(new File(PropertyManager.getProperty(PropertyFields.LAST_OPENED)).getName());
+            recentFiles_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromRecentHandler);
+            this.openRecent_MenuItem.getItems().add(recentFiles_MenuItem);
         } catch (NullPointerException nullPointerException) {
             LOG.catching(Level.INFO, nullPointerException);
             LOG.info("No recent File opened ?");

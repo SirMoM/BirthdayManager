@@ -3,6 +3,7 @@ package application.controller;
 import application.model.Person;
 import application.model.PersonManager;
 import application.model.PersonsInAWeek;
+import application.model.RecentItems;
 import application.processes.LoadPersonsTask;
 import application.processes.SaveBirthdaysToFileTask;
 import application.util.PropertyFields;
@@ -331,7 +332,6 @@ public class BirthdaysOverviewController extends Controller {
         // File
         this.openFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromFileChooserHandler);
         this.openFile_MenuItem.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN));
-
         this.createRecentFilesMenuItems();
 
         this.closeFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().closeFileHandler);
@@ -411,6 +411,9 @@ public class BirthdaysOverviewController extends Controller {
                 keyEvent.consume();
             }
         });
+        getMainController().getSessionInfos().getRecentFileNames().addListener(listener -> {
+            createRecentFilesMenuItems();
+        } );
     }
 
     private void refreshBirthdayTableView() {
@@ -426,11 +429,18 @@ public class BirthdaysOverviewController extends Controller {
      *
      */
     private void createRecentFilesMenuItems() {
+        // clear all menu items
+        this.openRecent_MenuItem.getItems().clear();
+
         // create Menu Items and adding them
-        this.recentFiles_MenuItem = new MenuItem();
-        this.recentFiles_MenuItem.textProperty().bind(this.getMainController().getSessionInfos().getRecentFileName());
-        this.recentFiles_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromRecentHandler);
-        this.openRecent_MenuItem.getItems().add(this.recentFiles_MenuItem);
+        RecentItems recentFileNames = getMainController().getSessionInfos().getRecentFileNames();
+        for (String paths : recentFileNames.getItems()) {
+            File file = new File(paths);
+            MenuItem tempMenuItem = new MenuItem();
+            tempMenuItem.textProperty().set(file.getName());
+            tempMenuItem.addEventHandler(ActionEvent.ANY, new RecentFileEventHandler(file));
+            this.openRecent_MenuItem.getItems().add(tempMenuItem);
+        }
     }
 
     /*
@@ -534,5 +544,22 @@ public class BirthdaysOverviewController extends Controller {
         alert.setTitle("ERROR: Parsing failed");
         alert.setContentText(personCouldNotBeParsedException.getMessage());
         alert.showAndWait();
+    }
+
+    private class RecentFileEventHandler implements EventHandler {
+        File fileToOpen;
+
+        public RecentFileEventHandler(File file) {
+            this.fileToOpen = file;
+        }
+
+        @Override
+        public void handle(Event event) {
+            try {
+                BirthdaysOverviewController.this.getMainController().openFile(fileToOpen);
+            } catch (IOException ioException) {
+                LOG.catching(Level.DEBUG, ioException);
+            }
+        }
     }
 }
