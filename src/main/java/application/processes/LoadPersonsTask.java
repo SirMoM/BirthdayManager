@@ -60,7 +60,8 @@ public class LoadPersonsTask extends Task<List<Person>> {
 		String line = this.reader.readLine();
 		while (line != null) {
 			if (!this.csvFile) {
-				persons.add(Person.parseFromTXTLine(line));
+				// @TODO use real line numbers
+				persons.add(Person.parseFromTXTLine(line, 0));
 				this.prozess++;
 			} else if (this.csvFile) {
 				persons.add(Person.parseFromCSVLine(line, this.prozess));

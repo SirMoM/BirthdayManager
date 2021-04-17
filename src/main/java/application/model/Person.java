@@ -151,16 +151,17 @@ public class Person {
 	 * @param line which line of the file is parsed right now
 	 * @return a new Person resulting from the given String
 	 */
-	public static Person parseFromCSVLine(final String txtLine, final int line) {
+	public static Person parseFromCSVLine(final String txtLine, final int line) throws PersonCouldNotBeParsedException {
 		String name = null;
 		String surname = null;
 		String misc = null;
-		final LocalDate birthday;
-		String whatCouldNotBeParsed = null;
+		LocalDate birthday;
+		String whatCouldNotBeParsed = "";
+
 		try {
 			final String[] splitLine = txtLine.split(",");
-			if (splitLine.length < 1) {
-				throw new IndexOutOfBoundsException("Could not split line");
+			if (splitLine.length == 1) {
+				throw new PersonCouldNotBeParsedException(line, "the whole line");
 			}
 			whatCouldNotBeParsed = "birthday";
 			birthday = parse(splitLine[0], Person.DATE_FORMATTER);
@@ -168,9 +169,7 @@ public class Person {
 			whatCouldNotBeParsed = "full name";
 			final String[] nameAsArray = splitLine[1].split(";");
 
-			whatCouldNotBeParsed = "name";
 			name = nameAsArray[0];
-			whatCouldNotBeParsed = "surname";
 			surname = nameAsArray[1];
 
 			if (nameAsArray.length > 2) {
@@ -179,16 +178,18 @@ public class Person {
 			} else {
 				misc = null;
 			}
-
-			whatCouldNotBeParsed = null;
 			return new Person(surname, name, misc, birthday);
-		} catch (final IndexOutOfBoundsException indexOutOfBoundsException) {
-			final Alert alert = new Alert(AlertType.WARNING);
+		} catch (IndexOutOfBoundsException | DateTimeParseException exception) {
+
+			// TODO Use this to inform the User
+			/*final Alert alert = new Alert(AlertType.WARNING);
 			alert.setTitle("ERROR: Parsing failed");
 			alert.setHeaderText("Line " + line + " could not be parsed: ");
 			alert.setContentText("This attribute could not be parsed: " + whatCouldNotBeParsed + "\n" + txtLine);
 			alert.showAndWait();
-			return null;
+			return null;*/
+			throw new PersonCouldNotBeParsedException(line, whatCouldNotBeParsed);
+
 		}
 
 	}
@@ -197,49 +198,48 @@ public class Person {
 	 * @param txtLine a read line from the Text-file
 	 * @return a new Person resulting from the given String
 	 */
-	public static Person parseFromTXTLine(final String txtLine) {
+	public static Person parseFromTXTLine(final String txtLine, final int line) throws PersonCouldNotBeParsedException {
 		String name = null;
 		String surname = null;
 		String misc = null;
-		LocalDate birthday = null;
+		LocalDate birthday;
+		String whatCouldNotBeParsed = "";
 
 		try {
 			final String[] splitLine = txtLine.split("=");
-			if (splitLine.length < 1) {
-				throw new IndexOutOfBoundsException("Could not split line");
+			if (splitLine.length == 1) {
+				throw new PersonCouldNotBeParsedException(line, "the whole line");
 			}
-			final String[] nameSplit = splitLine[0].split(" ");
-			try {
-				birthday = parse(splitLine[1], Person.DATE_FORMATTER);
-			} catch (final DateTimeParseException e) {
-				final Alert alert = new Alert(AlertType.WARNING);
-				alert.setTitle("Could not parse this birthday");
-				alert.setHeaderText("Birthday which could not be parsed: ");
-				alert.setContentText(splitLine[1]);
-				alert.showAndWait();
-				return null;
-			}
+			whatCouldNotBeParsed = "birthday";
+			birthday = parse(splitLine[1], Person.DATE_FORMATTER);
 
-			if (nameSplit.length == 3) {
-				name = nameSplit[0];
-				misc = nameSplit[1];
-				surname = nameSplit[2];
-			} else if (nameSplit.length == 2) {
-				name = nameSplit[0];
-				surname = nameSplit[1];
+			whatCouldNotBeParsed = "full name";
+			final String[] nameAsArray = splitLine[0].split(" ");
+
+			surname = nameAsArray[0];
+
+			if (nameAsArray.length > 2) {
+				whatCouldNotBeParsed = "misc";
+				misc = nameAsArray[1];
+				whatCouldNotBeParsed = "full name";
+				name = nameAsArray[2];
 			} else {
-				misc = splitLine[0];
+				misc = null;
+				whatCouldNotBeParsed = "full name";
+				name = nameAsArray[1];
 			}
 			return new Person(surname, name, misc, birthday);
-		} catch (final IndexOutOfBoundsException e) {
-			final Alert alert = new Alert(AlertType.WARNING);
-			alert.setTitle("Could not parse this line");
-			alert.setHeaderText("Line which could not be parsed: ");
-			alert.setContentText(txtLine);
-			alert.showAndWait();
-			return null;
-		}
+		} catch (IndexOutOfBoundsException | DateTimeParseException exception) {
 
+			// TODO Use this to inform the User
+			/*final Alert alert = new Alert(AlertType.WARNING);
+			alert.setTitle("ERROR: Parsing failed");
+			alert.setHeaderText("Line " + line + " could not be parsed: ");
+			alert.setContentText("This attribute could not be parsed: " + whatCouldNotBeParsed + "\n" + txtLine);
+			alert.showAndWait();
+			return null;*/
+			throw new PersonCouldNotBeParsedException(line, whatCouldNotBeParsed);
+		}
 	}
 
 	/*
@@ -363,5 +363,20 @@ public class Person {
 		}
 
 		return builder.toString();
+	}
+
+	static class PersonCouldNotBeParsedException extends Exception{
+		public int line = -1;
+		public String whatCouldNotBeParsed;
+
+		public PersonCouldNotBeParsedException(int line, String whatCouldNotBeParsed ){
+			this.line = line;
+			this.whatCouldNotBeParsed = whatCouldNotBeParsed;
+		}
+
+		@Override
+		public String getMessage() {
+			return "Could not parse Person from line: " + line + "\n Could not parse field: " + whatCouldNotBeParsed;
+		}
 	}
 }
