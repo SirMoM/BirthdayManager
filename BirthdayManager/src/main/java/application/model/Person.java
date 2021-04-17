@@ -336,6 +336,26 @@ public class Person{
 		return builder.toString();
 	}
 
+	public String namesToString() {
+		final StringBuilder builder = new StringBuilder();
+		if (this.getSurname() != null) {
+			builder.append(this.surname.get());
+		}
+		if (this.misc.get() != null) {
+			if (builder.length() != 0) {
+				builder.append(" ");
+			}
+			builder.append(this.misc.get());
+		}
+		if (this.name.get() != null) {
+			if (builder.length() != 0) {
+				builder.append(" ");
+			}
+			builder.append(this.name.get());
+		}
+		return builder.toString();
+	}
+
 	/**
 	 * String representation of the person.
 	 * <p>

@@ -32,6 +32,8 @@ dependencies {
     //Log4J
 	compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
  	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.1'
+ 	
+ 	compile 'net.sf.biweekly:biweekly:0.6.3'	
 	
 	//hamcrest
 	testImplementation 'org.hamcrest:hamcrest:2.1'

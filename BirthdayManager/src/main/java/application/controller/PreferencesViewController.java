@@ -129,6 +129,9 @@ public class PreferencesViewController extends Controller {
 				PreferencesViewController.this.LOG.catching(fileNotFoundException);
 			} catch (final IOException ioException) {
 				PreferencesViewController.this.LOG.catching(ioException);
+			} catch (final NullPointerException nullPointerException) {
+				PreferencesViewController.this.LOG.catching(Level.INFO, nullPointerException);
+				PreferencesViewController.this.LOG.info("A field was not properly set ?");
 			}
 		}
 	};

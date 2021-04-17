@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 import application.model.PersonManager;
 import application.model.SessionInfos;
 import application.processes.LoadPersonsTask;
+import application.processes.ExportToCalenderTask;
 import application.processes.SaveBirthdaysToFileTask;
 import application.processes.UpdateNextBirthdaysTask;
 import application.util.PropertieFields;
@@ -30,6 +31,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.MenuItem;
@@ -123,6 +125,41 @@ public class MainController{
 			final File saveFile = fileChooser.showSaveDialog(MainController.this.getStage().getScene().getWindow());
 
 			new Thread(new SaveBirthdaysToFileTask(saveFile)).start();
+		}
+	};
+	final EventHandler<ActionEvent> exportToCalendarHandler = new EventHandler<ActionEvent>() {
+
+		@Override
+		public void handle(final ActionEvent event) {
+			final FileChooser fileChooser = new FileChooser();
+			fileChooser.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
+
+			fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+			fileChooser.setInitialFileName("birthdays.ics");
+			fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Calendars", "*.ics"));
+
+			final File saveFile = fileChooser.showSaveDialog(MainController.this.getStage().getScene().getWindow());
+			ExportToCalenderTask exportToCalenderTask = null;
+			try {
+				exportToCalenderTask = new ExportToCalenderTask(saveFile);
+				exportToCalenderTask.setOnSucceeded(x -> {
+					LOG.debug("EXPORTED");
+					final Alert alert = new Alert(AlertType.INFORMATION);
+					alert.setTitle("Exported");
+					alert.setHeaderText("All bithdays have been exported to " + saveFile.getAbsolutePath() + "!");
+					alert.showAndWait();
+				});
+				if (activeController instanceof BirthdaysOverviewController) {
+					((BirthdaysOverviewController) activeController).getProgressbar().progressProperty()
+							.bind(exportToCalenderTask.workDoneProperty());
+
+				}
+			} catch (IOException ioException) {
+				LOG.catching(Level.ERROR, ioException);
+			}
+			if (exportToCalenderTask != null) {
+				new Thread(exportToCalenderTask).start();
+			}
 		}
 	};
 	final EventHandler<ActionEvent> openFromFileChooserHandler = new EventHandler<ActionEvent>(){
