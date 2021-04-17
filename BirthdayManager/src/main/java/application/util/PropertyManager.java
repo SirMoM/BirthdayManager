@@ -17,7 +17,7 @@ import application.model.PersonManager;
  * @author Admin
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
-public class PropertieManager {
+public class PropertyManager {
 
 	private final Logger LOG = LogManager.getLogger(this.getClass().getName());
 
@@ -25,16 +25,16 @@ public class PropertieManager {
 	private final File propertiesFile;
 	private final String PROPERTIE_FILE_NAME = "BirthdayManager.properties";
 
-	private static PropertieManager propertieManagerSingelton = null;
+	private static PropertyManager propertieManagerSingelton = null;
 
 	/**
 	 * Static method to create instance of PersonManager class
 	 *
 	 * @return the only instance {@link PersonManager}
 	 */
-	public static PropertieManager getInstance() {
+	public static PropertyManager getInstance() {
 		if (propertieManagerSingelton == null) {
-			propertieManagerSingelton = new PropertieManager();
+			propertieManagerSingelton = new PropertyManager();
 		}
 		return propertieManagerSingelton;
 	}
@@ -43,7 +43,7 @@ public class PropertieManager {
 	 * Basis ConfigHandler uses the a app.cfg file generates it if necessary Private
 	 * constructor restricted to this class itself.
 	 */
-	private PropertieManager() {
+	private PropertyManager() {
 		this.properties = new Properties();
 //		this.propertiesFile = new File(System.getProperty("java.io.tmpdir") + this.PROPERTIE_FILE_NAME);
 		this.propertiesFile = new File(this.PROPERTIE_FILE_NAME);
@@ -75,13 +75,14 @@ public class PropertieManager {
 	 * </ul>
 	 */
 	private void fillWithStandartProperties() {
-		this.properties.setProperty(PropertieFields.SHOW_BIRTHDAYS_COUNT, "15");
-		this.properties.setProperty(PropertieFields.SAVED_LOCALE, "en_GB");
-		this.properties.setProperty(PropertieFields.AUTOSAVE, "true");
-		this.properties.setProperty(PropertieFields.WRITE_THRU, "true");
-		this.properties.setProperty(PropertieFields.OPEN_FILE_ON_START, "true");
-		this.properties.setProperty(PropertieFields.HIGHLIGHT_TODAY_COLOR, "mediumseagreen");
-		this.properties.setProperty(PropertieFields.EXPORT_WITH_ALARM, "true");
+		this.properties.setProperty(PropertyFields.SAVED_LOCALE, "en_GB");
+		this.properties.setProperty(PropertyFields.AUTOSAVE, "true");
+		this.properties.setProperty(PropertyFields.WRITE_THRU, "true");
+		this.properties.setProperty(PropertyFields.OPEN_FILE_ON_START, "false");
+		this.properties.setProperty(PropertyFields.SHOW_BIRTHDAYS_COUNT, "15");
+		this.properties.setProperty(PropertyFields.FIRST_HIGHLIGHT_COLOR, "#ff000066");
+		this.properties.setProperty(PropertyFields.SECOND_HIGHLIGHT_COLOR, "#ffcc6666");
+		this.properties.setProperty(PropertyFields.EXPORT_WITH_ALARM, "true");
 		try {
 			this.storeProperties("Default properties stored");
 		} catch (final IOException ioException) {
@@ -92,7 +93,7 @@ public class PropertieManager {
 	/**
 	 * @return the a propertie
 	 */
-	public static String getPropertie(final String key) {
+	public static String getProperty(final String key) {
 		String propertie = null;
 		try {
 			propertie = getInstance().properties.get(key).toString();

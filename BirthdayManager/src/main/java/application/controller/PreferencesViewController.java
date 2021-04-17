@@ -14,8 +14,8 @@ import java.util.ResourceBundle;
 
 import org.apache.logging.log4j.Level;
 
-import application.util.PropertieFields;
-import application.util.PropertieManager;
+import application.util.PropertyFields;
+import application.util.PropertyManager;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
 import javafx.beans.value.ChangeListener;
@@ -25,13 +25,17 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
@@ -45,6 +49,21 @@ import javafx.util.StringConverter;
 public class PreferencesViewController extends Controller {
 	private Properties propertiesToEdit;
 
+//	private SpinnerValueFactory<Integer> spinnerValueFactory = new SpinnerValueFactory<Integer>() {
+//		
+//		@Override
+//		public void increment(int steps) {
+//			// TODO Auto-generated method stub
+//			
+//		}
+//		
+//		@Override
+//		public void decrement(int steps) {
+//			// TODO Auto-generated method stub
+//			
+//		}
+//	};
+
 	@FXML
 	private ResourceBundle resources;
 
@@ -52,16 +71,16 @@ public class PreferencesViewController extends Controller {
 	private URL location;
 
 	@FXML
-	private Label languageOptions_label;
+	private Label languageOptions_Label;
 
 	@FXML
-	private Label chooseLanguage_label;
+	private Label chooseLanguage_Label;
 
 	@FXML
 	private ComboBox<Locale> language_CompoBox;
 
 	@FXML
-	private Label saveOptions_label;
+	private Label saveOptions_Label;
 
 	@FXML
 	private CheckBox writeThru_CheckBox;
@@ -95,6 +114,31 @@ public class PreferencesViewController extends Controller {
 
 	@FXML
 	private Button save_button;
+
+	@FXML
+	private CheckBox iCalNotification_CheckBox;
+
+	@FXML
+	private ColorPicker first_ColorPicker;
+
+	@FXML
+	private ColorPicker second_ColorPicker;
+
+	@FXML
+	private Label firstHighlightingColor_Label;
+
+	@FXML
+	private Label secondHighlightingColor_Label;
+
+	@FXML
+	private Label appearanceOptions_Label;
+
+	@FXML
+	private Spinner<Integer> countBirthdaysShown_Spinner;
+
+	@FXML
+	private Label countBirthdaysShown_Label;
+
 	ChangeListener<Boolean> openFileOnStartCheckboxChangeListener = new ChangeListener<Boolean>() {
 
 		@Override
@@ -110,19 +154,33 @@ public class PreferencesViewController extends Controller {
 		@Override
 		public void handle(final ActionEvent arg0) {
 
-			PreferencesViewController.this.propertiesToEdit.setProperty(PropertieFields.SAVED_LOCALE,
+			PropertyManager.getInstance().getProperties().setProperty(PropertyFields.SAVED_LOCALE,
 					PreferencesViewController.this.language_CompoBox.getValue().toString());
-			PreferencesViewController.this.propertiesToEdit.setProperty(PropertieFields.AUTOSAVE,
+			PropertyManager.getInstance().getProperties().setProperty(PropertyFields.AUTOSAVE,
 					PreferencesViewController.this.autoSave_CheckBox.selectedProperty().getValue().toString());
-			PreferencesViewController.this.propertiesToEdit.setProperty(PropertieFields.WRITE_THRU,
+			PropertyManager.getInstance().getProperties().setProperty(PropertyFields.WRITE_THRU,
 					PreferencesViewController.this.writeThru_CheckBox.selectedProperty().getValue().toString());
-			PreferencesViewController.this.propertiesToEdit.setProperty(PropertieFields.OPEN_FILE_ON_START,
+			PropertyManager.getInstance().getProperties().setProperty(PropertyFields.OPEN_FILE_ON_START,
 					PreferencesViewController.this.openFileOnStart_Checkbox.selectedProperty().getValue().toString());
-			PreferencesViewController.this.propertiesToEdit.setProperty(PropertieFields.FILE_ON_START,
-					PreferencesViewController.this.startupFile_textField.getText());
+			PropertyManager.getInstance().getProperties().setProperty(PropertyFields.EXPORT_WITH_ALARM,
+					PreferencesViewController.this.iCalNotification_CheckBox.selectedProperty().getValue().toString());
+			try {
+				PropertyManager.getInstance().getProperties().setProperty(PropertyFields.FILE_ON_START,
+						PreferencesViewController.this.startupFile_textField.getText());
+			} catch (final NullPointerException nullPointerException) {
+				PreferencesViewController.this.LOG.catching(Level.INFO, nullPointerException);
+				PreferencesViewController.this.LOG.info("startupFile_textField was not properly set ?");
+			}
+
+			PropertyManager.getInstance().getProperties().setProperty(PropertyFields.FIRST_HIGHLIGHT_COLOR,
+					"#" + Integer.toHexString(first_ColorPicker.getValue().hashCode()));
+			PropertyManager.getInstance().getProperties().setProperty(PropertyFields.SECOND_HIGHLIGHT_COLOR,
+					"#" + Integer.toHexString(second_ColorPicker.getValue().hashCode()));
+			PropertyManager.getInstance().getProperties().setProperty(PropertyFields.SHOW_BIRTHDAYS_COUNT,
+					PreferencesViewController.this.countBirthdaysShown_Spinner.getValue().toString());
 
 			try {
-				PropertieManager.getInstance().storeProperties("Saved properies" + LocalDateTime.now().toString());
+				PropertyManager.getInstance().storeProperties("Saved properies" + LocalDateTime.now().toString());
 				PreferencesViewController.this.updateLocalisation();
 				PreferencesViewController.this.getMainController().settingsChanged();
 			} catch (final FileNotFoundException fileNotFoundException) {
@@ -154,9 +212,9 @@ public class PreferencesViewController extends Controller {
 			fileChooser.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
 
 			try {
-				PropertieManager.getInstance();
+				PropertyManager.getInstance();
 				fileChooser.setInitialDirectory(
-						new File(PropertieManager.getPropertie(PropertieFields.LAST_OPEND).toString()).getParentFile());
+						new File(PropertyManager.getProperty(PropertyFields.LAST_OPEND).toString()).getParentFile());
 			} catch (final NullPointerException nullPointerException) {
 				fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
 			}
@@ -184,18 +242,30 @@ public class PreferencesViewController extends Controller {
 	 * loaded properly.
 	 */
 	private void assertions() {
-		assert this.languageOptions_label != null : "fx:id=\"languageOptions_label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.chooseLanguage_label != null : "fx:id=\"chooseLanguage_label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.language_CompoBox != null : "fx:id=\"language_CompoBox\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.saveOptions_label != null : "fx:id=\"saveOptions_label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.writeThru_CheckBox != null : "fx:id=\"writeThru_CheckBox\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.autoSave_CheckBox != null : "fx:id=\"autoSave_CheckBox\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.miscellaneous_label != null : "fx:id=\"miscellaneous_label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.openFileOnStart_Checkbox != null : "fx:id=\"openFileOnStart_Checkbox\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.startupFile_textField != null : "fx:id=\"startupFile_textField\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.chooseFile_button != null : "fx:id=\"chooseFile_button\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.cancel_button != null : "fx:id=\"cancel_button\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-		assert this.save_button != null : "fx:id=\"save_button\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert languageOptions_Label != null : "fx:id=\"languageOptions_Label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert chooseLanguage_Label != null : "fx:id=\"chooseLanguage_Label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert language_CompoBox != null : "fx:id=\"language_CompoBox\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert saveOptions_Label != null : "fx:id=\"saveOptions_Label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert writeThru_CheckBox != null : "fx:id=\"writeThru_CheckBox\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert writeThru_Tooltip != null : "fx:id=\"writeThru_Tooltip\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert autoSave_CheckBox != null : "fx:id=\"autoSave_CheckBox\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert autsave_Tooltipp != null : "fx:id=\"autsave_Tooltipp\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert miscellaneous_label != null : "fx:id=\"miscellaneous_label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert openFileOnStart_Checkbox != null : "fx:id=\"openFileOnStart_Checkbox\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert openFileOnStartUp_ToolTipp != null : "fx:id=\"openFileOnStartUp_ToolTipp\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert startupFile_textField != null : "fx:id=\"startupFile_textField\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert chooseFile_button != null : "fx:id=\"chooseFile_button\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert cancel_button != null : "fx:id=\"cancel_button\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert save_button != null : "fx:id=\"save_button\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert iCalNotification_CheckBox != null : "fx:id=\"iCalNotification_CheckBox\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert first_ColorPicker != null : "fx:id=\"first_ColorPicker\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert second_ColorPicker != null : "fx:id=\"second_ColorPicker\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert firstHighlightingColor_Label != null : "fx:id=\"firstHighlightingColor_Label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert secondHighlightingColor_Label != null : "fx:id=\"secondHighlightingColor_Label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert appearanceOptions_Label != null : "fx:id=\"appearanceOptions_Label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert countBirthdaysShown_Spinner != null : "fx:id=\"countBirthdaysShown_Spinner\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+		assert countBirthdaysShown_Label != null : "fx:id=\"countBirthdaysShown_Label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+
 	}
 
 	/**
@@ -208,6 +278,7 @@ public class PreferencesViewController extends Controller {
 
 		this.save_button.addEventHandler(ActionEvent.ANY, this.savePropertiesHandler);
 		this.cancel_button.addEventHandler(ActionEvent.ANY, this.exitHandler);
+		this.countBirthdaysShown_Spinner.setValueFactory(new IntegerSpinnerValueFactory(5, 50, 10, 1));
 	}
 
 	/**
@@ -273,31 +344,36 @@ public class PreferencesViewController extends Controller {
 	 */
 	private void loadPreferences() {
 		this.fillComboBoxLanguages();
-		this.propertiesToEdit = PropertieManager.getInstance().getProperties();
-		final String displayLanguage = new Locale(this.propertiesToEdit.getProperty(PropertieFields.SAVED_LOCALE))
+		final String displayLanguage = new Locale(PropertyManager.getProperty(PropertyFields.SAVED_LOCALE))
 				.getDisplayLanguage();
 		this.LOG.info(new Locale(displayLanguage).getDisplayLanguage());
 		this.language_CompoBox.getSelectionModel().select(new Locale(displayLanguage));
 		this.writeThru_CheckBox.selectedProperty()
-				.set(new Boolean(this.propertiesToEdit.getProperty(PropertieFields.WRITE_THRU)));
+				.set(new Boolean(PropertyManager.getProperty(PropertyFields.WRITE_THRU)));
 		this.autoSave_CheckBox.selectedProperty()
-				.set(new Boolean(this.propertiesToEdit.getProperty(PropertieFields.AUTOSAVE)));
+				.set(new Boolean(PropertyManager.getProperty(PropertyFields.AUTOSAVE)));
 
-		final Boolean openFileOnStart = new Boolean(
-				this.propertiesToEdit.getProperty(PropertieFields.OPEN_FILE_ON_START));
+		final Boolean openFileOnStart = new Boolean(PropertyManager.getProperty(PropertyFields.OPEN_FILE_ON_START));
 
 		this.openFileOnStart_Checkbox.selectedProperty().set(openFileOnStart);
 		try {
-			PropertieManager.getInstance();
-			this.startupFile_textField.setText(PropertieManager.getPropertie(PropertieFields.LAST_OPEND));
+			PropertyManager.getInstance();
+			this.startupFile_textField.setText(PropertyManager.getProperty(PropertyFields.LAST_OPEND));
 		} catch (final NullPointerException nullPointerException) {
 			this.LOG.catching(Level.INFO, nullPointerException);
 		}
 		if (openFileOnStart) {
-			this.startupFile_textField.setText(this.propertiesToEdit.getProperty(PropertieFields.FILE_ON_START));
+			this.startupFile_textField.setText(PropertyManager.getProperty(PropertyFields.FILE_ON_START));
 		}
 		this.startupFile_textField.setDisable(!openFileOnStart);
 		this.chooseFile_button.setDisable(!openFileOnStart);
+
+		this.first_ColorPicker.setValue(Color.web(PropertyManager.getProperty(PropertyFields.FIRST_HIGHLIGHT_COLOR)));
+		this.second_ColorPicker.setValue(Color.web(PropertyManager.getProperty(PropertyFields.SECOND_HIGHLIGHT_COLOR)));
+		this.iCalNotification_CheckBox.selectedProperty()
+				.set(new Boolean(PropertyManager.getProperty(PropertyFields.EXPORT_WITH_ALARM)));
+		this.countBirthdaysShown_Spinner.getValueFactory()
+				.setValue(Integer.valueOf(PropertyManager.getProperty(PropertyFields.SHOW_BIRTHDAYS_COUNT)));
 	}
 
 	/*
@@ -309,10 +385,10 @@ public class PreferencesViewController extends Controller {
 	public void updateLocalisation() {
 		final LangResourceManager resourceManager = new LangResourceManager();
 
-		this.languageOptions_label.setText(resourceManager.getLocaleString(LangResourceKeys.languageOptions_label));
-		this.chooseLanguage_label.setText(resourceManager.getLocaleString(LangResourceKeys.chooseLanguage_label));
+		this.languageOptions_Label.setText(resourceManager.getLocaleString(LangResourceKeys.languageOptions_label));
+		this.chooseLanguage_Label.setText(resourceManager.getLocaleString(LangResourceKeys.chooseLanguage_label));
 		this.autoSave_CheckBox.setText(resourceManager.getLocaleString(LangResourceKeys.autoSave_CheckBox));
-		this.saveOptions_label.setText(resourceManager.getLocaleString(LangResourceKeys.saveOptions_label));
+		this.saveOptions_Label.setText(resourceManager.getLocaleString(LangResourceKeys.saveOptions_label));
 		this.writeThru_CheckBox.setText(resourceManager.getLocaleString(LangResourceKeys.writeThru_CheckBox));
 		this.miscellaneous_label.setText(resourceManager.getLocaleString(LangResourceKeys.miscellaneous_label));
 		this.openFileOnStart_Checkbox
@@ -324,5 +400,15 @@ public class PreferencesViewController extends Controller {
 		this.writeThru_Tooltip.setText(resourceManager.getLocaleString(LangResourceKeys.writeThru_Tooltip));
 		this.openFileOnStartUp_ToolTipp
 				.setText(resourceManager.getLocaleString(LangResourceKeys.openFileOnStartUp_ToolTipp));
+
+		this.firstHighlightingColor_Label
+				.setText(resourceManager.getLocaleString(LangResourceKeys.firstHighlightingColor_label));
+		this.secondHighlightingColor_Label
+				.setText(resourceManager.getLocaleString(LangResourceKeys.secondHighlightingColor_label));
+		this.appearanceOptions_Label.setText(resourceManager.getLocaleString(LangResourceKeys.appearanceOptions_label));
+		this.countBirthdaysShown_Label
+				.setText(resourceManager.getLocaleString(LangResourceKeys.countBirthdaysShown_Label));
+		this.iCalNotification_CheckBox
+				.setText(resourceManager.getLocaleString(LangResourceKeys.iCalNotification_checkBox));
 	}
 }
