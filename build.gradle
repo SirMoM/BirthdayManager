@@ -2,7 +2,6 @@ import net.researchgate.release.BzrAdapter
 import net.researchgate.release.GitAdapter
 import net.researchgate.release.HgAdapter
 import net.researchgate.release.SvnAdapter
-
 import java.util.regex.Matcher
 
 plugins {
@@ -20,11 +19,18 @@ repositories {
     jcenter()
 }
 dependencies {
-    // Plugins
-    // Gitflow Plugin
     // Gradle dependencies
     // This dependency is used by the application.
     implementation 'com.google.guava:guava:29.0-jre'
+
+
+    // Exporting to iCal
+    // https://github.com/mangstadt/biweekly
+    compile 'net.sf.biweekly:biweekly:0.6.6'
+
+    //Log4J
+    compile 'org.apache.logging.log4j:log4j-api:2.14.0'
+    compile 'org.apache.logging.log4j:log4j-core:2.14.0'
 
     // Test dependencies
     // Use JUnit test framework.
