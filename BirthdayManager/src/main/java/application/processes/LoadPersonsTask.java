@@ -12,6 +12,8 @@ import org.apache.logging.log4j.Logger;
 
 import application.model.Person;
 import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
 
 /**
  * @author Noah Ruben
@@ -45,7 +47,6 @@ public class LoadPersonsTask extends Task<List<Person>> {
 		LOG.info("Anzahl: " + count);
 		this.MAX_Prozess = count;
 		this.csvFile = csvFile;
-
 	}
 
 	@Override

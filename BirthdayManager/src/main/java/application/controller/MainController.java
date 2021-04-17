@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 
 import application.model.PersonManager;
 import application.model.SessionInfos;
+import application.processes.CheckMissedBirthdays;
 import application.processes.ExportToCalenderTask;
 import application.processes.LoadPersonsTask;
 import application.processes.ExportToCalenderTask;
@@ -472,6 +473,7 @@ public class MainController{
 					this.LOG.warn("Should have opend a file upon start but no file to open was found!");
 				}
 			}
+			
 		} catch (final Exception exception){
 			this.LOG.catching(Level.ERROR, exception);
 		}

@@ -21,4 +21,5 @@ public interface PropertyFields {
 	final String EXPORT_WITH_ALARM = "export_with_alarm";
 	final String FIRST_HIGHLIGHT_COLOR = "first_highlight_color";
 	final String SECOND_HIGHLIGHT_COLOR = "second_highlight_color";
+	final String LAST_VISIT = "lastVisit";
 }
