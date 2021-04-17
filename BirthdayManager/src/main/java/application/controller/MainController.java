@@ -60,7 +60,6 @@ public class MainController{
 
 		@Override
 		public void handle(final ActionEvent event){
-			MainController.this.sessionInfos.setFileToOpen(null);
 			MainController.this.sessionInfos.resetSubLists();
 			PersonManager.getInstance().setSaveFile(null);
 		}
@@ -118,8 +117,8 @@ public class MainController{
 
 			final File selectedFile = fileChooser.showOpenDialog(MainController.this.getStage().getScene().getWindow());
 			MainController.this.LOG.debug("Opend file:" + selectedFile.getAbsolutePath());
-			MainController.this.getSessionInfos().setFileToOpen(selectedFile);
 			PersonManager.getInstance().setSaveFile(selectedFile);
+			MainController.this.sessionInfos.getRecentFileName().set(selectedFile.getName());
 
 			final SaveLastFileUsedTask saveLastFileUsedTask = new SaveLastFileUsedTask(MainController.this);
 			saveLastFileUsedTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>(){
@@ -145,7 +144,6 @@ public class MainController{
 			MainController.this.LOG.debug("Saved as recend used: " + lastUsedFilePath);
 			final File birthdayFile = new File(lastUsedFilePath);
 
-			MainController.this.getSessionInfos().setFileToOpen(birthdayFile);
 			PersonManager.getInstance().setSaveFile(birthdayFile);
 
 			final SaveLastFileUsedTask saveLastFileUsedTask = new SaveLastFileUsedTask(MainController.this);
@@ -292,7 +290,6 @@ public class MainController{
 	public void start(){
 		try{
 			this.replaceSceneContent("/application/view/BirthdaysOverview.fxml", new BirthdaysOverviewController(this));
-
 		} catch (final Exception exception){
 			this.LOG.catching(Level.ERROR, exception);
 		}

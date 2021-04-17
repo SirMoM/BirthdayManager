@@ -78,6 +78,13 @@ public class PersonManager{
 	}
 
 	/**
+	 * @return the saveFile
+	 */
+	public File getSaveFile(){
+		return this.saveFile;
+	}
+
+	/**
 	 * Populates the {@link ArrayList} which contains the Persons ==
 	 * {@link #personDB}
 	 *
@@ -89,7 +96,10 @@ public class PersonManager{
 		String line;
 		final BufferedReader bufferedReader = new BufferedReader(new FileReader(this.saveFile));
 		while ((line = bufferedReader.readLine()) != null){
-			this.personDB.add(new Person(line));
+			final Person parsedPerson = Person.parseFromTXTLine(line);
+			if(parsedPerson != null){
+				this.personDB.add(parsedPerson);
+			}
 		}
 		bufferedReader.close();
 	}

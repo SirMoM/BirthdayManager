@@ -12,6 +12,8 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 
 /**
  * @author Noah Ruben
@@ -27,8 +29,91 @@ import javafx.beans.property.StringProperty;
  */
 public class Person{
 	protected final static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+
+	/**
+	 * @param txtLine a read line from the Text-file
+	 * @return a new Person resulting from the given String
+	 */
+	public static Person parseFromCSVLine(final String txtLine){
+		String name = null;
+		String surname = null;
+		String misc = null;
+		LocalDate birthday = null;
+
+		try{
+			final String[] splitLine = txtLine.split(";");
+			if(splitLine.length < 1){
+				throw new IndexOutOfBoundsException("Could not split line");
+			}
+			final String[] nameSplit = splitLine[0].split(" ");
+			birthday = parse(splitLine[1], Person.DATE_FORMATTER);
+
+			if(nameSplit.length == 3){
+				name = nameSplit[0];
+				misc = nameSplit[1];
+				surname = nameSplit[2];
+			} else if(nameSplit.length == 2){
+				name = nameSplit[0];
+				surname = nameSplit[1];
+			} else{
+				misc = splitLine[0];
+			}
+			return new Person(surname, name, misc, birthday);
+		} catch (final IndexOutOfBoundsException e){
+			final Alert alert = new Alert(AlertType.WARNING);
+			alert.setTitle("Could not parse this line");
+			alert.setHeaderText("Line which could not be parsed: ");
+			alert.setContentText(txtLine);
+			alert.showAndWait();
+			return null;
+		}
+
+	}
+
+	/**
+	 * @param txtLine a read line from the Text-file
+	 * @return a new Person resulting from the given String
+	 */
+	public static Person parseFromTXTLine(final String txtLine){
+		String name = null;
+		String surname = null;
+		String misc = null;
+		LocalDate birthday = null;
+
+		try{
+			final String[] splitLine = txtLine.split("=");
+			if(splitLine.length < 1){
+				throw new IndexOutOfBoundsException("Could not split line");
+			}
+			final String[] nameSplit = splitLine[0].split(" ");
+			birthday = parse(splitLine[1], Person.DATE_FORMATTER);
+
+			if(nameSplit.length == 3){
+				name = nameSplit[0];
+				misc = nameSplit[1];
+				surname = nameSplit[2];
+			} else if(nameSplit.length == 2){
+				name = nameSplit[0];
+				surname = nameSplit[1];
+			} else{
+				misc = splitLine[0];
+			}
+			return new Person(surname, name, misc, birthday);
+		} catch (final IndexOutOfBoundsException e){
+			final Alert alert = new Alert(AlertType.WARNING);
+			alert.setTitle("Could not parse this line");
+			alert.setHeaderText("Line which could not be parsed: ");
+			alert.setContentText(txtLine);
+			alert.showAndWait();
+			return null;
+		}
+
+	}
+
 	private StringProperty surname;
+
 	private StringProperty name;
+
 	private StringProperty misc;
 
 	private ObjectProperty<LocalDate> birthday;
@@ -37,32 +122,9 @@ public class Person{
 	 * Create an empty person
 	 */
 	public Person(){
-	}
-
-	/**
-	 * @param lineFromFile a read line from the rext file
-	 */
-	// TODO DO the parsing elsewhere
-	public Person(final String lineFromFile){
-		super();
 		this.surname = new SimpleStringProperty();
 		this.name = new SimpleStringProperty();
 		this.misc = new SimpleStringProperty();
-		this.birthday = new SimpleObjectProperty<LocalDate>();
-		final String[] splitLine = lineFromFile.split("=");
-		final String[] nameSplit = splitLine[0].split(" ");
-		if(nameSplit.length == 3){
-			this.setName(nameSplit[0]);
-			this.setMisc(nameSplit[1]);
-			this.setSurname(nameSplit[2]);
-		} else if(nameSplit.length == 2){
-			this.setName(nameSplit[0]);
-			this.setSurname(nameSplit[1]);
-		} else{
-			this.setMisc(splitLine[0]);
-		}
-		this.setBirthday(parse(splitLine[1], DATE_FORMATTER));
-
 	}
 
 	/**
@@ -257,5 +319,4 @@ public class Person{
 
 		return builder.toString();
 	}
-
 }
