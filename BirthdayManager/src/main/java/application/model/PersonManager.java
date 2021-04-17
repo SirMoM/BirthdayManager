@@ -47,6 +47,13 @@ public class PersonManager{
 		this.setPersonDB(new ArrayList<Person>());
 	}
 
+	public void addNewPerson(final Person newPerson){
+		this.personDB.add(newPerson);
+		if(this.writeThru){
+			this.saveToFile();
+		}
+	}
+
 	/**
 	 * Checks if the Save-File exists. If not create the File.
 	 */

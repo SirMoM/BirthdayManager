@@ -217,6 +217,19 @@ public class MainController{
 	/**
 	 * Swiches scenes to the BirthdayOverview. Generates a new Controller.
 	 *
+	 * @see EditBirthdayViewController
+	 */
+	public void goToEditBirthdayView(){
+		try{
+			this.replaceSceneContent("/application/view/EditBirthdayView.fxml", new NewBirthdayViewController(this));
+		} catch (final Exception exception){
+			this.LOG.catching(Level.ERROR, exception);
+		}
+	}
+
+	/**
+	 * Switches scenes to the BirthdayOverview. Generates a new Controller.
+	 *
 	 * @param person The person to edit.
 	 *
 	 * @see EditBirthdayViewController

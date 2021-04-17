@@ -115,8 +115,7 @@ public class UpdateAllSubBirthdayListsTask extends Task<Boolean>{
 	/**
 	 * Fills the RecentBirthdays
 	 *
-	 * @param temp the {@link List} of persons where the recent Birthdays are
-	 *             extracted
+	 * @param temp the {@link List} of persons where the Birthdays are listed
 	 */
 	private void updateRecentBirthdays(final List<Person> temp){
 		// TODO Jahres übergreifend XD
@@ -130,7 +129,7 @@ public class UpdateAllSubBirthdayListsTask extends Task<Boolean>{
 			if(tempPerson.getBirthday().getDayOfYear() < LocalDate.now().getDayOfYear()){
 				this.sessionInfos.getRecentBirthdays().add(tempPerson);
 			} else{
-				this.LOG.warn(tempPerson.toExtendedString() + "not added!");
+				this.LOG.warn(tempPerson.toExtendedString() + "not added to recent! ");
 			}
 		}
 
