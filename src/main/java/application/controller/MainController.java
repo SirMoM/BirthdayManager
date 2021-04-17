@@ -33,6 +33,7 @@ import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -395,10 +396,25 @@ public class MainController {
             final Stage stage = new Stage();
             stage.setTitle("Preferences");
             stage.setScene(scene);
-            scene.getStylesheets().add("dark-mode.css");
+            setStyle(scene);
             stage.show();
         } catch (final IOException ioException) {
             this.LOG.log(Level.ERROR, "Failed to create new Window.", ioException);
+        }
+    }
+
+    protected void setStyle(Scene scene) {
+        scene.getStylesheets().clear();
+        if (Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.DARK_MODE))) {
+            scene.getStylesheets().add("dark-mode.css");
+        }
+    }
+
+    protected void setStyle() {
+        Scene scene = this.getStage().getScene();
+        scene.getStylesheets().clear();
+        if (Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.DARK_MODE))) {
+            scene.getStylesheets().add("dark-mode.css");
         }
     }
 
@@ -413,15 +429,18 @@ public class MainController {
         loader.setController(controller);
         final Parent root = loader.load();
         final Scene scene = new Scene(root);
-        scene.getStylesheets().add("dark-mode.css");
         this.stage.setScene(scene);
+        setStyle();
 
         // Show the GUI
         this.stage.show();
     }
 
     public void settingsChanged() {
+        Scene scene = getStage().getScene();
+        goToBirthdaysOverview();
         this.getActiveController().updateLocalisation();
+
     }
 
     /** Starts the application with the BirthdaysOverview and possibly loaded file */
@@ -447,7 +466,7 @@ public class MainController {
             this.LOG.catching(Level.ERROR, exception);
         }
     }
-
+    // TODO "real" Alert
     private void checkVersionAndAlert() {
         CheckForUpdatesTask checkForUpdatesTask = new CheckForUpdatesTask();
         checkForUpdatesTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, event -> {

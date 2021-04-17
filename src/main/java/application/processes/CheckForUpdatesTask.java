@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -25,7 +26,7 @@ public class CheckForUpdatesTask extends Task<String> {
         LOG.info("Check for version!");
         String currentVersion = getCurrentVersion();
         String latestVersion = getLatestVersion();
-
+        LOG.info("This version {} upstream version {}", currentVersion, latestVersion);
         if (!currentVersion.equals(latestVersion)) {
             LOG.info("Newer Version of the Software is available! New version {}", latestVersion);
             return "A new version is available " + latestVersion;
@@ -54,19 +55,12 @@ public class CheckForUpdatesTask extends Task<String> {
     }
 
     private String getCurrentVersion() throws IOException {
-        String version = "";
-        ClassLoader classLoader = getClass().getClassLoader();
-        Enumeration<URL> resources = classLoader.getResources("META-INF/MANIFEST.MF");
-        while (resources.hasMoreElements()) {
-            Manifest manifest = new Manifest(resources.nextElement().openStream());
-            // check that this is your manifest and do what you need or get the next one
-            if (manifest.getMainAttributes().getValue("Implementation-Title") == "BirthdayManager") {
-                version = manifest.getMainAttributes().getValue("Implementation-Version");
-                break;
-            } else {
-                LOG.debug("Didn't find own manifest!");
-            }
+        String version = this.getClass().getPackage().getImplementationVersion();
+        if (version == null){
+            BufferedReader reader = new BufferedReader(new FileReader("gradle.properties"));
+            version = reader.readLine().split("=")[1];
         }
+
         return version;
     }
 }

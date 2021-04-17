@@ -148,18 +148,20 @@ public class PreferencesViewController extends Controller {
         properties.setProperty(PropertyFields.FIRST_HIGHLIGHT_COLOR, PreferencesViewController.this.first_ColorPicker.getValue().toString().replace("0x", "#"));
         properties.setProperty(PropertyFields.SECOND_HIGHLIGHT_COLOR, PreferencesViewController.this.second_ColorPicker.getValue().toString().replace("0x", "#"));
         properties.setProperty(PropertyFields.SHOW_BIRTHDAYS_COUNT, PreferencesViewController.this.countBirthdaysShown_Spinner.getValue().toString());
-
+        properties.setProperty(PropertyFields.DARK_MODE, String.valueOf(PreferencesViewController.this.darkMode_ToggleButton.isSelected()));
         try {
             PropertyManager.getInstance().storeProperties("Saved properies" + LocalDateTime.now().toString());
             PreferencesViewController.this.updateLocalisation();
-            PreferencesViewController.this.getMainController().settingsChanged();
         } catch (final IOException ioException) {
             PreferencesViewController.this.LOG.catching(ioException);
         } catch (final NullPointerException nullPointerException) {
             PreferencesViewController.this.LOG.catching(Level.INFO, nullPointerException);
             PreferencesViewController.this.LOG.info("A field was not properly set ?");
         }
+        PreferencesViewController.this.getMainController().settingsChanged();
+        ((Stage) save_button.getScene().getWindow()).close();
     };
+
     @FXML
     private ToggleButton darkMode_ToggleButton;
 
@@ -294,6 +296,7 @@ public class PreferencesViewController extends Controller {
         this.second_ColorPicker.setValue(Color.web(PropertyManager.getProperty(PropertyFields.SECOND_HIGHLIGHT_COLOR)));
         this.iCalNotification_CheckBox.selectedProperty().set(Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.EXPORT_WITH_ALARM)));
         this.countBirthdaysShown_Spinner.getValueFactory().setValue(Integer.valueOf(PropertyManager.getProperty(PropertyFields.SHOW_BIRTHDAYS_COUNT)));
+        this.darkMode_ToggleButton.setSelected(Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.DARK_MODE)));
     }
 
     /*

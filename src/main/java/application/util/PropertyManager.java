@@ -118,6 +118,14 @@ public class PropertyManager {
             this.properties.setProperty(PropertyFields.LAST_VISIT, LocalDate.now().toString());
             LOG.info(message, PropertyFields.LAST_VISIT);
         }
+        if (this.properties.getProperty(PropertyFields.DARK_MODE) == null) {
+            this.properties.setProperty(PropertyFields.DARK_MODE, "true");
+            LOG.info(message, PropertyFields.DARK_MODE);
+        }
+        if (this.properties.getProperty(PropertyFields.NEW_VERSION_REMINDER) == null) {
+            this.properties.setProperty(PropertyFields.NEW_VERSION_REMINDER, "false");
+            LOG.info(message, PropertyFields.NEW_VERSION_REMINDER);
+        }
         try {
             this.storeProperties("Default properties stored");
         } catch (final IOException ioException) {
