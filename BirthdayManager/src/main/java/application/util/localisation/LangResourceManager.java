@@ -24,7 +24,7 @@ public class LangResourceManager{
 	ResourceBundle langResourceBundle = null;
 
 	/**
-	 * @param locale the {@link Locale} which determinate the application language
+	 * The Basic Constructor
 	 */
 	public LangResourceManager(){
 		final Locale locale = new Locale(new PropertieManager().getPropertie(PropertieFields.SAVED_LOCALE));

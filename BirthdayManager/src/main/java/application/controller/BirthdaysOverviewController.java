@@ -37,10 +37,6 @@ import javafx.scene.text.Font;
  * @author Noah Ruben
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
-/**
- * @author Admin
- * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
- */
 public class BirthdaysOverviewController extends Controller{
 
 	protected final static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");

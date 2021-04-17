@@ -10,6 +10,10 @@ package application.util.localisation;
  */
 public enum LangResourceKeys{
 
+	// Person
+	age,
+
+	// Overview
 	str_nextBirthday_Label,
 	str_recentBirthday_Label,
 
