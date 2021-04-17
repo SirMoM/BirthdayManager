@@ -300,6 +300,8 @@ public class MainController{
 			this.replaceSceneContent("/application/view/BirthdaysOverview.fxml", this.activeController);
 			if(new Boolean(this.sessionInfos.getPropertiesHandler().getPropertie(PropertieFields.OPEN_FILE_ON_START))){
 				PersonManager.getInstance().setSaveFile(new File(this.sessionInfos.getPropertiesHandler().getPropertie(PropertieFields.FILE_ON_START)));
+				this.sessionInfos.updateSubLists();
+				this.LOG.debug("OPEN with File");
 			}
 		} catch (final Exception exception){
 			this.LOG.catching(Level.ERROR, exception);
