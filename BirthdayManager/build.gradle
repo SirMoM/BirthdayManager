@@ -54,10 +54,10 @@ repositories {
 	mavenCentral()
 }
 
-clean {
-    delete "C:/Users/Admin/git/BirthdayManagerWebsite/jar"
-    delete "C:/Users/Admin/git/BirthdayManagerWebsite/javaDocs"
-}
+//clean {
+//    delete "C:/Users/Admin/git/BirthdayManagerWebsite/jar"
+//    delete "C:/Users/Admin/git/BirthdayManagerWebsite/javaDocs"
+//}
 
 def getDate() {
     return new Date().format('dd.MM.yyyy_HH:mm:ss')

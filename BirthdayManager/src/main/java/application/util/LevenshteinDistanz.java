@@ -15,15 +15,15 @@ public class LevenshteinDistanz {
 	    if(y.length() == 0) return x.length();
 		
 		
-		// Erstellen der Matrix für die Berechnung der Levenshtein-Distanz
+		// Erstellen der Matrix fÃ¼r die Berechnung der Levenshtein-Distanz
 		int[][] dp = new int[x.length() + 1][y.length() + 1];
 
-		// For-loops für die matrix
+		// For-loops fÃ¼r die matrix
 		for (int i = 0; i <= x.length(); i++) {
 			for (int j = 0; j <= y.length(); j++) {
-				if (i == 0) { // Erste Zeile mit Standart-Werten füllen
+				if (i == 0) { // Erste Zeile mit Standart-Werten fï¿½llen
 					dp[i][j] = j;
-				} else if (j == 0) { // Erste Reihe mit Standart-Werten füllen
+				} else if (j == 0) { // Erste Reihe mit Standart-Werten fï¿½llen
 					dp[i][j] = i;
 				} else { 
 					// Def. https://dzone.com/articles/the-levenshtein-algorithm-1

@@ -65,7 +65,7 @@ public class UpdateBirthdaysThisWeekTask extends Task<List<PersonsInAWeek>> {
 		this.personDB.sort(new BirthdayComparator(true));
 
 		for (final Person person : this.personDB) {
-			final LocalDate birthday = person.getBirthday().withYear(2019);
+			final LocalDate birthday = person.getBirthday().withYear(LocalDate.now().getYear());
 			if (birthday.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) == this.week) {
 				birthdaysThisWeek.add(person);
 			}

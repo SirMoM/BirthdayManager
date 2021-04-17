@@ -5,6 +5,7 @@ package application.processes;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 
@@ -73,7 +74,7 @@ public class ExportToCalenderTask extends Task<Boolean> {
 			Summary summary = event.setSummary(person.namesToString());
 			summary.setLanguage("de-DE");
 			Date start = Date
-					.from(person.getBirthday().withYear(2019).atStartOfDay(ZoneId.systemDefault()).toInstant());
+					.from(person.getBirthday().withYear(LocalDate.now().getYear()).atStartOfDay(ZoneId.systemDefault()).toInstant());
 			event.setDateStart(start, false);
 			event.setClassification(Classification.PUBLIC);
 
