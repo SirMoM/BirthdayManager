@@ -32,8 +32,8 @@ public class LoadBirthdaysFromFileTask extends Task<List<Person>>{
 		File fileToOpen = this.mainController.getSessionInfos().getFileToOpen();
 		String line;
 		try{
-			BufferedReader br = new BufferedReader(new FileReader(fileToOpen));
-			while ((line = br.readLine()) != null){
+			BufferedReader bufferedReader = new BufferedReader(new FileReader(fileToOpen));
+			while ((line = bufferedReader.readLine()) != null){
 				Person person = new Person(line);
 				this.getPersons().add(person);
 			}

@@ -32,6 +32,26 @@ public class MainController{
 		return this.stage;
 	}
 
+	public void goToBirthdaysOverview(){
+		try{
+			this.replaceSceneContent("/application/view/BirthdaysOverview.fxml", new BirthdaysOverviewController(this));
+
+		} catch (Exception ex){
+			System.out.println("BirthdaysOverview: " + ex.getMessage());
+			ex.printStackTrace();
+		}
+	}
+
+	public void goToEditBirthdayView(){
+		try{
+			this.replaceSceneContent("/application/view/EditBirthdayView.fxml", new EditBirthdayViewController(this));
+
+		} catch (Exception ex){
+			System.out.println("EditBirthdayView: " + ex.getMessage());
+			ex.printStackTrace();
+		}
+	}
+
 	public void gotoNextScene(String fxmlPath, Initializable controller){
 		try{
 			this.replaceSceneContent(fxmlPath, controller);
@@ -49,7 +69,7 @@ public class MainController{
 			this.replaceSceneContent("/application/view/BirthdaysOverview.fxml", new BirthdaysOverviewController(this));
 
 		} catch (Exception ex){
-			System.out.println("Login: " + ex.getMessage());
+			System.out.println("BirthdaysOverview: " + ex.getMessage());
 			ex.printStackTrace();
 		}
 	}
