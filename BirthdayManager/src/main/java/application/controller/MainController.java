@@ -60,25 +60,50 @@ public class MainController {
 	final EventHandler<ActionEvent> closeAppHandler = new EventHandler<ActionEvent>() {
 		@Override
 		public void handle(final ActionEvent event) {
-			if (new Boolean(PropertyManager.getProperty(PropertyFields.AUTOSAVE))) {
-				new Thread(new SaveBirthdaysToFileTask()).start();
+			boolean autosave = Boolean.getBoolean(PropertyManager.getProperty(PropertyFields.AUTOSAVE));
+
+			if (autosave && getSessionInfos().getSaveFile() != null) {
+				new Thread(new SaveBirthdaysToFileTask(getSessionInfos().getSaveFile())).start();
 			} else {
+				LOG.debug(getSessionInfos().getSaveFile());
+				LangResourceManager lRM = new LangResourceManager();
 				final Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-				// TODO Localistion
-				alert.setTitle("EXIT");
-				alert.setContentText("Save changes?");
-				final ButtonType okButton = new ButtonType("Yes", ButtonBar.ButtonData.YES);
-				final ButtonType noButton = new ButtonType("No", ButtonBar.ButtonData.NO);
+				alert.setTitle(lRM.getLocaleString(LangResourceKeys.save_before_exit));
+				alert.setContentText(lRM.getLocaleString(LangResourceKeys.save_before_exit_question));
+
+				final ButtonType okButton = new ButtonType(lRM.getLocaleString(LangResourceKeys.yes), ButtonBar.ButtonData.YES);
+				final ButtonType noButton = new ButtonType(lRM.getLocaleString(LangResourceKeys.no), ButtonBar.ButtonData.NO);
 				alert.getButtonTypes().setAll(okButton, noButton);
+
 				alert.showAndWait().ifPresent(type -> {
-					if (type == ButtonType.OK) {
-						new Thread(new SaveBirthdaysToFileTask()).start();
-					} else {
-						return;
+					if (type.getButtonData() == ButtonType.YES.getButtonData()) {
+						if (getSessionInfos().getSaveFile() == null) {
+							final FileChooser fileChooser = new FileChooser();
+							fileChooser.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
+							fileChooser.getExtensionFilters().add(new ExtensionFilter(new LangResourceManager().getLocaleString(LangResourceKeys.csv_file), "*.csv"));
+							try {
+								fileChooser.setInitialDirectory(new File(PropertyManager.getProperty(PropertyFields.LAST_OPEND).toString()).getParentFile());
+							} catch (final NullPointerException nullPointerException) {
+								fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+							}
+
+							// if the chooser is "x'ed" the file is null
+							final File selectedFile = fileChooser.showOpenDialog(MainController.this.getStage().getScene().getWindow());
+							if (selectedFile == null) {
+								final Alert error = new Alert(Alert.AlertType.ERROR);
+								error.showAndWait();
+								return;
+							} else {
+								getSessionInfos().setSaveFile(selectedFile);
+								new Thread(new SaveBirthdaysToFileTask(getSessionInfos().getSaveFile())).start();
+							}
+
+						}
 					}
 				});
 			}
 			Platform.exit();
+			System.exit(0);
 		}
 
 	};
@@ -103,7 +128,28 @@ public class MainController {
 
 		@Override
 		public void handle(final ActionEvent event) {
-			new Thread(new SaveBirthdaysToFileTask()).start();
+			if (getSessionInfos().getSaveFile() == null) {
+				final FileChooser fileChooser = new FileChooser();
+				fileChooser.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
+				fileChooser.getExtensionFilters().add(new ExtensionFilter(new LangResourceManager().getLocaleString(LangResourceKeys.csv_file), "*.csv"));
+				try {
+					fileChooser.setInitialDirectory(new File(PropertyManager.getProperty(PropertyFields.LAST_OPEND).toString()).getParentFile());
+				} catch (final NullPointerException nullPointerException) {
+					fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+				}
+
+				// if the chooser is "x'ed" the file is null
+				final File selectedFile = fileChooser.showOpenDialog(MainController.this.getStage().getScene().getWindow());
+				getSessionInfos().setSaveFile(selectedFile);
+
+			}
+			if (getSessionInfos().getSaveFile() == null) {
+				final Alert error = new Alert(Alert.AlertType.ERROR);
+				error.showAndWait();
+				return;
+			} else {
+				new Thread(new SaveBirthdaysToFileTask(getSessionInfos().getSaveFile())).start();
+			}
 		}
 	};
 	final EventHandler<ActionEvent> exportToFileHandler = new EventHandler<ActionEvent>() {
@@ -114,15 +160,13 @@ public class MainController {
 			fileChooser.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
 
 			try {
-				fileChooser.setInitialDirectory(
-						new File(PropertyManager.getProperty(PropertyFields.LAST_OPEND).toString()).getParentFile());
+				fileChooser.setInitialDirectory(new File(PropertyManager.getProperty(PropertyFields.LAST_OPEND).toString()).getParentFile());
 			} catch (final NullPointerException nullPointerException) {
 				fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
 			}
 			// TODO Extension Filters with internationalisation
 			fileChooser.setInitialFileName("Birthdays");
-			fileChooser.getExtensionFilters().addAll(new ExtensionFilter("CSV Files", "*.csv"),
-					new ExtensionFilter("All Files", "*.*"));
+			fileChooser.getExtensionFilters().addAll(new ExtensionFilter("CSV Files", "*.csv"), new ExtensionFilter("All Files", "*.*"));
 
 			final File saveFile = fileChooser.showSaveDialog(MainController.this.getStage().getScene().getWindow());
 
@@ -152,8 +196,7 @@ public class MainController {
 					alert.showAndWait();
 				});
 				if (getActiveController() instanceof BirthdaysOverviewController) {
-					((BirthdaysOverviewController) getActiveController()).getProgressbar().progressProperty()
-							.bind(exportToCalenderTask.workDoneProperty());
+					((BirthdaysOverviewController) getActiveController()).getProgressbar().progressProperty().bind(exportToCalenderTask.workDoneProperty());
 
 				}
 			} catch (IOException ioException) {
@@ -169,24 +212,20 @@ public class MainController {
 		public void handle(final ActionEvent event) {
 			final FileChooser fileChooser = new FileChooser();
 			fileChooser.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
+			fileChooser.getExtensionFilters().add(new ExtensionFilter(new LangResourceManager().getLocaleString(LangResourceKeys.csv_file), "*.csv"));
 
 			try {
-				fileChooser.setInitialDirectory(
-						new File(PropertyManager.getProperty(PropertyFields.LAST_OPEND).toString()).getParentFile());
+				fileChooser.setInitialDirectory(new File(PropertyManager.getProperty(PropertyFields.LAST_OPEND).toString()).getParentFile());
 			} catch (final NullPointerException nullPointerException) {
 				fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
 			}
 
-			// TODO Extension Filters with internationalization
-			fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Text Files", "*.txt"),
-					new ExtensionFilter("CSV Files", "*.csv"), new ExtensionFilter("All Files", "*.*"));
-
-			// if the chooser is X the file is null
+			// if the chooser is "x'ed" the file is null
 			final File selectedFile = fileChooser.showOpenDialog(MainController.this.getStage().getScene().getWindow());
 			if (selectedFile == null) {
 				return;
 			}
-			try {
+			try { // TODO REDO THIS OPEN SHIT to not throw something
 				MainController.this.openFile(selectedFile);
 			} catch (final IOException ioException) {
 				MainController.this.LOG.catching(ioException);
@@ -323,6 +362,7 @@ public class MainController {
 	 */
 	private void openFile(final File selectedFile) throws IOException {
 		MainController.this.LOG.debug("Opend file:" + selectedFile.getAbsolutePath());
+		getSessionInfos().setSaveFile(selectedFile);
 		PersonManager.getInstance().setSaveFile(selectedFile);
 
 		final LoadPersonsTask loadPersonsTask = new LoadPersonsTask(selectedFile,
@@ -330,8 +370,8 @@ public class MainController {
 		loadPersonsTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>() {
 			@Override
 			public void handle(final WorkerStateEvent event) {
-				PersonManager.getInstance().getPersonDB().clear();
-				PersonManager.getInstance().getPersonDB().addAll(loadPersonsTask.getValue());
+				PersonManager.getInstance().getPersons().clear();
+				PersonManager.getInstance().getPersons().addAll(loadPersonsTask.getValue());
 				MainController.this.LOG.debug("Loaded birthdays from File");
 				sessionInfos.updateSubLists();
 			}

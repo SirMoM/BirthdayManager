@@ -25,7 +25,8 @@ public class PropertieManagerTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		this.classToTest = PropertyManager.getInstance();
+		PropertyManager.getInstance().fillWithStandartProperties();
+
 	}
 
 	/**
@@ -33,10 +34,15 @@ public class PropertieManagerTest {
 	 * {@link application.util.PropertyManager#getProperty(java.lang.String)}.
 	 */
 	@Test
-	public final void testGetPropertie() {
-		assertThat(PropertyManager.getProperty(PropertyFields.SHOW_BIRTHDAYS_COUNT), is("10"));
-		assertThat(PropertyManager.getProperty(PropertyFields.WRITE_THRU), is("false"));
-		assertThat(PropertyManager.getProperty(PropertyFields.AUTOSAVE), is("false"));
+	public final void testGetProperty() {
+		assertThat(PropertyManager.getProperty(PropertyFields.AUTOSAVE), is("true"));
+		assertThat(PropertyManager.getProperty(PropertyFields.WRITE_THRU), is("true"));
+		assertThat(PropertyManager.getProperty(PropertyFields.OPEN_FILE_ON_START), is("false"));
+		assertThat(PropertyManager.getProperty(PropertyFields.SHOW_BIRTHDAYS_COUNT), is("15"));
+		assertThat(PropertyManager.getProperty(PropertyFields.FIRST_HIGHLIGHT_COLOR), is("#ff000066"));
+		assertThat(PropertyManager.getProperty(PropertyFields.SECOND_HIGHLIGHT_COLOR), is("#ffcc6666"));
+		assertThat(PropertyManager.getProperty(PropertyFields.EXPORT_WITH_ALARM), is("true"));
+
 	}
 
 	/**
@@ -51,7 +57,7 @@ public class PropertieManagerTest {
 		tempPropertieManager.getProperties().setProperty("test", "test");
 		tempPropertieManager.storeProperties("test");
 
-		this.classToTest.loadProperties();
+		PropertyManager.getInstance().loadProperties();
 
 		assertThat(PropertyManager.getProperty("test"), is("test"));
 

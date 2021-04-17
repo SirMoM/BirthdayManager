@@ -194,7 +194,8 @@ public class EditBirthdayViewController extends Controller {
 			}
 			LOG.debug(EditBirthdayViewController.this.hasChange);
 			if (new Boolean(PropertyManager.getProperty(PropertyFields.WRITE_THRU))) {
-				SaveBirthdaysToFileTask task = new SaveBirthdaysToFileTask();
+				SaveBirthdaysToFileTask task = new SaveBirthdaysToFileTask(
+						getMainController().getSessionInfos().getSaveFile());
 				task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 
 					@Override
@@ -238,7 +239,7 @@ public class EditBirthdayViewController extends Controller {
 	 */
 	public EditBirthdayViewController(final MainController mainController, final int indexPerson) {
 		super(mainController);
-		this.personToEdit = PersonManager.getInstance().get(indexPerson);
+		this.personToEdit = PersonManager.getInstance().getPersonFromIndex(indexPerson);
 		this.indexPerson = indexPerson;
 	}
 

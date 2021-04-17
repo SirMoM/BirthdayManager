@@ -28,7 +28,7 @@ import javafx.scene.control.Alert.AlertType;
  * @author Admin
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
-public class Person{
+public class Person {
 	protected final static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
 	/**
@@ -44,18 +44,15 @@ public class Person{
 	 * @param txtLine a read line from the Text-file
 	 * @return a new Person resulting from the given String
 	 */
-	public static Person parseFromCSVLine(final String txtLine, final int line){
+	public static Person parseFromCSVLine(final String txtLine, final int line) {
 		String name = null;
 		String surname = null;
 		String misc = null;
 		final LocalDate birthday;
 		String whatCouldNotBeParsed = null;
-
-		System.err.println("asgdp");
-
-		try{
+		try {
 			final String[] splitLine = txtLine.split(",");
-			if(splitLine.length < 1){
+			if (splitLine.length < 1) {
 				throw new IndexOutOfBoundsException("Could not split line");
 			}
 			whatCouldNotBeParsed = "birthday";
@@ -69,16 +66,16 @@ public class Person{
 			whatCouldNotBeParsed = "surname";
 			surname = nameAsArray[1];
 
-			if(nameAsArray.length > 2){
+			if (nameAsArray.length > 2) {
 				whatCouldNotBeParsed = "misc";
 				misc = nameAsArray[2];
-			} else{
+			} else {
 				misc = null;
 			}
 
 			whatCouldNotBeParsed = null;
 			return new Person(surname, name, misc, birthday);
-		} catch (final IndexOutOfBoundsException indexOutOfBoundsException){
+		} catch (final IndexOutOfBoundsException indexOutOfBoundsException) {
 			final Alert alert = new Alert(AlertType.WARNING);
 			alert.setTitle("ERROR: Parsing failed");
 			alert.setHeaderText("Line " + line + " could not be parsed: ");
@@ -93,21 +90,21 @@ public class Person{
 	 * @param txtLine a read line from the Text-file
 	 * @return a new Person resulting from the given String
 	 */
-	public static Person parseFromTXTLine(final String txtLine){
+	public static Person parseFromTXTLine(final String txtLine) {
 		String name = null;
 		String surname = null;
 		String misc = null;
 		LocalDate birthday = null;
 
-		try{
+		try {
 			final String[] splitLine = txtLine.split("=");
-			if(splitLine.length < 1){
+			if (splitLine.length < 1) {
 				throw new IndexOutOfBoundsException("Could not split line");
 			}
 			final String[] nameSplit = splitLine[0].split(" ");
-			try{
+			try {
 				birthday = parse(splitLine[1], Person.DATE_FORMATTER);
-			} catch (final DateTimeParseException e){
+			} catch (final DateTimeParseException e) {
 				final Alert alert = new Alert(AlertType.WARNING);
 				alert.setTitle("Could not parse this birthday");
 				alert.setHeaderText("Birthday which could not be parsed: ");
@@ -116,18 +113,18 @@ public class Person{
 				return null;
 			}
 
-			if(nameSplit.length == 3){
+			if (nameSplit.length == 3) {
 				name = nameSplit[0];
 				misc = nameSplit[1];
 				surname = nameSplit[2];
-			} else if(nameSplit.length == 2){
+			} else if (nameSplit.length == 2) {
 				name = nameSplit[0];
 				surname = nameSplit[1];
-			} else{
+			} else {
 				misc = splitLine[0];
 			}
 			return new Person(surname, name, misc, birthday);
-		} catch (final IndexOutOfBoundsException e){
+		} catch (final IndexOutOfBoundsException e) {
 			final Alert alert = new Alert(AlertType.WARNING);
 			alert.setTitle("Could not parse this line");
 			alert.setHeaderText("Line which could not be parsed: ");
@@ -149,7 +146,7 @@ public class Person{
 	/**
 	 * Create an empty person
 	 */
-	public Person(){
+	public Person() {
 		this.surname = new SimpleStringProperty();
 		this.name = new SimpleStringProperty();
 		this.misc = new SimpleStringProperty();
@@ -165,21 +162,21 @@ public class Person{
 	 *                 not get parsed properly
 	 * @param birthday the Birthday of the person
 	 */
-	public Person(final String surname, final String name, final String misc, final LocalDate birthday){
+	public Person(final String surname, final String name, final String misc, final LocalDate birthday) {
 		super();
-		if(surname == null || surname.isEmpty()){
+		if (surname == null || surname.isEmpty()) {
 			this.surname = new SimpleStringProperty();
-		} else{
+		} else {
 			this.surname = new SimpleStringProperty(surname);
 		}
-		if(name == null || name.isEmpty()){
+		if (name == null || name.isEmpty()) {
 			this.name = new SimpleStringProperty();
-		} else{
+		} else {
 			this.name = new SimpleStringProperty(name);
 		}
-		if(misc == null || misc.isEmpty()){
+		if (misc == null || misc.isEmpty()) {
 			this.misc = new SimpleStringProperty();
-		} else{
+		} else {
 			this.misc = new SimpleStringProperty(misc);
 		}
 		this.birthday = new SimpleObjectProperty<LocalDate>(birthday);
@@ -188,17 +185,17 @@ public class Person{
 	/**
 	 * @return the birthday of the person
 	 */
-	public LocalDate getBirthday(){
+	public LocalDate getBirthday() {
 		return this.birthday.getValue();
 	}
 
 	/**
 	 * @return the middle name / everything of the person
 	 */
-	public String getMisc(){
-		try{
+	public String getMisc() {
+		try {
 			return this.misc.getValue();
-		} catch (final NullPointerException NullPointerException){
+		} catch (final NullPointerException NullPointerException) {
 			return null;
 		}
 	}
@@ -206,10 +203,10 @@ public class Person{
 	/**
 	 * @return the name of the person
 	 */
-	public String getName(){
-		try{
+	public String getName() {
+		try {
 			return this.name.getValue();
-		} catch (final NullPointerException NullPointerException){
+		} catch (final NullPointerException NullPointerException) {
 			return null;
 		}
 	}
@@ -217,10 +214,10 @@ public class Person{
 	/**
 	 * @return the surname of the person
 	 */
-	public String getSurname(){
-		try{
+	public String getSurname() {
+		try {
 			return this.surname.getValue();
-		} catch (final NullPointerException NullPointerException){
+		} catch (final NullPointerException NullPointerException) {
 			return null;
 		}
 	}
@@ -228,50 +225,51 @@ public class Person{
 	/**
 	 * @param birthday the birthday to set
 	 */
-	public void setBirthday(final LocalDate birthday){
+	public void setBirthday(final LocalDate birthday) {
 		this.birthday.set(birthday);
 	}
 
 	/**
 	 * @param misc the middle name to set
 	 */
-	public void setMisc(final String misc){
+	public void setMisc(final String misc) {
 		this.misc.set(misc);
 	}
 
 	/**
 	 * @param name the name to set
 	 */
-	public void setName(final String name){
+	public void setName(final String name) {
 		this.name.set(name);
 	}
 
 	/**
 	 * @param surname the surname to set
 	 */
-	public void setSurname(final String surname){
+	public void setSurname(final String surname) {
 		this.surname.set(surname);
 	}
 
 	/**
 	 * @return a CSV-String representation of the person.
 	 */
-	public String toCSVString(){
+	public String toCSVString() {
 		final StringBuilder builder = new StringBuilder();
-		if(this.getName() != null){
+		if (this.getBirthday() != null) {
+			builder.append(Person.DATE_FORMATTER.format(this.getBirthday()));
+		}
+		builder.append(",");
+
+		if (this.getName() != null) {
 			builder.append(this.getName());
-			builder.append(";");
 		}
-		if(this.getMisc() != null){
-			builder.append(this.getMisc());
+		if (this.getSurname() != null) {
 			builder.append(";");
-		}
-		if(this.getSurname() != null){
 			builder.append(this.getSurname());
-			builder.append(";");
 		}
-		if(this.getBirthday() != null){
-			builder.append(this.getBirthday());
+		if (this.getMisc() != null) {
+			builder.append(";");
+			builder.append(this.getMisc());
 		}
 
 		return builder.toString();
@@ -280,25 +278,25 @@ public class Person{
 	/**
 	 * @return a ExtendedString of the person for Debugging
 	 */
-	public String toExtendedString(){
+	public String toExtendedString() {
 		final StringBuilder builder = new StringBuilder();
 		builder.append("Person: ");
-		if(this.getName() != null){
+		if (this.getName() != null) {
 			builder.append("getName()=");
 			builder.append(this.getName());
 			builder.append(", ");
 		}
-		if(this.getMisc() != null){
+		if (this.getMisc() != null) {
 			builder.append("getMisc()=");
 			builder.append(this.getMisc());
 			builder.append(", ");
 		}
-		if(this.getSurname() != null){
+		if (this.getSurname() != null) {
 			builder.append("getSurname()=");
 			builder.append(this.getSurname());
 			builder.append(", ");
 		}
-		if(this.getBirthday() != null){
+		if (this.getBirthday() != null) {
 			builder.append("getBirthday()=");
 			builder.append(this.getBirthday());
 		}
@@ -312,24 +310,20 @@ public class Person{
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
-	public String toString(){
+	public String toString() {
 		final StringBuilder builder = new StringBuilder();
-		if(this.getSurname() != null){
-			builder.append(this.surname.get());
-		}
-		if(this.misc.get() != null){
-			if(builder.length() != 0){
-				builder.append(" ,");
-			}
-			builder.append(this.misc.get());
-		}
-		if(this.name.get() != null){
-			if(builder.length() != 0){
-				builder.append(" ,");
-			}
+		if (this.name.get() != null) {
 			builder.append(this.name.get());
 		}
-		if(this.birthday.get() != null){
+		if (this.misc.get() != null) {
+			builder.append(" ");
+			builder.append(this.misc.get());
+		}
+		if (this.getSurname() != null) {
+			builder.append(" ");
+			builder.append(this.surname.get());
+		}
+		if (this.birthday.get() != null) {
 			builder.append("\n");
 			builder.append(DATE_FORMATTER.format(this.birthday.get()));
 		}
@@ -338,20 +332,16 @@ public class Person{
 
 	public String namesToString() {
 		final StringBuilder builder = new StringBuilder();
-		if (this.getSurname() != null) {
-			builder.append(this.surname.get());
+		if (this.getName() != null) {
+			builder.append(this.name.get());
 		}
-		if (this.misc.get() != null) {
-			if (builder.length() != 0) {
-				builder.append(" ");
-			}
+		if (this.getMisc() != null) {
+			builder.append(" ");
 			builder.append(this.misc.get());
 		}
-		if (this.name.get() != null) {
-			if (builder.length() != 0) {
-				builder.append(" ");
-			}
-			builder.append(this.name.get());
+		if (this.getSurname() != null) {
+			builder.append(" ");
+			builder.append(this.surname.get());
 		}
 		return builder.toString();
 	}
@@ -363,20 +353,20 @@ public class Person{
 	 * <p>
 	 * <code>name misc surname</code>=<code>dd.mm.yyyy</code>
 	 */
-	public String toTXTString(){
+	public String toTXTString() {
 		final StringBuilder builder = new StringBuilder();
-		if(this.getName() != null && !this.getName().isEmpty()){
+		if (this.getName() != null && !this.getName().isEmpty()) {
 			builder.append(this.getName());
 			builder.append(" ");
 		}
-		if(this.getMisc() != null && !this.getMisc().isEmpty()){
+		if (this.getMisc() != null && !this.getMisc().isEmpty()) {
 			builder.append(this.getMisc());
 			builder.append(" ");
 		}
-		if(this.getSurname() != null && !this.getSurname().isEmpty()){
+		if (this.getSurname() != null && !this.getSurname().isEmpty()) {
 			builder.append(this.getSurname());
 		}
-		if(this.getBirthday() != null){
+		if (this.getBirthday() != null) {
 			builder.append("=");
 			builder.append(DATE_FORMATTER.format(this.birthday.get()));
 		}

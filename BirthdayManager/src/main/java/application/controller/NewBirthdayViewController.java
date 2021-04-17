@@ -8,6 +8,8 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 
+import org.apache.logging.log4j.Level;
+
 import application.model.Person;
 import application.model.PersonManager;
 import application.processes.SaveBirthdaysToFileTask;
@@ -174,7 +176,8 @@ public class NewBirthdayViewController extends Controller {
 			NewBirthdayViewController.this.getMainController().goToBirthdaysOverview();
 
 			if (new Boolean(PropertyManager.getProperty(PropertyFields.WRITE_THRU))) {
-				SaveBirthdaysToFileTask task = new SaveBirthdaysToFileTask();
+				SaveBirthdaysToFileTask task = new SaveBirthdaysToFileTask(
+						getMainController().getSessionInfos().getSaveFile());
 				task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 
 					@Override
@@ -304,9 +307,14 @@ public class NewBirthdayViewController extends Controller {
 		this.birthday_Label.setText(resourceManager.getLocaleString(LangResourceKeys.birthday_Label));
 
 		this.openFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromFileChooserHandler);
-		this.recentFiles_MenuItem = new MenuItem(
-				new File(PropertyManager.getProperty(PropertyFields.LAST_OPEND)).getName());
-		this.recentFiles_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromRecentHandler);
-		this.openRecent_MenuItem.getItems().add(this.recentFiles_MenuItem);
+		try {
+			this.recentFiles_MenuItem = new MenuItem(
+					new File(PropertyManager.getProperty(PropertyFields.LAST_OPEND)).getName());
+			this.recentFiles_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromRecentHandler);
+			this.openRecent_MenuItem.getItems().add(this.recentFiles_MenuItem);
+		} catch (NullPointerException nullPointerException) {
+			LOG.catching(Level.INFO, nullPointerException);
+			LOG.info("No recent File opend ?");
+		}
 	}
 }

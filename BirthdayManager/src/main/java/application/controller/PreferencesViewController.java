@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.Locale;
-import java.util.Properties;
 import java.util.ResourceBundle;
 
 import org.apache.logging.log4j.Level;
@@ -47,22 +46,6 @@ import javafx.util.StringConverter;
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
 public class PreferencesViewController extends Controller {
-	private Properties propertiesToEdit;
-
-//	private SpinnerValueFactory<Integer> spinnerValueFactory = new SpinnerValueFactory<Integer>() {
-//		
-//		@Override
-//		public void increment(int steps) {
-//			// TODO Auto-generated method stub
-//			
-//		}
-//		
-//		@Override
-//		public void decrement(int steps) {
-//			// TODO Auto-generated method stub
-//			
-//		}
-//	};
 
 	@FXML
 	private ResourceBundle resources;
