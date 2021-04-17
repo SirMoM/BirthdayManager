@@ -62,6 +62,21 @@ public enum LangResourceKeys{
 	surname_Label,
 	surname_TextField,
 	birthday_Label,
-	birthday_DatePicker;
+	birthday_DatePicker,
 
+	// Preferences View
+	languageOptions_label,
+	chooseLanguage_label,
+	saveOptions_label,
+	writeThru_CheckBox,
+	autoSave_CheckBox,
+	miscellaneous_label,
+	openFileOnStart_Checkbox,
+	chooseFile_button,
+	cancel_button,
+	save_button,
+
+	autsave_Tooltipp,
+	writeThru_Tooltip,
+	openFileOnStartUp_ToolTipp;
 }

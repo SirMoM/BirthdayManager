@@ -11,6 +11,9 @@ import java.util.ResourceBundle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import application.util.PropertieFields;
+import application.util.PropertieManager;
+
 /**
  * @author Noah Ruben
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
@@ -23,7 +26,8 @@ public class LangResourceManager{
 	/**
 	 * @param locale the {@link Locale} which determinate the application language
 	 */
-	public LangResourceManager(final Locale locale){
+	public LangResourceManager(){
+		final Locale locale = new Locale(new PropertieManager().getPropertie(PropertieFields.SAVED_LOCALE));
 		try{
 			this.langResourceBundle = PropertyResourceBundle.getBundle(this.LANG_BUNDLE_BASE_NAME, locale);
 		} catch (final MissingResourceException missingResourceException){
