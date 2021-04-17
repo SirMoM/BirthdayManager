@@ -13,12 +13,15 @@ import org.apache.logging.log4j.Logger;
 
 import application.model.PersonManager;
 import application.model.SessionInfos;
+import application.processes.LoadPersonsTask;
 import application.processes.SaveBirthdaysToFileTask;
+import application.processes.UpdateNextBirthdaysTask;
 import application.util.PropertieFields;
 import application.util.PropertieManager;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
 import javafx.application.Platform;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -43,7 +46,7 @@ import javafx.stage.Stage;
  * @author Admin
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
-public class MainController {
+public class MainController{
 	private final Logger LOG;
 	private final Stage stage;
 	private final SessionInfos sessionInfos;
@@ -52,12 +55,12 @@ public class MainController {
 	@FXML
 	private MenuItem changeLanguage_MenuItem;
 
-	final EventHandler<ActionEvent> closeAppHandler = new EventHandler<ActionEvent>() {
+	final EventHandler<ActionEvent> closeAppHandler = new EventHandler<ActionEvent>(){
 		@Override
-		public void handle(final ActionEvent event) {
-			if (new Boolean(PropertieManager.getPropertie(PropertieFields.AUTOSAVE))) {
+		public void handle(final ActionEvent event){
+			if(new Boolean(PropertieManager.getPropertie(PropertieFields.AUTOSAVE))){
 				new Thread(new SaveBirthdaysToFileTask()).start();
-			} else {
+			} else{
 				final Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
 				// TODO Localistion
 				alert.setTitle("EXIT");
@@ -66,9 +69,9 @@ public class MainController {
 				final ButtonType noButton = new ButtonType("No", ButtonBar.ButtonData.NO);
 				alert.getButtonTypes().setAll(okButton, noButton);
 				alert.showAndWait().ifPresent(type -> {
-					if (type == ButtonType.OK) {
+					if(type == ButtonType.OK){
 						new Thread(new SaveBirthdaysToFileTask()).start();
-					} else {
+					} else{
 						return;
 					}
 				});
@@ -78,103 +81,107 @@ public class MainController {
 
 	};
 
-	final EventHandler<ActionEvent> closeFileHandler = new EventHandler<ActionEvent>() {
+	final EventHandler<ActionEvent> closeFileHandler = new EventHandler<ActionEvent>(){
 
 		@Override
-		public void handle(final ActionEvent event) {
+		public void handle(final ActionEvent event){
 			MainController.this.sessionInfos.resetSubLists();
 			PersonManager.getInstance().setSaveFile(null);
 		}
 	};
-	final EventHandler<ActionEvent> openPreferencesHander = new EventHandler<ActionEvent>() {
+	final EventHandler<ActionEvent> openPreferencesHander = new EventHandler<ActionEvent>(){
 
 		@Override
-		public void handle(final ActionEvent event) {
+		public void handle(final ActionEvent event){
 			MainController.this.openPreferences();
 			MainController.this.LOG.trace("Open Preferences");
 		}
 	};
-	final EventHandler<ActionEvent> saveToFileHandler = new EventHandler<ActionEvent>() {
+	final EventHandler<ActionEvent> saveToFileHandler = new EventHandler<ActionEvent>(){
 
 		@Override
-		public void handle(final ActionEvent event) {
+		public void handle(final ActionEvent event){
 			new Thread(new SaveBirthdaysToFileTask()).start();
 		}
 	};
-	final EventHandler<ActionEvent> exportToFileHandler = new EventHandler<ActionEvent>() {
+	final EventHandler<ActionEvent> exportToFileHandler = new EventHandler<ActionEvent>(){
 
 		@Override
-		public void handle(final ActionEvent event) {
+		public void handle(final ActionEvent event){
 			final FileChooser fileChooser = new FileChooser();
 			fileChooser.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
 
-			try {
-				fileChooser.setInitialDirectory(
-						new File(PropertieManager.getPropertie(PropertieFields.LAST_OPEND).toString()).getParentFile());
-			} catch (final NullPointerException nullPointerException) {
+			try{
+				fileChooser.setInitialDirectory(new File(PropertieManager.getPropertie(PropertieFields.LAST_OPEND).toString()).getParentFile());
+			} catch (final NullPointerException nullPointerException){
 				fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
 			}
 			// TODO Extension Filters with internationalisation
 			fileChooser.setInitialFileName("Birthdays");
-			fileChooser.getExtensionFilters().addAll(new ExtensionFilter("CSV Files", "*.csv"),
-					new ExtensionFilter("All Files", "*.*"));
+			fileChooser.getExtensionFilters().addAll(new ExtensionFilter("CSV Files", "*.csv"), new ExtensionFilter("All Files", "*.*"));
 
 			final File saveFile = fileChooser.showSaveDialog(MainController.this.getStage().getScene().getWindow());
 
 			new Thread(new SaveBirthdaysToFileTask(saveFile)).start();
 		}
 	};
-	final EventHandler<ActionEvent> openFromFileChooserHandler = new EventHandler<ActionEvent>() {
+	final EventHandler<ActionEvent> openFromFileChooserHandler = new EventHandler<ActionEvent>(){
 		@Override
-		public void handle(final ActionEvent event) {
+		public void handle(final ActionEvent event){
 			final FileChooser fileChooser = new FileChooser();
 			fileChooser.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
 
-			try {
-				fileChooser.setInitialDirectory(
-						new File(PropertieManager.getPropertie(PropertieFields.LAST_OPEND).toString()).getParentFile());
-			} catch (final NullPointerException nullPointerException) {
+			try{
+				fileChooser.setInitialDirectory(new File(PropertieManager.getPropertie(PropertieFields.LAST_OPEND).toString()).getParentFile());
+			} catch (final NullPointerException nullPointerException){
 				fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
 			}
 
 			// TODO Extension Filters with internationalization
-			fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Text Files", "*.txt"),
-					new ExtensionFilter("CSV Files", "*.csv"), new ExtensionFilter("All Files", "*.*"));
+			fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Text Files", "*.txt"), new ExtensionFilter("CSV Files", "*.csv"), new ExtensionFilter("All Files", "*.*"));
 
 			// if the chooser is X the file is null
 			final File selectedFile = fileChooser.showOpenDialog(MainController.this.getStage().getScene().getWindow());
-			if (selectedFile == null) {
+			if(selectedFile == null){
 				return;
 			}
-			MainController.this.openFile(selectedFile);
+			try{
+				MainController.this.openFile(selectedFile);
+			} catch (final IOException ioException){
+				MainController.this.LOG.catching(ioException);
+			}
 		}
 	};
-	final EventHandler<ActionEvent> openFromRecentHandler = new EventHandler<ActionEvent>() {
+	final EventHandler<ActionEvent> openFromRecentHandler = new EventHandler<ActionEvent>(){
 		@Override
-		public void handle(final ActionEvent event) {
+		public void handle(final ActionEvent event){
 			final String lastUsedFilePath = PropertieManager.getPropertie(PropertieFields.LAST_OPEND).toString();
 			final File birthdayFile = new File(lastUsedFilePath);
 
-			MainController.this.openFile(birthdayFile);
+			try{
+				MainController.this.openFile(birthdayFile);
+			} catch (final IOException ioException){
+				MainController.this.LOG.catching(ioException);
+			}
 		}
 	};
-	public EventHandler<ActionEvent> openFileExternal = new EventHandler<ActionEvent>() {
+	public EventHandler<ActionEvent> openFileExternal = new EventHandler<ActionEvent>(){
 
 		@Override
-		public void handle(ActionEvent event) {
+		public void handle(final ActionEvent event){
 			// first check if Desktop is supported by Platform or not
-			if (!Desktop.isDesktopSupported()) {
+			if(!Desktop.isDesktopSupported()){
 				System.out.println("Desktop is not supported");
 				return;
 			}
 
-			File file = PersonManager.getInstance().getSaveFile();
+			final File file = PersonManager.getInstance().getSaveFile();
 
-			Desktop desktop = Desktop.getDesktop();
-			if (desktop.isSupported(Desktop.Action.EDIT)) {
-				try {
+			final Desktop desktop = Desktop.getDesktop();
+			if(desktop.isSupported(Desktop.Action.EDIT)){
+				try{
 					desktop.edit(file);
-				} catch (IOException ioException) {
+				} catch (final IOException ioException){
 					ioException.printStackTrace();
 				}
 			}
@@ -185,24 +192,24 @@ public class MainController {
 	/**
 	 * @param stage the mainstage for the application
 	 */
-	public MainController(final Stage stage) {
+	public MainController(final Stage stage){
 		this.stage = stage;
 		this.sessionInfos = new SessionInfos();
 		this.LOG = LogManager.getLogger(this.getClass().getName());
-		this.stage.getIcons().add(new Image(getClass().getResourceAsStream("/img/icons8-birthday-50.png")));
+		this.stage.getIcons().add(new Image(this.getClass().getResourceAsStream("/img/icons8-birthday-50.png")));
 	}
 
 	/**
 	 * @return the session infos for the spezific App-Instance
 	 */
-	public SessionInfos getSessionInfos() {
+	public SessionInfos getSessionInfos(){
 		return this.sessionInfos;
 	}
 
 	/**
 	 * @return the main stage of this app
 	 */
-	public Stage getStage() {
+	public Stage getStage(){
 		return this.stage;
 	}
 
@@ -211,12 +218,12 @@ public class MainController {
 	 *
 	 * @see BirthdaysOverviewController
 	 */
-	public void goToBirthdaysOverview() {
+	public void goToBirthdaysOverview(){
 		this.activeController = new BirthdaysOverviewController(this);
-		try {
+		try{
 			this.replaceSceneContent("/application/view/BirthdaysOverview.fxml", this.activeController);
 
-		} catch (final Exception exception) {
+		} catch (final Exception exception){
 			this.LOG.catching(Level.ERROR, exception);
 		}
 	}
@@ -226,11 +233,11 @@ public class MainController {
 	 *
 	 * @see EditBirthdayViewController
 	 */
-	public void goToEditBirthdayView() {
+	public void goToEditBirthdayView(){
 		this.activeController = new NewBirthdayViewController(this);
-		try {
+		try{
 			this.replaceSceneContent("/application/view/EditBirthdayView.fxml", this.activeController);
-		} catch (final Exception exception) {
+		} catch (final Exception exception){
 			this.LOG.catching(Level.ERROR, exception);
 		}
 	}
@@ -242,12 +249,12 @@ public class MainController {
 	 *
 	 * @see EditBirthdayViewController
 	 */
-	public void goToEditBirthdayView(final int indexPerson) {
+	public void goToEditBirthdayView(final int indexPerson){
 		this.activeController = new EditBirthdayViewController(this, indexPerson);
-		try {
+		try{
 			this.replaceSceneContent("/application/view/EditBirthdayView.fxml", this.activeController);
 
-		} catch (final Exception exception) {
+		} catch (final Exception exception){
 			this.LOG.catching(Level.ERROR, exception);
 		}
 	}
@@ -256,12 +263,59 @@ public class MainController {
 	 * @param fxmlPath   the path of the FXML-File representing the view
 	 * @param controller the associated Controller
 	 */
-	public void gotoNextScene(final String fxmlPath, final Initializable controller) {
-		try {
+	public void gotoNextScene(final String fxmlPath, final Initializable controller){
+		try{
 			this.replaceSceneContent(fxmlPath, controller);
-		} catch (final Exception exception) {
+		} catch (final Exception exception){
 			this.LOG.catching(Level.ERROR, exception);
 		}
+	}
+
+	/**
+	 * @param selectedFile used to fill the birthday list
+	 * @throws IOException
+	 */
+	private void openFile(final File selectedFile) throws IOException{
+		MainController.this.LOG.debug("Opend file:" + selectedFile.getAbsolutePath());
+		// Performance issues from this ?
+		// TODO put this in a TASK
+		PersonManager.getInstance().setSaveFile(selectedFile);
+
+		final LoadPersonsTask loadPersonsTask = new LoadPersonsTask(selectedFile, selectedFile.getAbsolutePath().endsWith(".csv"));
+		loadPersonsTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>(){
+
+			@Override
+			public void handle(final WorkerStateEvent event){
+				PersonManager.getInstance().getPersonDB().clear();
+				PersonManager.getInstance().getPersonDB().addAll(loadPersonsTask.getValue());
+				MainController.this.LOG.debug("Loaded birthdays from File");
+
+				final UpdateNextBirthdaysTask updateNextBirthdaysTask = new UpdateNextBirthdaysTask();
+				updateNextBirthdaysTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>(){
+
+					@Override
+					public void handle(final WorkerStateEvent arg0){
+						MainController.this.getSessionInfos().getNextBirthdays().setAll(updateNextBirthdaysTask.getValue());
+					}
+				});
+				new Thread(updateNextBirthdaysTask).start();
+			}
+		});
+		new Thread(loadPersonsTask).start();
+
+		MainController.this.sessionInfos.getRecentFileName().set(selectedFile.getName());
+		MainController.this.sessionInfos.getFileToOpenName().set(selectedFile.getName());
+
+		PropertieManager.getInstance().getProperties().setProperty(PropertieFields.LAST_OPEND, PersonManager.getInstance().getSaveFile().getAbsolutePath());
+		try
+
+		{
+			PropertieManager.getInstance().storeProperties("Saved recent file.");
+		} catch (final IOException ioException){
+			this.LOG.catching(Level.FATAL, ioException);
+		}
+		// TODO put this in a TASK
+
 	}
 
 	/**
@@ -273,8 +327,8 @@ public class MainController {
 	 * </ul>
 	 *
 	 */
-	public void openPreferences() {
-		try {
+	public void openPreferences(){
+		try{
 			final FXMLLoader fxmlLoader = new FXMLLoader();
 			fxmlLoader.setLocation(this.getClass().getResource("/application/view/PreferencesView.fxml"));
 			fxmlLoader.setController(new PreferencesViewController(this));
@@ -283,7 +337,7 @@ public class MainController {
 			stage.setTitle("Preferences");
 			stage.setScene(scene);
 			stage.show();
-		} catch (final IOException ioException) {
+		} catch (final IOException ioException){
 			this.LOG.log(Level.ERROR, "Failed to create new Window.", ioException);
 		}
 	}
@@ -293,7 +347,7 @@ public class MainController {
 	 * @param controller the associated Controller
 	 * @throws IOException if the FXML-File could not be loaded
 	 */
-	private void replaceSceneContent(final String fxmlPath, final Initializable controller) throws IOException {
+	private void replaceSceneContent(final String fxmlPath, final Initializable controller) throws IOException{
 		final FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(this.getClass().getResource(fxmlPath));
 		loader.setController(controller);
@@ -308,52 +362,28 @@ public class MainController {
 		this.stage.show();
 	}
 
-	public void settingsChanged() {
+	public void settingsChanged(){
 		this.activeController.updateLocalisation();
 	}
 
 	/**
 	 * Starts the application with the BirthdaysOverview and possibly loaded file
 	 */
-	public void start() {
+	public void start(){
 		this.activeController = new BirthdaysOverviewController(this);
-		try {
+		try{
 			this.replaceSceneContent("/application/view/BirthdaysOverview.fxml", this.activeController);
-			if (new Boolean(PropertieManager.getPropertie(PropertieFields.OPEN_FILE_ON_START))) {
-				String file = PropertieManager.getPropertie(PropertieFields.FILE_ON_START);
-				if (file != null) {
-					openFile(new File(PropertieManager.getPropertie(PropertieFields.FILE_ON_START)));
-				} else {
-					LOG.warn("Should have opend a file upon start but no file to open was found!");
+			if(new Boolean(PropertieManager.getPropertie(PropertieFields.OPEN_FILE_ON_START))){
+				final String file = PropertieManager.getPropertie(PropertieFields.FILE_ON_START);
+				if(file != null){
+					this.openFile(new File(PropertieManager.getPropertie(PropertieFields.FILE_ON_START)));
+				} else{
+					this.LOG.warn("Should have opend a file upon start but no file to open was found!");
 				}
 			}
-		} catch (final Exception exception) {
+		} catch (final Exception exception){
 			this.LOG.catching(Level.ERROR, exception);
 		}
-	}
-
-	/**
-	 * @param selectedFile used to fill the birthday list
-	 */
-	private void openFile(final File selectedFile) {
-		MainController.this.LOG.debug("Opend file:" + selectedFile.getAbsolutePath());
-		// Performance issues from this ?
-		// TODO put this in a TASK
-		PersonManager.getInstance().setSaveFile(selectedFile);
-
-		MainController.this.sessionInfos.getRecentFileName().set(selectedFile.getName());
-		MainController.this.sessionInfos.getFileToOpenName().set(selectedFile.getName());
-
-		PropertieManager.getInstance().getProperties().setProperty(PropertieFields.LAST_OPEND,
-				PersonManager.getInstance().getSaveFile().getAbsolutePath());
-		try {
-			PropertieManager.getInstance().storeProperties("Saved recent file.");
-		} catch (IOException ioException) {
-			LOG.catching(Level.FATAL, ioException);
-		}
-		// Performance issues from this ?
-		// TODO put this in a TASK
-		MainController.this.sessionInfos.updateSubLists();
 	}
 
 }
