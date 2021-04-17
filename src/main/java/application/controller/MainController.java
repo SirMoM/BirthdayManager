@@ -6,7 +6,6 @@ import application.model.SessionInfos;
 import application.processes.CheckForUpdatesTask;
 import application.processes.ExportToCalenderTask;
 import application.processes.LoadPersonsTask;
-import application.processes.ExportToCalenderTask;
 import application.processes.SaveBirthdaysToFileTask;
 import application.util.PropertyFields;
 import application.util.PropertyManager;
@@ -347,7 +346,7 @@ public class MainController {
      * @param selectedFile used to fill the birthday list
      * @throws IOException
      */
-    private void openFile(final File selectedFile) throws IOException {
+    void openFile(final File selectedFile) throws IOException {
         LOG.debug("Open file: {}", selectedFile.getAbsolutePath());
 
         this.getSessionInfos().setSaveFile(selectedFile);
@@ -365,7 +364,8 @@ public class MainController {
         });
         new Thread(loadPersonsTask).start();
 
-        MainController.this.sessionInfos.getRecentFileName().set(selectedFile.getName());
+
+        MainController.this.sessionInfos.getRecentFileNames().push(selectedFile.getAbsolutePath());
         MainController.this.sessionInfos.getFileToOpenName().set(selectedFile.getName());
 
         PropertyManager.getInstance().getProperties().setProperty(PropertyFields.LAST_OPENED, getSessionInfos().getSaveFile().getAbsolutePath());

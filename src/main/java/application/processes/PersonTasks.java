@@ -22,6 +22,7 @@ public abstract class PersonTasks<G> extends Task<G> {
     protected PersonTasks(final long waitTimeLimit) {
         this.waitTimeLimit = waitTimeLimit;
     }
+
     protected PersonTasks() {
     }
 

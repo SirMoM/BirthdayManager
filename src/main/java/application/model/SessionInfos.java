@@ -1,6 +1,3 @@
-/**
- *
- */
 package application.model;
 
 import application.controller.MainController;
@@ -49,7 +46,7 @@ public class SessionInfos {
     private final ObservableList<Person> nextBirthdays = FXCollections.observableArrayList();
     private final ObservableList<PersonsInAWeek> personsInAWeekList = FXCollections.observableArrayList();
 
-    private StringProperty recentFileName = new SimpleStringProperty();
+    private final RecentItems recentFileNames = new RecentItems(5);
     private Locale appLocale;
     private File saveFile;
 
@@ -67,59 +64,69 @@ public class SessionInfos {
         LOG.debug("Loaded locale property {}", localePropertyString);
 
         try {
-            this.getRecentFileName().set(new File(PropertyManager.getProperty(PropertyFields.LAST_OPENED)).getName());
+            recentFileNames.loadFromProperties(PropertyManager.getProperty(PropertyFields.LAST_OPENED));
         } catch (final NullPointerException nullPointerException) {
             LOG.catching(Level.WARN, nullPointerException);
-            LOG.warn("\nDon't worry just could not load recent File");
+            LOG.warn("Don't worry just could not load recent File");
         }
     }
 
-    /** @return the appLocale */
+    public RecentItems getRecentFileNames() {
+        return recentFileNames;
+    }
+
+    /**
+     * @return the appLocale
+     */
     public Locale getAppLocale() {
         return this.appLocale;
     }
 
-    /** @param appLocale the appLocale to set */
+    /**
+     * @param appLocale the appLocale to set
+     */
     public void setAppLocale(final Locale appLocale) {
         this.appLocale = appLocale;
     }
 
-    /** @return the birthdaysThisWeek */
+    /**
+     * @return the birthdaysThisWeek
+     */
     public List<Person> getBirthdaysThisWeek() {
         return this.birthdaysThisWeek;
     }
 
-    /** @return the fileToOpenName */
+    /**
+     * @return the fileToOpenName
+     */
     public StringProperty getFileToOpenName() {
         return this.fileToOpenName;
     }
 
-    /** @return the nextBirthdays */
+    /**
+     * @return the nextBirthdays
+     */
     public ObservableList<Person> getNextBirthdays() {
         return this.nextBirthdays;
     }
 
-    /** @return the personsInAWeekList */
+    /**
+     * @return the personsInAWeekList
+     */
     public ObservableList<PersonsInAWeek> getPersonsInAWeekList() {
         return this.personsInAWeekList;
     }
 
-    /** @return the recentBirthdays */
+    /**
+     * @return the recentBirthdays
+     */
     public ObservableList<Person> getRecentBirthdays() {
         return this.recentBirthdays;
     }
 
-    /** @return the recentFileName */
-    public StringProperty getRecentFileName() {
-        return this.recentFileName;
-    }
-
-    /** @param recentFileName the recentFileName to set */
-    public void setRecentFileName(final StringProperty recentFileName) {
-        this.recentFileName = recentFileName;
-    }
-
-    /** resets the nextBirthdays and recentBirthdays */
+    /**
+     * resets the nextBirthdays and recentBirthdays
+     */
     public void resetSubLists() {
         this.nextBirthdays.clear();
         this.recentBirthdays.clear();
