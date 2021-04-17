@@ -4,15 +4,20 @@
 package application.model;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.temporal.IsoFields;
+import java.util.List;
 import java.util.Locale;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import application.util.BirthdayComparator;
 import application.util.PropertieFields;
 import application.util.PropertieManager;
 import application.util.localisation.LangResourceManager;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -32,7 +37,7 @@ public class SessionInfos{
 	private final StringProperty fileToOpenName = new SimpleStringProperty();
 	private StringProperty recentFileName = new SimpleStringProperty();
 
-	private final ObservableList<Person> nextBirthdays = FXCollections.observableArrayList();
+	private ObservableList<Person> nextBirthdays = FXCollections.observableArrayList();
 	private final ObservableList<Person> recentBirthdays = FXCollections.observableArrayList();
 
 	private final ObservableMap<Object, Object> birthdaysThisWeek = FXCollections.observableHashMap();
@@ -138,9 +143,110 @@ public class SessionInfos{
 	}
 
 	/**
+	 * @param nextBirthdays the nextBirthdays to set
+	 */
+	public void setNextBirthdays(final ObservableList<Person> nextBirthdays){
+		this.nextBirthdays = nextBirthdays;
+	}
+
+	/**
 	 * @param recentFileName the recentFileName to set
 	 */
 	public void setRecentFileName(final StringProperty recentFileName){
 		this.recentFileName = recentFileName;
 	}
+
+	/**
+	 * Fills the BirthdaysThisMonth
+	 *
+	 * @param temp the {@link List} of persons where the Birthdays this month are
+	 *             extracted
+	 */
+	private void updateBirthdaysThisMonth(){
+		// TODO updateBirthdaysThisMonth
+		final List<Person> temp = PersonManager.getInstance().getPersonDB();
+		temp.sort(new BirthdayComparator(true));
+	}
+
+	/**
+	 * Fills the BirthdaysThisWeek
+	 *
+	 * @param temp the {@link List} of persons where the Birthdays this week are
+	 *             extracted
+	 */
+	private void updateBirthdaysThisWeek(){
+		final List<Person> temp = PersonManager.getInstance().getPersonDB();
+		temp.sort(new BirthdayComparator(true));
+
+		final int week = LocalDate.now().get(IsoFields.WEEK_BASED_YEAR);
+
+	}
+
+	/**
+	 * Fills the NextBirthdays
+	 *
+	 * @param temp the {@link List} of persons where the next Birthdays are
+	 *             extracted
+	 */
+	private void updateNextBirthdays(){
+		final int NEXT_BIRTHDAYS_COUNT = Integer.parseInt(this.getPropertiesHandler().getPropertie(PropertieFields.SHOW_BIRTHDAYS_COUNT));
+		final List<Person> temp = PersonManager.getInstance().getPersonDB();
+		temp.sort(new BirthdayComparator(true));
+		final int birthdaysSize = temp.size() - 1;
+		int i = 0;
+		for(; i < NEXT_BIRTHDAYS_COUNT; i++){
+			final Person tempPerson = temp.get(i);
+			if(tempPerson.getBirthday().getDayOfYear() < LocalDate.now().getDayOfYear()){
+				break;
+			} else{
+				// Avoid throwing IllegalStateException by running from a non-JavaFX thread.
+				Platform.runLater(() -> {
+					this.getNextBirthdays().add(tempPerson);
+				});
+			}
+		}
+		for(; i < NEXT_BIRTHDAYS_COUNT; i++){
+			final Person tempPerson = temp.get(birthdaysSize - i);
+			// Avoid throwing IllegalStateException by running from a non-JavaFX thread.
+			Platform.runLater(() -> {
+				this.getNextBirthdays().add(tempPerson);
+			});
+		}
+
+	}
+
+	/**
+	 * Fills the RecentBirthdays
+	 *
+	 * @param temp the {@link List} of persons where the Birthdays are listed
+	 */
+	private void updateRecentBirthdays(){
+		final int NEXT_BIRTHDAYS_COUNT = Integer.parseInt(this.getPropertiesHandler().getPropertie(PropertieFields.SHOW_BIRTHDAYS_COUNT));
+		final List<Person> temp = PersonManager.getInstance().getPersonDB();
+		temp.sort(new BirthdayComparator(true));
+		int i = 0;
+
+		for(; i > NEXT_BIRTHDAYS_COUNT; i++){
+			final Person tempPerson = temp.get(i);
+			if(tempPerson.getBirthday().getDayOfYear() < LocalDate.now().getDayOfYear()){
+				this.getRecentBirthdays().add(tempPerson);
+			} else{
+				LOG.warn(tempPerson.toExtendedString() + "not added to recent! ");
+			}
+		}
+	}
+
+	public void updateSubLists(){
+		this.resetSubLists();
+		try{
+			this.updateNextBirthdays();
+			this.updateRecentBirthdays();
+			this.updateBirthdaysThisWeek();
+			this.updateBirthdaysThisMonth();
+		} catch (final IndexOutOfBoundsException outOfBoundsException){
+			LOG.catching(Level.INFO, outOfBoundsException);
+			LOG.info("Probably not enought Persons to geather the next 10 birthdays");
+		}
+	}
+
 }

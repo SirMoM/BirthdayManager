@@ -299,6 +299,7 @@ public class Person{
 		if(this.birthday.get() != null){
 			builder.append("\n");
 			builder.append(DATE_FORMATTER.format(this.birthday.get()));
+			builder.append("\t \t \t Alter: \t" + (LocalDate.now().getYear() - this.birthday.getValue().getYear()));
 		}
 		return builder.toString();
 	}

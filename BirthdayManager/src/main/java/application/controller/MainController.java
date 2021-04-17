@@ -15,7 +15,6 @@ import application.model.PersonManager;
 import application.model.SessionInfos;
 import application.processes.SaveBirthdaysToFileTask;
 import application.processes.SaveLastFileUsedTask;
-import application.processes.UpdateAllSubBirthdayListsTask;
 import application.util.PropertieFields;
 import application.util.localisation.LangResourceKeys;
 import javafx.application.Platform;
@@ -134,7 +133,7 @@ public class MainController{
 				}
 			});
 			new Thread(saveLastFileUsedTask).start();
-			new Thread(new UpdateAllSubBirthdayListsTask(MainController.this.sessionInfos)).start();
+			MainController.this.sessionInfos.updateSubLists();
 		}
 	};
 	final EventHandler<ActionEvent> openFromRecentHandler = new EventHandler<ActionEvent>(){
@@ -159,7 +158,7 @@ public class MainController{
 				}
 			});
 			new Thread(saveLastFileUsedTask).start();
-			new Thread(new UpdateAllSubBirthdayListsTask(MainController.this.sessionInfos)).start();
+			MainController.this.getSessionInfos().updateSubLists();
 		}
 	};
 
@@ -194,20 +193,6 @@ public class MainController{
 	public void goToBirthdaysOverview(){
 		try{
 			this.replaceSceneContent("/application/view/BirthdaysOverview.fxml", new BirthdaysOverviewController(this));
-
-		} catch (final Exception exception){
-			this.LOG.catching(Level.ERROR, exception);
-		}
-	}
-
-	/**
-	 * Swiches scenes to the BirthdayOverview.
-	 *
-	 * @param birthdaysOverviewController
-	 */
-	public void goToBirthdaysOverview(final BirthdaysOverviewController birthdaysOverviewController){
-		try{
-			this.replaceSceneContent("/application/view/BirthdaysOverview.fxml", birthdaysOverviewController);
 
 		} catch (final Exception exception){
 			this.LOG.catching(Level.ERROR, exception);
@@ -305,7 +290,6 @@ public class MainController{
 			this.replaceSceneContent("/application/view/BirthdaysOverview.fxml", new BirthdaysOverviewController(this));
 			if(new Boolean(this.sessionInfos.getPropertiesHandler().getPropertie(PropertieFields.OPEN_FILE_ON_START))){
 				PersonManager.getInstance().setSaveFile(new File(this.sessionInfos.getPropertiesHandler().getPropertie(PropertieFields.FILE_ON_START)));
-				new Thread(new UpdateAllSubBirthdayListsTask(this.sessionInfos)).start();
 			}
 		} catch (final Exception exception){
 			this.LOG.catching(Level.ERROR, exception);
