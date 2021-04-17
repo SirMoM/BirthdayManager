@@ -8,6 +8,7 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
@@ -263,13 +264,21 @@ public class SessionInfos {
 
 					for (Person person : value) {
 						int age = (LocalDate.now().getYear() - person.getBirthday().getYear());
-//					stringBuilder.append(lRM.getLocaleString(LangResourceKeys.age) + ": " + age+ "\t");
 						long days = ChronoUnit.DAYS.between(person.getBirthday().withYear(LocalDate.now().getYear()),
 								LocalDate.now());
 						stringBuilder.append(person.namesToString() + " ");
-						String missedBirthdaysMessage = String
-								.format(lRM.getLocaleString(LangResourceKeys.missedBirthdaysMsg), days, age);
-						stringBuilder.append(missedBirthdaysMessage);
+						
+						try {
+							String missedBirthdaysMessage = String.format(lRM.getLocaleString(LangResourceKeys.missedBirthdaysMsg), days, age);
+							stringBuilder.append(missedBirthdaysMessage);
+						} catch (IllegalFormatException illegalFormatException) {
+							LOG.catching(Level.WARN, illegalFormatException);
+							LOG.warn("Could not generate Missing-Text for " + person.toString() + " based on " + days + " and " + age);
+						} catch (NullPointerException nullPointerException) {
+							LOG.catching(Level.WARN, nullPointerException);
+							LOG.warn("Could not generate Missing-Text for " + person.toString() + " based on " + days + " and " + age);
+						}
+						
 						stringBuilder.append("\n");
 					}
 
