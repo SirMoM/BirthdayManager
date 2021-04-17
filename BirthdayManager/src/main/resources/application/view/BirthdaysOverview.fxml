@@ -32,7 +32,6 @@
             <MenuItem fx:id="closeFile_MenuItem" mnemonicParsing="false" text="Close" />
             <MenuItem fx:id="saveFile_MenuItem" mnemonicParsing="false" text="Save" />
             <MenuItem fx:id="saveAsFile_MenuItem" mnemonicParsing="false" text="Save As…" />
-                  <MenuItem fx:id="exporteFile_MenuItem" mnemonicParsing="false" text="Export..." />
             <SeparatorMenuItem mnemonicParsing="false" />
             <MenuItem fx:id="preferences_MenuItem" mnemonicParsing="false" text="Preferences…" />
             <SeparatorMenuItem mnemonicParsing="false" />

@@ -17,6 +17,7 @@ import application.util.localisation.LangResourceManager;
 import javafx.collections.ObservableList;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -27,6 +28,8 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -74,9 +77,6 @@ public class BirthdaysOverviewController extends Controller{
 
 	@FXML
 	private MenuItem saveAsFile_MenuItem;
-
-	@FXML
-	private MenuItem exporteFile_MenuItem;
 
 	@FXML
 	private MenuItem preferences_MenuItem;
@@ -236,18 +236,25 @@ public class BirthdaysOverviewController extends Controller{
 		@Override
 		public void handle(final ActionEvent event){
 			BirthdaysOverviewController.this.getMainController().getSessionInfos().setAppLocale(Locale.getDefault());
-			BirthdaysOverviewController.this.getMainController().getSessionInfos().getLangResourceManager().changeLocale(new Locale("de", "DE"));
+			BirthdaysOverviewController.this.getMainController().getSessionInfos().getLangResourceManager().changeLocale(new Locale("en", "GB"));
 			BirthdaysOverviewController.this.updateLocalisation();
 		}
 	};
 
-	private final EventHandler<MouseEvent> birthdayDoubleClickHandler = new EventHandler<MouseEvent>(){
+	private final EventHandler<Event> birthdayDoubleClickHandler = new EventHandler<Event>(){
 
 		@Override
-		public void handle(final MouseEvent event){
-			if(event.getClickCount() >= 2){
-				final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
-				BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(selectedItems.get(0));
+		public void handle(final Event event){
+			if(event.getEventType().equals(MouseEvent.ANY)){
+				if(((MouseEvent) event).getClickCount() >= 2){
+					final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
+					BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(selectedItems.get(0));
+				}
+			} else if(event.getEventType().equals(KeyEvent.KEY_PRESSED)){
+				if(((KeyEvent) event).getCode() == KeyCode.ENTER){
+					final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
+					BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(selectedItems.get(0));
+				}
 			}
 		}
 	};
@@ -271,7 +278,6 @@ public class BirthdaysOverviewController extends Controller{
 		assert this.closeFile_MenuItem != null : "fx:id=\"closeFile_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
 		assert this.saveFile_MenuItem != null : "fx:id=\"saveFile_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
 		assert this.saveAsFile_MenuItem != null : "fx:id=\"saveAsFile_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
-		assert this.exporteFile_MenuItem != null : "fx:id=\"exporteFile_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
 		assert this.preferences_MenuItem != null : "fx:id=\"preferences_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
 		assert this.quit_MenuItem != null : "fx:id=\"quit_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
 		assert this.edit_menu != null : "fx:id=\"edit_menu\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
@@ -308,6 +314,56 @@ public class BirthdaysOverviewController extends Controller{
 		assert this.date_label != null : "fx:id=\"date_label\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
 	}
 
+	/**
+	 * Bind EventHandlers an JavaFX-Components
+	 */
+	private void bindComponents(){
+		// Menu items
+		// File
+		this.openFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromFileChooserHandler);
+		this.createRecentFilesMenueItems();
+
+		this.closeFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().closeFileHandler);
+		this.saveFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().saveToFileHandler);
+		this.saveAsFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().exportToFileHandler);
+
+		this.preferences_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openPreferencesHander);
+
+		this.quit_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().closeAppHandler);
+
+		this.openBirthday_MenuItem.addEventHandler(ActionEvent.ANY, this.openBirthday);
+
+		this.showNextBirthdays_MenuItem.addEventHandler(ActionEvent.ANY, this.showNextBirthdaysHandler);
+		this.showLastBirthdays_MenuItem.addEventHandler(ActionEvent.ANY, this.showRecentBirthdaysHandler);
+
+		this.debug.addEventHandler(ActionEvent.ACTION, this.updateListsHandler);
+		this.refresh_MenuItem.addEventHandler(ActionEvent.ANY, this.updateListsHandler);
+
+		this.changeLanguage_MenuItem.addEventHandler(ActionEvent.ANY, this.changeLanguageHandler);
+
+		// configure the List
+		this.nextBdaysList.setItems(this.getMainController().getSessionInfos().getNextBirthdays());
+		this.nextBdaysList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+		this.nextBdaysList.addEventHandler(MouseEvent.MOUSE_CLICKED, this.birthdayDoubleClickHandler);
+		this.nextBdaysList.addEventHandler(KeyEvent.KEY_PRESSED, this.birthdayDoubleClickHandler);
+
+		// set Texts
+		this.date_label.setText(DATE_FORMATTER.format(LocalDate.now()));
+		this.openedFile_label.textProperty().bind(this.getMainController().getSessionInfos().getFileToOpenName());
+
+	}
+
+	/**
+	 *
+	 */
+	private void createRecentFilesMenueItems(){
+		// create Menue Items and adding them
+		this.recentFiles_MenuItem = new MenuItem();
+		this.recentFiles_MenuItem.textProperty().bind(this.getMainController().getSessionInfos().getRecentFileName());
+		this.recentFiles_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromRecentHandler);
+		this.openRecent_MenuItem.getItems().add(this.recentFiles_MenuItem);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 *
@@ -321,37 +377,7 @@ public class BirthdaysOverviewController extends Controller{
 		// Localisation
 		this.updateLocalisation();
 
-		// EventHandlers
-		this.saveFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().saveToFileHandler);
-		this.closeFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().closeFileHandler);
-		this.saveAsFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().exportToFileHandler);
-		this.openBirthday_MenuItem.addEventHandler(ActionEvent.ANY, this.openBirthday);
-
-		this.preferences_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openPreferencesHander);
-
-		this.debug.addEventHandler(ActionEvent.ACTION, this.updateListsHandler);
-		this.refresh_MenuItem.addEventHandler(ActionEvent.ANY, this.updateListsHandler);
-
-		this.showNextBirthdays_MenuItem.addEventHandler(ActionEvent.ANY, this.showNextBirthdaysHandler);
-		this.showLastBirthdays_MenuItem.addEventHandler(ActionEvent.ANY, this.showRecentBirthdaysHandler);
-
-		this.openFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromFileChooserHandler);
-
-		this.changeLanguage_MenuItem.addEventHandler(ActionEvent.ANY, this.changeLanguageHandler);
-
-		this.nextBdaysList.setItems(this.getMainController().getSessionInfos().getNextBirthdays());
-		this.nextBdaysList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-		this.nextBdaysList.addEventHandler(MouseEvent.MOUSE_CLICKED, this.birthdayDoubleClickHandler);
-
-		// set Texts
-		this.date_label.setText(DATE_FORMATTER.format(LocalDate.now()));
-		this.openedFile_label.textProperty().bind(this.getMainController().getSessionInfos().getFileToOpenName());
-
-		// create Menue Items and adding them
-		this.recentFiles_MenuItem = new MenuItem();
-		this.recentFiles_MenuItem.textProperty().bind(this.getMainController().getSessionInfos().getRecentFileName());
-		this.recentFiles_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromRecentHandler);
-		this.openRecent_MenuItem.getItems().add(this.recentFiles_MenuItem);
+		this.bindComponents();
 
 	}
 
@@ -372,7 +398,6 @@ public class BirthdaysOverviewController extends Controller{
 		this.closeFile_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.closeFile_MenuItem));
 		this.saveFile_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.saveFile_MenuItem));
 		this.saveAsFile_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.saveAsFile_MenuItem));
-		this.exporteFile_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.exporteFile_MenuItem));
 		this.preferences_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.preferences_MenuItem));
 		this.quit_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.quit_MenuItem));
 

@@ -18,6 +18,7 @@ import application.processes.SaveLastFileUsedTask;
 import application.processes.UpdateAllSubBirthdayListsTask;
 import application.util.PropertieFields;
 import application.util.localisation.LangResourceKeys;
+import javafx.application.Platform;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -46,6 +47,14 @@ public class MainController{
 
 	@FXML
 	private MenuItem changeLanguage_MenuItem;
+
+	final EventHandler<ActionEvent> closeAppHandler = new EventHandler<ActionEvent>(){
+		@Override
+		public void handle(final ActionEvent event){
+			Platform.exit();
+		}
+
+	};
 
 	final EventHandler<ActionEvent> closeFileHandler = new EventHandler<ActionEvent>(){
 
