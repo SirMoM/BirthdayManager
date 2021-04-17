@@ -77,6 +77,10 @@ public class PersonManager{
 		}
 	}
 
+	public Person get(final int indexPerson){
+		return this.personDB.get(indexPerson);
+	}
+
 	/**
 	 * @return the personDB == the {@link ArrayList} which contains the Persons
 	 */
@@ -227,11 +231,14 @@ public class PersonManager{
 	}
 
 	/**
-	 * @param personToUpdate the person which will be updated
-	 * @param updatedPerson  the person which was updated
+	 * @param indexPerson   the index of the person which will be updated
+	 * @param updatedPerson the person which was updated
 	 */
-	public void updatePerson(final Person personToUpdate, final Person updatedPerson){
-		this.personDB.set(this.personDB.indexOf(personToUpdate), updatedPerson);
+	public void updatePerson(final int indexPerson, final Person updatedPerson){
+		this.personDB.get(indexPerson).setBirthday(updatedPerson.getBirthday());
+		this.personDB.get(indexPerson).setName(updatedPerson.getName());
+		this.personDB.get(indexPerson).setSurname(updatedPerson.getSurname());
+		this.personDB.get(indexPerson).setMisc(updatedPerson.getMisc());
 		if(this.writeThru){
 			this.saveToFile();
 		}

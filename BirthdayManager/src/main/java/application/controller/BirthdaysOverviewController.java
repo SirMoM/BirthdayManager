@@ -10,6 +10,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
 import application.model.Person;
+import application.model.PersonManager;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
 import javafx.collections.ObservableList;
@@ -183,7 +184,8 @@ public class BirthdaysOverviewController extends Controller{
 			if(selectedItems.isEmpty()){
 				return;
 			} else{
-				BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(selectedItems.get(0));
+				final int indexOf = PersonManager.getInstance().getPersonDB().indexOf(selectedItems.get(0));
+				BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(indexOf);
 			}
 		}
 	};
@@ -221,12 +223,14 @@ public class BirthdaysOverviewController extends Controller{
 			if(event.getEventType().equals(MouseEvent.MOUSE_CLICKED)){
 				if(((MouseEvent) event).getClickCount() >= 2){
 					final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
-					BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(selectedItems.get(0));
+					final int indexOf = PersonManager.getInstance().getPersonDB().indexOf(selectedItems.get(0));
+					BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(indexOf);
 				}
 			} else if(event.getEventType().equals(KeyEvent.KEY_PRESSED)){
 				if(((KeyEvent) event).getCode() == KeyCode.ENTER){
 					final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
-					BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(selectedItems.get(0));
+					final int indexOf = PersonManager.getInstance().getPersonDB().indexOf(selectedItems.get(0));
+					BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(indexOf);
 				}
 			}
 		}
