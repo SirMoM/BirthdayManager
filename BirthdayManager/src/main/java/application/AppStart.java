@@ -1,5 +1,7 @@
 package application;
 
+import java.util.logging.Logger;
+
 import application.controller.MainController;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -12,7 +14,11 @@ public class AppStart extends Application{
 
 	@Override
 	public void start(final Stage stage) throws Exception{
-		final MainController mainController = new MainController(stage);
-		mainController.start();
+		try{
+			final MainController mainController = new MainController(stage);
+			mainController.start();
+		} catch (final Exception e){
+			Logger.getLogger(this.getClass().getName());
+		}
 	}
 }
