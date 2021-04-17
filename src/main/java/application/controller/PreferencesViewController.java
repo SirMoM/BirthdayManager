@@ -80,12 +80,47 @@ public class PreferencesViewController extends Controller {
 
     @FXML
     private Button chooseFile_button;
+
+    @FXML
+    private Button cancel_button;
+
+    @FXML
+    private Button save_button;
+
+    @FXML
+    private CheckBox iCalNotification_CheckBox;
+
+    @FXML
+    private ColorPicker first_ColorPicker;
+
+    @FXML
+    private ColorPicker second_ColorPicker;
+
+    @FXML
+    private Label firstHighlightingColor_Label;
+
+    @FXML
+    private Label secondHighlightingColor_Label;
+
+    @FXML
+    private Label appearanceOptions_Label;
+
+    @FXML
+    private Spinner<Integer> countBirthdaysShown_Spinner;
+
+    @FXML
+    private Label countBirthdaysShown_Label;
+
+    @FXML
+    private ToggleButton darkMode_ToggleButton;
+
+    @FXML
+    private CheckBox reminder_CheckBox;
+
     ChangeListener<Boolean> openFileOnStartCheckboxChangeListener = (observable, oldValue, newValue) -> {
         PreferencesViewController.this.startupFile_textField.setDisable(!newValue);
         PreferencesViewController.this.chooseFile_button.setDisable(!newValue);
     };
-    @FXML
-    private Button cancel_button;
 
     private final EventHandler<ActionEvent> exitHandler = event -> {
         final Stage stage = (Stage) PreferencesViewController.this.cancel_button.getScene().getWindow();
@@ -109,24 +144,6 @@ public class PreferencesViewController extends Controller {
         PreferencesViewController.this.startupFile_textField.setText(saveFile.getAbsolutePath());
         ((Stage) PreferencesViewController.this.cancel_button.getParent().getScene().getWindow()).toFront();
     };
-    @FXML
-    private Button save_button;
-    @FXML
-    private CheckBox iCalNotification_CheckBox;
-    @FXML
-    private ColorPicker first_ColorPicker;
-    @FXML
-    private ColorPicker second_ColorPicker;
-    @FXML
-    private Label firstHighlightingColor_Label;
-    @FXML
-    private Label secondHighlightingColor_Label;
-    @FXML
-    private Label appearanceOptions_Label;
-    @FXML
-    private Spinner<Integer> countBirthdaysShown_Spinner;
-    @FXML
-    private Label countBirthdaysShown_Label;
     private final EventHandler<ActionEvent> savePropertiesHandler = event -> {
         Properties properties = PropertyManager.getInstance().getProperties();
         properties.setProperty(PropertyFields.SAVED_LOCALE, PreferencesViewController.this.language_CompoBox.getValue().toString());
@@ -149,6 +166,8 @@ public class PreferencesViewController extends Controller {
         properties.setProperty(PropertyFields.SECOND_HIGHLIGHT_COLOR, PreferencesViewController.this.second_ColorPicker.getValue().toString().replace("0x", "#"));
         properties.setProperty(PropertyFields.SHOW_BIRTHDAYS_COUNT, PreferencesViewController.this.countBirthdaysShown_Spinner.getValue().toString());
         properties.setProperty(PropertyFields.DARK_MODE, String.valueOf(PreferencesViewController.this.darkMode_ToggleButton.isSelected()));
+        properties.setProperty(PropertyFields.NEW_VERSION_REMINDER, String.valueOf(PreferencesViewController.this.reminder_CheckBox.isSelected()));
+
         try {
             PropertyManager.getInstance().storeProperties("Saved properies" + LocalDateTime.now().toString());
             PreferencesViewController.this.updateLocalisation();
@@ -161,9 +180,6 @@ public class PreferencesViewController extends Controller {
         PreferencesViewController.this.getMainController().settingsChanged();
         ((Stage) save_button.getScene().getWindow()).close();
     };
-
-    @FXML
-    private ToggleButton darkMode_ToggleButton;
 
     public PreferencesViewController(final MainController mainController) {
         super(mainController);
@@ -297,6 +313,7 @@ public class PreferencesViewController extends Controller {
         this.iCalNotification_CheckBox.selectedProperty().set(Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.EXPORT_WITH_ALARM)));
         this.countBirthdaysShown_Spinner.getValueFactory().setValue(Integer.valueOf(PropertyManager.getProperty(PropertyFields.SHOW_BIRTHDAYS_COUNT)));
         this.darkMode_ToggleButton.setSelected(Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.DARK_MODE)));
+        this.reminder_CheckBox.setSelected(Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.NEW_VERSION_REMINDER)));
     }
 
     /*

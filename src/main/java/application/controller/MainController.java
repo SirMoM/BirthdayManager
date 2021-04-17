@@ -1,6 +1,3 @@
-/**
- *
- */
 package application.controller;
 
 import application.model.Person;
@@ -22,18 +19,18 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
+import javafx.scene.control.*;
+import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
+import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,6 +38,8 @@ import org.apache.logging.log4j.Logger;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * @author Noah Ruben
@@ -246,7 +245,9 @@ public class MainController {
     @FXML
     private MenuItem changeLanguage_MenuItem;
 
-    /** @param stage the mainstage for the application */
+    /**
+     * @param stage the mainstage for the application
+     */
     public MainController(final Stage stage) {
         this.stage = stage;
         this.sessionInfos = new SessionInfos(this);
@@ -264,12 +265,16 @@ public class MainController {
         this.activeController = activeController;
     }
 
-    /** @return the session infos for the spezific App-Instance */
+    /**
+     * @return the session infos for the spezific App-Instance
+     */
     public SessionInfos getSessionInfos() {
         return this.sessionInfos;
     }
 
-    /** @return the main stage of this app */
+    /**
+     * @return the main stage of this app
+     */
     public Stage getStage() {
         return this.stage;
     }
@@ -335,7 +340,7 @@ public class MainController {
     }
 
     /**
-     * @param fxmlPath the path of the FXML-File representing the view
+     * @param fxmlPath   the path of the FXML-File representing the view
      * @param controller the associated Controller
      */
     public void gotoNextScene(final String fxmlPath, final Initializable controller) {
@@ -419,7 +424,7 @@ public class MainController {
     }
 
     /**
-     * @param fxmlPath the path of the FXML-File representing the view
+     * @param fxmlPath   the path of the FXML-File representing the view
      * @param controller the associated Controller
      * @throws IOException if the FXML-File could not be loaded
      */
@@ -443,7 +448,9 @@ public class MainController {
 
     }
 
-    /** Starts the application with the BirthdaysOverview and possibly loaded file */
+    /**
+     * Starts the application with the BirthdaysOverview and possibly loaded file
+     */
     public void start() {
         this.setActiveController(new BirthdaysOverviewController(this));
         checkVersionAndAlert();
@@ -466,16 +473,48 @@ public class MainController {
             this.LOG.catching(Level.ERROR, exception);
         }
     }
+
     // TODO "real" Alert
     private void checkVersionAndAlert() {
+        if(Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.NEW_VERSION_REMINDER))){
+            LOG.debug("Don't check for new version!");
+            return;
+        }
         CheckForUpdatesTask checkForUpdatesTask = new CheckForUpdatesTask();
         checkForUpdatesTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, event -> {
             String msg = checkForUpdatesTask.getValue();
             if (msg != null) {
-                final Alert alert = new Alert(Alert.AlertType.WARNING);
+                final Alert alert = new Alert(AlertType.INFORMATION);
                 alert.setTitle("New version!");
-                alert.setContentText(msg);
-                alert.showAndWait();
+                Button button = new Button("Open Download page!");
+                button.setOnAction(actionEvent -> {
+                    if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                        try {
+                            Desktop.getDesktop().browse(new URI("https://github.com/SirMoM/BirthdayManager/packages"));
+                        } catch (IOException | URISyntaxException e) {
+                            LOG.catching(e);
+                        }
+                    }
+                });
+                CheckBox checkBox = new CheckBox("Don't remind me again");
+                GridPane gridPane = new GridPane();
+                gridPane.setMaxWidth(Double.MAX_VALUE);
+                gridPane.add(button, 1, 0);
+                gridPane.add(checkBox, 1, 1);
+                gridPane.setAlignment(Pos.CENTER);
+                alert.getDialogPane().setContent(gridPane);
+                alert.setHeaderText(msg);
+                ButtonType dialogResult = alert.showAndWait().orElse(ButtonType.CLOSE);
+                System.out.println(checkBox.isSelected());
+                if (checkBox.isSelected()) {
+                  PropertyManager.getInstance().getProperties().setProperty(PropertyFields.NEW_VERSION_REMINDER, String.valueOf(checkBox.isSelected()));
+                    try {
+                        PropertyManager.getInstance().storeProperties("");
+                    } catch (IOException e) {
+                        LOG.catching(e);
+                    }
+                }
+
             }
         });
         new Thread(checkForUpdatesTask).start();
