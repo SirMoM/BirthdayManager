@@ -10,6 +10,8 @@ import javax.swing.text.StyledEditorKit.BoldAction;
 
 import application.model.Person;
 import application.model.PersonManager;
+import application.util.localisation.LangResourceKeys;
+import application.util.localisation.LangResourceManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -19,6 +21,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.input.KeyCode;
@@ -29,6 +32,7 @@ import javafx.scene.input.KeyEvent;
  *
  */
 public class SearchViewController extends Controller {
+	
 
 	private ObservableList<Person> searchResults;
 
@@ -46,6 +50,9 @@ public class SearchViewController extends Controller {
 
 	@FXML
 	private ListView<Person> searchResults_ListView;
+	
+	@FXML
+	private MenuItem openBirthday_MenuItem;
 
 	private EventHandler<Event> searchEventHandler = new EventHandler<Event>() {
 
@@ -80,6 +87,20 @@ public class SearchViewController extends Controller {
 		}
 	};
 
+
+	final EventHandler<ActionEvent> openBirthday = new EventHandler<ActionEvent>() {
+		@Override
+		public void handle(final ActionEvent arg0) {
+			final ObservableList<Person> selectedItems = SearchViewController.this.searchResults_ListView.getSelectionModel().getSelectedItems();
+			if (selectedItems.isEmpty()) {
+				return;
+			} else {
+				final int indexOf = PersonManager.getInstance().getPersons().indexOf(selectedItems.get(0));
+				SearchViewController.this.getMainController().goToEditBirthdayView(indexOf);
+			}
+		}
+	};
+	
 	public SearchViewController(MainController mainController) {
 		super(mainController);
 		searchResults = FXCollections.observableArrayList();
@@ -123,6 +144,7 @@ public class SearchViewController extends Controller {
 		assert search_Button != null : "fx:id=\"search_Button\" was not injected: check your FXML file 'SearchView.fxml'.";
 		assert advancedSettings_Accordion != null : "fx:id=\"advancedSettings_Accordion\" was not injected: check your FXML file 'SearchView.fxml'.";
 		assert searchResults_ListView != null : "fx:id=\"searchResults_ListView\" was not injected: check your FXML file 'SearchView.fxml'.";
+		assert openBirthday_MenuItem != null : "fx:id=\"openBirthday_MenuItem\" was not injected: check your FXML file 'SearchView.fxml'.";
 	}
 
 	/**
@@ -132,10 +154,12 @@ public class SearchViewController extends Controller {
 		search_Button.addEventHandler(ActionEvent.ANY, this.searchEventHandler);
 		searchText_TextField.addEventHandler(KeyEvent.KEY_PRESSED, this.searchEventHandler);
 		searchResults_ListView.setItems(this.searchResults);
+		this.openBirthday_MenuItem.addEventHandler(ActionEvent.ANY, this.openBirthday);
 	}
 
 	@Override
 	public void updateLocalisation() {
+		this.openBirthday_MenuItem.setText((new LangResourceManager()).getLocaleString(LangResourceKeys.openBirthday_MenuItem));
 	}
 
 }
