@@ -11,14 +11,14 @@ import java.util.ResourceBundle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import application.util.PropertieFields;
-import application.util.PropertieManager;
+import application.util.PropertyFields;
+import application.util.PropertyManager;
 
 /**
  * @author Noah Ruben
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
-public class LangResourceManager {
+public class LangResourceManager{
 	final static Logger LOG = LogManager.getLogger();
 	final private String LANG_BUNDLE_BASE_NAME = "lang";
 	ResourceBundle langResourceBundle = null;
@@ -26,14 +26,14 @@ public class LangResourceManager {
 	/**
 	 * The Basic Constructor
 	 */
-	public LangResourceManager() {
-		final Locale locale = new Locale(PropertieManager.getPropertie(PropertieFields.SAVED_LOCALE));
-		try {
+	public LangResourceManager(){
+		final Locale locale = new Locale(PropertyManager.getProperty(PropertyFields.SAVED_LOCALE));
+		try{
 			this.langResourceBundle = PropertyResourceBundle.getBundle(this.LANG_BUNDLE_BASE_NAME, locale);
-		} catch (final MissingResourceException missingResourceException) {
+		} catch (final MissingResourceException missingResourceException){
 			LOG.catching(missingResourceException);
 		}
-		if (this.langResourceBundle == null) {
+		if(this.langResourceBundle == null){
 			LOG.error("Could not get a langResourceBundle");
 		}
 	}
@@ -41,24 +41,24 @@ public class LangResourceManager {
 	/**
 	 * @param locale the {@link Locale} which determinate the application language
 	 */
-	public void changeLocale(final Locale locale) {
-		try {
+	public void changeLocale(final Locale locale){
+		try{
 			this.langResourceBundle = PropertyResourceBundle.getBundle(this.LANG_BUNDLE_BASE_NAME, locale);
-		} catch (final MissingResourceException missingResourceException) {
+		} catch (final MissingResourceException missingResourceException){
 			LOG.catching(missingResourceException);
 		}
-		if (this.langResourceBundle == null) {
+		if(this.langResourceBundle == null){
 			LOG.error("Could not get a langResourceBundle");
 		}
 
 	}
 
 	/**
-	 * @param langResourceKey A key from {@link LangResourceKeys}
+	 * @param LangResourceKeys A key from {@link LangResourceKeys}
 	 * @return the component string in the correct language
 	 */
-	public String getLocaleString(final LangResourceKeys langResourceKey) {
-		return this.langResourceBundle.getString(langResourceKey.name());
+	public String getLocaleString(final LangResourceKeys LangResourceKeys){
+		return this.langResourceBundle.getString(LangResourceKeys.name());
 	}
 
 }

@@ -18,42 +18,48 @@ import org.junit.Test;
  */
 public class PropertieManagerTest {
 
-	private PropertieManager classToTest;
+	private PropertyManager classToTest;
 
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@Before
 	public void setUp() throws Exception {
-		this.classToTest = PropertieManager.getInstance();
+		PropertyManager.getInstance().fillWithStandartProperties();
+
 	}
 
 	/**
 	 * Test method for
-	 * {@link application.util.PropertieManager#getPropertie(java.lang.String)}.
+	 * {@link application.util.PropertyManager#getProperty(java.lang.String)}.
 	 */
 	@Test
-	public final void testGetPropertie() {
-		assertThat(PropertieManager.getPropertie(PropertieFields.SHOW_BIRTHDAYS_COUNT), is("10"));
-		assertThat(PropertieManager.getPropertie(PropertieFields.WRITE_THRU), is("false"));
-		assertThat(PropertieManager.getPropertie(PropertieFields.AUTOSAVE), is("false"));
+	public final void testGetProperty() {
+		assertThat(PropertyManager.getProperty(PropertyFields.AUTOSAVE), is("true"));
+		assertThat(PropertyManager.getProperty(PropertyFields.WRITE_THRU), is("true"));
+		assertThat(PropertyManager.getProperty(PropertyFields.OPEN_FILE_ON_START), is("false"));
+		assertThat(PropertyManager.getProperty(PropertyFields.SHOW_BIRTHDAYS_COUNT), is("15"));
+		assertThat(PropertyManager.getProperty(PropertyFields.FIRST_HIGHLIGHT_COLOR), is("#ff000066"));
+		assertThat(PropertyManager.getProperty(PropertyFields.SECOND_HIGHLIGHT_COLOR), is("#ffcc6666"));
+		assertThat(PropertyManager.getProperty(PropertyFields.EXPORT_WITH_ALARM), is("true"));
+
 	}
 
 	/**
-	 * Test method for {@link application.util.PropertieManager#loadProperties()}.
+	 * Test method for {@link application.util.PropertyManager#loadProperties()}.
 	 *
 	 * @throws IOException
 	 * @throws FileNotFoundException
 	 */
 	@Test
 	public final void testStoreLoadProperties() throws FileNotFoundException, IOException {
-		final PropertieManager tempPropertieManager = PropertieManager.getInstance();
+		final PropertyManager tempPropertieManager = PropertyManager.getInstance();
 		tempPropertieManager.getProperties().setProperty("test", "test");
 		tempPropertieManager.storeProperties("test");
 
-		this.classToTest.loadProperties();
+		PropertyManager.getInstance().loadProperties();
 
-		assertThat(PropertieManager.getPropertie("test"), is("test"));
+		assertThat(PropertyManager.getProperty("test"), is("test"));
 
 	}
 }

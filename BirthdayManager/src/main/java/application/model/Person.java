@@ -32,39 +32,54 @@ public class Person {
 	protected final static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
 	/**
+	 * Parsing lines in the format: birthday;name;sonstiges
+	 * <p>
+	 * <ul>
+	 * <li>the name is expected like this: name, surname, misc
+	 * <li>the birthday is expected like this: dd.MM.yyyy
+	 * </ul>
+	 *
+	 * the name and surname are mandatory
+	 *
 	 * @param txtLine a read line from the Text-file
 	 * @return a new Person resulting from the given String
 	 */
-	public static Person parseFromCSVLine(final String txtLine) {
+	public static Person parseFromCSVLine(final String txtLine, final int line) {
 		String name = null;
 		String surname = null;
 		String misc = null;
-		LocalDate birthday = null;
-
+		final LocalDate birthday;
+		String whatCouldNotBeParsed = null;
 		try {
-			final String[] splitLine = txtLine.split(";");
+			final String[] splitLine = txtLine.split(",");
 			if (splitLine.length < 1) {
 				throw new IndexOutOfBoundsException("Could not split line");
 			}
-			final String[] nameSplit = splitLine[0].split(" ");
-			birthday = parse(splitLine[1], Person.DATE_FORMATTER);
+			whatCouldNotBeParsed = "birthday";
+			birthday = parse(splitLine[0], Person.DATE_FORMATTER);
 
-			if (nameSplit.length == 3) {
-				name = nameSplit[0];
-				misc = nameSplit[1];
-				surname = nameSplit[2];
-			} else if (nameSplit.length == 2) {
-				name = nameSplit[0];
-				surname = nameSplit[1];
+			whatCouldNotBeParsed = "full name";
+			final String[] nameAsArray = splitLine[1].split(";");
+
+			whatCouldNotBeParsed = "name";
+			name = nameAsArray[0];
+			whatCouldNotBeParsed = "surname";
+			surname = nameAsArray[1];
+
+			if (nameAsArray.length > 2) {
+				whatCouldNotBeParsed = "misc";
+				misc = nameAsArray[2];
 			} else {
-				misc = splitLine[0];
+				misc = null;
 			}
+
+			whatCouldNotBeParsed = null;
 			return new Person(surname, name, misc, birthday);
-		} catch (final IndexOutOfBoundsException e) {
+		} catch (final IndexOutOfBoundsException indexOutOfBoundsException) {
 			final Alert alert = new Alert(AlertType.WARNING);
-			alert.setTitle("Could not parse this line");
-			alert.setHeaderText("Line which could not be parsed: ");
-			alert.setContentText(txtLine);
+			alert.setTitle("ERROR: Parsing failed");
+			alert.setHeaderText("Line " + line + " could not be parsed: ");
+			alert.setContentText("This attribute could not be parsed: " + whatCouldNotBeParsed + "\n" + txtLine);
 			alert.showAndWait();
 			return null;
 		}
@@ -180,7 +195,7 @@ public class Person {
 	public String getMisc() {
 		try {
 			return this.misc.getValue();
-		} catch (NullPointerException NullPointerException) {
+		} catch (final NullPointerException NullPointerException) {
 			return null;
 		}
 	}
@@ -191,7 +206,7 @@ public class Person {
 	public String getName() {
 		try {
 			return this.name.getValue();
-		} catch (NullPointerException NullPointerException) {
+		} catch (final NullPointerException NullPointerException) {
 			return null;
 		}
 	}
@@ -202,7 +217,7 @@ public class Person {
 	public String getSurname() {
 		try {
 			return this.surname.getValue();
-		} catch (NullPointerException NullPointerException) {
+		} catch (final NullPointerException NullPointerException) {
 			return null;
 		}
 	}
@@ -240,20 +255,21 @@ public class Person {
 	 */
 	public String toCSVString() {
 		final StringBuilder builder = new StringBuilder();
+		if (this.getBirthday() != null) {
+			builder.append(Person.DATE_FORMATTER.format(this.getBirthday()));
+		}
+		builder.append(",");
+
 		if (this.getName() != null) {
 			builder.append(this.getName());
-			builder.append(";");
-		}
-		if (this.getMisc() != null) {
-			builder.append(this.getMisc());
-			builder.append(";");
 		}
 		if (this.getSurname() != null) {
-			builder.append(this.getSurname());
 			builder.append(";");
+			builder.append(this.getSurname());
 		}
-		if (this.getBirthday() != null) {
-			builder.append(this.getBirthday());
+		if (this.getMisc() != null) {
+			builder.append(";");
+			builder.append(this.getMisc());
 		}
 
 		return builder.toString();
@@ -296,20 +312,16 @@ public class Person {
 	@Override
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
-		if (this.getSurname() != null) {
-			builder.append(this.surname.get());
+		if (this.name.get() != null) {
+			builder.append(this.name.get());
 		}
 		if (this.misc.get() != null) {
-			if (builder.length() != 0) {
-				builder.append(" ,");
-			}
+			builder.append(" ");
 			builder.append(this.misc.get());
 		}
-		if (this.name.get() != null) {
-			if (builder.length() != 0) {
-				builder.append(" ,");
-			}
-			builder.append(this.name.get());
+		if (this.getSurname() != null) {
+			builder.append(" ");
+			builder.append(this.surname.get());
 		}
 		if (this.birthday.get() != null) {
 			builder.append("\n");
@@ -320,20 +332,16 @@ public class Person {
 
 	public String namesToString() {
 		final StringBuilder builder = new StringBuilder();
-		if (this.getSurname() != null) {
-			builder.append(this.surname.get());
+		if (this.getName() != null) {
+			builder.append(this.name.get());
 		}
-		if (this.misc.get() != null) {
-			if (builder.length() != 0) {
-				builder.append(" ");
-			}
+		if (this.getMisc() != null) {
+			builder.append(" ");
 			builder.append(this.misc.get());
 		}
-		if (this.name.get() != null) {
-			if (builder.length() != 0) {
-				builder.append(" ");
-			}
-			builder.append(this.name.get());
+		if (this.getSurname() != null) {
+			builder.append(" ");
+			builder.append(this.surname.get());
 		}
 		return builder.toString();
 	}
