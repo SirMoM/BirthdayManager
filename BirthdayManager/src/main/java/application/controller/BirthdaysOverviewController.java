@@ -7,19 +7,29 @@ import java.net.URL;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 import javax.swing.event.ChangeEvent;
 
 import application.model.Person;
 import application.model.PersonManager;
+<<<<<<< HEAD
+import application.model.PersonsInAWeek;
+import application.model.SessionInfos;
+import application.util.WeekTableCallback;
+import application.util.localisation.LangResourceKeys;
+import application.util.localisation.LangResourceManager;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
+=======
 import application.util.PropertieFields;
 import application.util.PropertieManager;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
+>>>>>>> refs/rewritten/origin-master
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -34,7 +44,9 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -55,7 +67,7 @@ public class BirthdaysOverviewController extends Controller {
 	private MenuItem recentFiles_MenuItem;
 
 	@FXML
-	private TableView<Person> week_tableView;
+	private TableView<PersonsInAWeek> week_tableView;
 
 	@FXML
 	private ResourceBundle resources;
@@ -130,25 +142,25 @@ public class BirthdaysOverviewController extends Controller {
 	private Tab week_tap;
 
 	@FXML
-	private TableColumn<Map, DayOfWeek> monday_column1;
+	private TableColumn<PersonsInAWeek, String> monday_column1;
 
 	@FXML
-	private TableColumn<DayOfWeek, Person> tuesday_column1;
+	private TableColumn<PersonsInAWeek, String> tuesday_column1;
 
 	@FXML
-	private TableColumn<DayOfWeek, Person> wednesday_column1;
+	private TableColumn<PersonsInAWeek, String> wednesday_column1;
 
 	@FXML
-	private TableColumn<DayOfWeek, Person> thursday_column1;
+	private TableColumn<PersonsInAWeek, String> thursday_column1;
 
 	@FXML
-	private TableColumn<DayOfWeek, Person> friday_column1;
+	private TableColumn<PersonsInAWeek, Person> friday_column1;
 
 	@FXML
-	private TableColumn<DayOfWeek, Person> saturday_column1;
+	private TableColumn<PersonsInAWeek, String> saturday_column1;
 
 	@FXML
-	private TableColumn<DayOfWeek, Person> sunday_column1;
+	private TableColumn<PersonsInAWeek, String> sunday_column1;
 
 	@FXML
 	private Tab month_tap;
@@ -378,7 +390,13 @@ public class BirthdaysOverviewController extends Controller {
 	/**
 	 * Bind EventHandlers an JavaFX-Components
 	 */
+<<<<<<< HEAD
+	private void bindComponents(){
+		this.month_tap.setDisable(true);
+		
+=======
 	private void bindComponents() {
+>>>>>>> refs/rewritten/origin-master
 		// Menu items
 		// File
 		this.openFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromFileChooserHandler);
@@ -418,6 +436,33 @@ public class BirthdaysOverviewController extends Controller {
 		
 		this.openFileExternal_Button.addEventHandler(ActionEvent.ANY, this.getMainController().openFileExternal);
 
+		System.out.println(this.getMainController().getSessionInfos().getPersonsInAWeekList());
+
+		this.week_tableView.setItems(this.getMainController().getSessionInfos().getPersonsInAWeekList());
+		this.monday_column1.setCellValueFactory(new WeekTableCallback(DayOfWeek.MONDAY));
+		this.tuesday_column1.setCellValueFactory(new WeekTableCallback(DayOfWeek.TUESDAY));
+		
+		this.thursday_column1.setCellValueFactory((p) -> {
+			PersonsInAWeek personsInAWeek = p.getValue();
+			
+			
+			if (personsInAWeek.getThursdayPerson() != null) {
+				return new SimpleStringProperty(personsInAWeek.getThursdayPerson().getName() + personsInAWeek.getThursdayPerson().getSurname());
+			}else {
+				return null;
+			}
+			
+		});
+		
+		this.friday_column1.setCellValueFactory(
+			    new PropertyValueFactory<PersonsInAWeek,Person>("fridayPerson")
+				);
+		this.week_tableView.refresh();
+		
+		refresh_MenuItem.setOnAction((p) -> {
+			getMainController().getSessionInfos().updateSubLists();
+			System.out.println(this.getMainController().getSessionInfos().getPersonsInAWeekList());
+			});
 	}
 
 	/**
@@ -439,8 +484,9 @@ public class BirthdaysOverviewController extends Controller {
 	 */
 	@Override
 	public void initialize(final URL location, final ResourceBundle resources) {
+		getMainController().getStage().setWidth(550);
+		
 		this.assertion();
-
 		// Localisation
 		this.updateLocalisation();
 
