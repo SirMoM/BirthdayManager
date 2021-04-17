@@ -22,6 +22,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.*;
 import java.io.IOException;
@@ -34,21 +36,18 @@ import java.util.regex.Pattern;
 
 /** @author Noah Ruben */
 public class SearchViewController extends Controller {
-
+    private static final Logger LOG = LogManager.getLogger(SearchViewController.class.getName());
     private final ObservableList<Person> searchResults;
+    private final EventHandler<ActionEvent> returnToPreviousView = actionEvent -> SearchViewController.this.getMainController().goToLastScene();
 
     @FXML
     private Label search_Label;
-
     @FXML
     private TextField searchText_TextField;
-
     @FXML
     private Button search_Button;
-
     @FXML
     private TitledPane advancedSettings_TitledPane;
-
     @FXML
     private DatePicker dateSearch_DatePicker;
     private final EventHandler<ActionEvent> searchDateEventHandler = event -> {
@@ -125,9 +124,9 @@ public class SearchViewController extends Controller {
             end = System.currentTimeMillis();
         }
 
-        SearchViewController.this.LOG.info("Started at {} ended at {}", start, end);
+        LOG.info("Started at {} ended at {}", start, end);
         double searchTimeInSek = (end - start) * 1e-3;
-        SearchViewController.this.LOG.debug("Searching the data took: {} Seconds.", searchTimeInSek);
+        LOG.debug("Searching the data took: {} Seconds.", searchTimeInSek);
     };
     private final EventHandler<ActionEvent> switchFuzzyRegExEventHandler = event -> {
         if (event.getSource() instanceof RadioButton) {
@@ -157,10 +156,6 @@ public class SearchViewController extends Controller {
     @FXML
     private Button closeSearch_Button;
 
-    private final EventHandler<ActionEvent> returnToPreviousView = actionEvent -> {
-        SearchViewController.this.getMainController().goToLastScene();
-    };
-
     public SearchViewController(MainController mainController) {
         super(mainController);
         searchResults = FXCollections.observableArrayList();
@@ -168,8 +163,9 @@ public class SearchViewController extends Controller {
 
     @FXML
     void showRegExHelp(ActionEvent event) throws IOException, URISyntaxException {
+        String url = "https://regexr.com/";
         if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-            Desktop.getDesktop().browse(new URI("https://regexr.com/"));
+            Desktop.getDesktop().browse(new URI(url));
         }
     }
 

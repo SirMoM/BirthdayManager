@@ -19,6 +19,8 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.net.URL;
@@ -30,7 +32,7 @@ import java.util.ResourceBundle;
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
 public class NewBirthdayViewController extends Controller {
-
+    private static final Logger LOG = LogManager.getLogger(NewBirthdayViewController.class.getName());
     private final Person newPerson;
     private final EventHandler<ActionEvent> returnToMainView = event -> NewBirthdayViewController.this.getMainController().goToLastScene();
 

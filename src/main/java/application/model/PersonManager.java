@@ -3,7 +3,6 @@
  */
 package application.model;
 
-import javafx.beans.property.SimpleBooleanProperty;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,11 +14,9 @@ import java.util.List;
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
 public class PersonManager {
-    static final Logger LOG = LogManager.getLogger(PersonManager.class);
+    private static final Logger LOG = LogManager.getLogger(PersonManager.class.getName());
     private static PersonManager personManagerSingelton = null;
-
-    public final SimpleBooleanProperty changesProperty = new SimpleBooleanProperty(false);
-
+    private SessionInfos sessionInfos;
     private List<Person> personDB;
 
     /** Private constructor restricted to this class itself. */
@@ -39,15 +36,29 @@ public class PersonManager {
         return personManagerSingelton;
     }
 
+    public void setSessionInfos(final SessionInfos sessionInfos) {
+        this.sessionInfos = sessionInfos;
+        if (!personDB.isEmpty()) {
+            sessionInfos.updateSubLists();
+        }
+    }
+
     public void addNewPerson(final Person newPerson) {
         this.personDB.add(newPerson);
-        changesProperty.set(true);
+        LOG.debug("Added new person {}", newPerson.toExtendedString());
+        updateSessionInfosIfPossible();
+    }
+
+    private void updateSessionInfosIfPossible() {
+        if (sessionInfos != null) sessionInfos.updateSubLists();
+        else LOG.debug("Could not update session infos; they are missing");
     }
 
     /** @param person The person to delete */
     public void deletePerson(final Person person) {
         this.personDB.remove(person);
-        this.changesProperty.set(true);
+        LOG.debug("Deleted person {}", person.toExtendedString());
+        updateSessionInfosIfPossible();
     }
 
     public Person getPersonFromIndex(final int indexPerson) {
@@ -62,6 +73,7 @@ public class PersonManager {
     /** @param personDB the personDB to set */
     public void setPersonDB(final List<Person> personDB) {
         this.personDB = personDB;
+        updateSessionInfosIfPossible();
     }
 
     /**
@@ -69,10 +81,11 @@ public class PersonManager {
      * @param updatedPerson the person which was updated
      */
     public void updatePerson(final int indexPerson, final Person updatedPerson) {
+        LOG.debug("Update person from {} new person {}", this.personDB.get(indexPerson).toExtendedString(), updatedPerson.toExtendedString());
         this.personDB.get(indexPerson).setBirthday(updatedPerson.getBirthday());
         this.personDB.get(indexPerson).setName(updatedPerson.getName());
         this.personDB.get(indexPerson).setSurname(updatedPerson.getSurname());
         this.personDB.get(indexPerson).setMisc(updatedPerson.getMisc());
-        this.changesProperty.set(true);
+        updateSessionInfosIfPossible();
     }
 }

@@ -10,7 +10,7 @@ class LevenshteinDistanzTest {
 
     @Test
     void calculate() {
-        assertThat(LevenshteinDistanz.calculate(same, same)).isEqualTo(0);
+        assertThat(LevenshteinDistanz.calculate(same, same)).isZero();
 
         assertThat(LevenshteinDistanz.calculate(same, same + "!")).isEqualTo(1);
         assertThat(LevenshteinDistanz.calculate(same + "!", same)).isEqualTo(1);

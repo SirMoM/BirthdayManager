@@ -9,7 +9,6 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -18,7 +17,7 @@ import java.util.List;
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
 public class SaveBirthdaysToFileTask extends Task<Boolean> {
-    private final Logger LOG;
+    private static final Logger LOG = LogManager.getLogger(SaveBirthdaysToFileTask.class.getName());
     File saveFile;
 
     /**
@@ -27,8 +26,7 @@ public class SaveBirthdaysToFileTask extends Task<Boolean> {
      * @param file the File
      */
     public SaveBirthdaysToFileTask(final File file) {
-        this.LOG = LogManager.getLogger(this.getClass().getName());
-        this.LOG.info("Save to " + file.getAbsolutePath());
+        LOG.info("Save to {}", file.getAbsolutePath());
         this.saveFile = file;
     }
 
@@ -39,7 +37,7 @@ public class SaveBirthdaysToFileTask extends Task<Boolean> {
      */
     @Override
     protected Boolean call() {
-        LOG.debug("Started " + this.getClass().getName());
+        LOG.debug("Started {}", this.getClass().getName());
 
         List<Person> persons = PersonManager.getInstance().getPersons();
 
@@ -67,7 +65,7 @@ public class SaveBirthdaysToFileTask extends Task<Boolean> {
             LOG.catching(ioException);
             return false;
         } finally {
-            LOG.debug(this.getClass().getName() + " ENDED");
+            LOG.debug("ENDED {}", this.getClass().getName());
         }
     }
 }

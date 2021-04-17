@@ -1,107 +1,109 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Accordion?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ContextMenu?>
-<?import javafx.scene.control.DatePicker?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.RadioButton?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.TitledPane?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" pickOnBounds="false" prefHeight="432.0" prefWidth="600.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml">
-   <children>
-      <Label fx:id="search_Label" prefHeight="61.0" prefWidth="123.0" text="Search" underline="true">
-         <font>
-            <Font size="39.0" />
-         </font>
-         <VBox.margin>
-            <Insets left="25.0" top="10.0" />
-         </VBox.margin>
-      </Label>
-      <HBox prefHeight="29.0" prefWidth="600.0">
-         <children>
-            <TextField fx:id="searchText_TextField" prefHeight="25.0" prefWidth="402.0">
-               <HBox.margin>
-                  <Insets right="15.0" />
-               </HBox.margin></TextField>
-            <Button fx:id="search_Button" mnemonicParsing="false" text="Search">
-               <HBox.margin>
-                  <Insets />
-               </HBox.margin>
-            </Button>
-         </children>
-         <VBox.margin>
-            <Insets left="25.0" right="15.0" />
-         </VBox.margin>
-      </HBox>
-      <Accordion>
-        <panes>
-          <TitledPane fx:id="advancedSettings_TitledPane" animated="true" text="Adv. Settings">
-               <content>
-                  <AnchorPane prefHeight="200.0" prefWidth="200.0">
-                     <children>
-                        <DatePicker fx:id="dateSearch_DatePicker" layoutX="279.0" layoutY="13.0" AnchorPane.rightAnchor="100.0" AnchorPane.topAnchor="15.0" />
-                        <RadioButton fx:id="enableFuzzy_RadioButton" layoutX="14.0" layoutY="25.0" mnemonicParsing="false" text="Enable fuzzy search" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="15.0" />
-                        <RadioButton fx:id="enableRegEx_RadioButton" layoutX="14.0" layoutY="59.0" mnemonicParsing="false" text="Enable RegEx" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="45.0" />
-                        <Button fx:id="dateSearch_Button" layoutX="475.0" layoutY="21.0" mnemonicParsing="false" text="Search" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="15.0" />
-                        <Button layoutX="3.0" layoutY="51.0" mnemonicParsing="false" onAction="#showRegExHelp" text="?" textAlignment="CENTER" underline="true" AnchorPane.topAnchor="42.0">
-                           <font>
-                              <Font size="11.0" />
-                           </font></Button>
-                     </children></AnchorPane>
-               </content>
-            </TitledPane>
-        </panes>
-         <VBox.margin>
-            <Insets left="25.0" right="15.0" />
-         </VBox.margin>
-         <padding>
-            <Insets top="5.0" />
-         </padding>
-      </Accordion>
-      <AnchorPane VBox.vgrow="ALWAYS">
-         <children>
-            <ListView fx:id="searchResults_ListView" prefWidth="560.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-               <contextMenu>
-                  <ContextMenu>
-                    <items>
-                      <MenuItem fx:id="openBirthday_MenuItem" mnemonicParsing="false" text="Open Person" />
-                    </items>
-                  </ContextMenu>
-               </contextMenu></ListView>
-         </children>
-         <VBox.margin>
-            <Insets left="25.0" right="15.0" />
-         </VBox.margin>
-      </AnchorPane>
-      <HBox alignment="CENTER" prefHeight="50.0" prefWidth="600.0">
-         <children>
-          <Button fx:id="openBirthday_Button" alignment="CENTER" defaultButton="true" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Open" textAlignment="CENTER">
-               <opaqueInsets>
-                  <Insets />
-               </opaqueInsets>
-            </Button>
-            <Region prefHeight="27.0" prefWidth="60.0" />
-            <Button fx:id="closeSearch_Button" alignment="CENTER" cancelButton="true" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Close" />
-         </children>
-         <opaqueInsets>
-            <Insets top="10.0" />
-         </opaqueInsets>
-         <VBox.margin>
-            <Insets bottom="10.0" />
-         </VBox.margin>
-      </HBox>
-   </children>
-   <opaqueInsets>
-      <Insets />
-   </opaqueInsets>
+<VBox xmlns:fx="http://javafx.com/fxml" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+      pickOnBounds="false" prefHeight="432.0" prefWidth="600.0" xmlns="http://javafx.com/javafx">
+    <children>
+        <Label fx:id="search_Label" prefHeight="61.0" prefWidth="123.0" text="Search" underline="true">
+            <font>
+                <Font size="39.0"/>
+            </font>
+            <VBox.margin>
+                <Insets left="25.0" top="10.0"/>
+            </VBox.margin>
+        </Label>
+        <HBox prefHeight="29.0" prefWidth="600.0">
+            <children>
+                <TextField fx:id="searchText_TextField" prefHeight="25.0" prefWidth="402.0">
+                    <HBox.margin>
+                        <Insets right="15.0"/>
+                    </HBox.margin>
+                </TextField>
+                <Button fx:id="search_Button" mnemonicParsing="false" text="Search">
+                    <HBox.margin>
+                        <Insets/>
+                    </HBox.margin>
+                </Button>
+            </children>
+            <VBox.margin>
+                <Insets left="25.0" right="15.0"/>
+            </VBox.margin>
+        </HBox>
+        <Accordion>
+            <panes>
+                <TitledPane fx:id="advancedSettings_TitledPane" animated="true" text="Adv. Settings">
+                    <content>
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                            <children>
+                                <DatePicker fx:id="dateSearch_DatePicker" layoutX="279.0" layoutY="13.0"
+                                            AnchorPane.rightAnchor="100.0" AnchorPane.topAnchor="15.0"/>
+                                <RadioButton fx:id="enableFuzzy_RadioButton" layoutX="14.0" layoutY="25.0"
+                                             mnemonicParsing="false" text="Enable fuzzy search"
+                                             AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="15.0"/>
+                                <RadioButton fx:id="enableRegEx_RadioButton" layoutX="14.0" layoutY="59.0"
+                                             mnemonicParsing="false" text="Enable RegEx" AnchorPane.leftAnchor="20.0"
+                                             AnchorPane.topAnchor="45.0"/>
+                                <Button fx:id="dateSearch_Button" layoutX="475.0" layoutY="21.0" mnemonicParsing="false"
+                                        text="Search" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="15.0"/>
+                                <Button layoutX="3.0" layoutY="51.0" mnemonicParsing="false" onAction="#showRegExHelp"
+                                        text="?" textAlignment="CENTER" underline="true" AnchorPane.topAnchor="42.0">
+                                    <font>
+                                        <Font size="11.0"/>
+                                    </font>
+                                </Button>
+                            </children>
+                        </AnchorPane>
+                    </content>
+                </TitledPane>
+            </panes>
+            <VBox.margin>
+                <Insets left="25.0" right="15.0"/>
+            </VBox.margin>
+            <padding>
+                <Insets top="5.0"/>
+            </padding>
+        </Accordion>
+        <AnchorPane VBox.vgrow="ALWAYS">
+            <children>
+                <ListView fx:id="searchResults_ListView" prefWidth="560.0" AnchorPane.bottomAnchor="15.0"
+                          AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <contextMenu>
+                        <ContextMenu>
+                            <items>
+                                <MenuItem fx:id="openBirthday_MenuItem" mnemonicParsing="false" text="Open Person"/>
+                            </items>
+                        </ContextMenu>
+                    </contextMenu>
+                </ListView>
+            </children>
+            <VBox.margin>
+                <Insets left="25.0" right="15.0"/>
+            </VBox.margin>
+        </AnchorPane>
+        <HBox alignment="CENTER" prefHeight="50.0" prefWidth="600.0">
+            <children>
+                <Button fx:id="openBirthday_Button" alignment="CENTER" defaultButton="true" mnemonicParsing="false"
+                        prefHeight="30.0" prefWidth="100.0" text="Open" textAlignment="CENTER">
+                    <opaqueInsets>
+                        <Insets/>
+                    </opaqueInsets>
+                </Button>
+                <Region prefHeight="27.0" prefWidth="60.0"/>
+                <Button fx:id="closeSearch_Button" alignment="CENTER" cancelButton="true" mnemonicParsing="false"
+                        prefHeight="30.0" prefWidth="100.0" text="Close"/>
+            </children>
+            <opaqueInsets>
+                <Insets top="10.0"/>
+            </opaqueInsets>
+            <VBox.margin>
+                <Insets bottom="10.0"/>
+            </VBox.margin>
+        </HBox>
+    </children>
+    <opaqueInsets>
+        <Insets/>
+    </opaqueInsets>
 </VBox>

@@ -4,42 +4,34 @@
 package application.processes;
 
 import application.model.Person;
-import application.model.PersonManager;
 import application.util.BirthdayComparator;
 import application.util.PropertyFields;
 import application.util.PropertyManager;
-import javafx.concurrent.Task;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * @author Admin
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
-public class UpdateNextBirthdaysTask extends Task<List<Person>> {
+public class UpdateNextBirthdaysTask extends PersonTasks<List<Person>> {
 
     /** Logger for this process */
-    private final Logger LOG;
+    private static final Logger LOG = LogManager.getLogger(UpdateNextBirthdaysTask.class.getName());
     /** How many birthdays will be shown. */
     private final int NEXT_BIRTHDAYS_COUNT;
-    /** List of all persons / birthdays */
-    private List<Person> personDB;
-    /** How long the process has bee waiting */
-    private int timeInWaiting;
 
     /** Default Constructor */
     public UpdateNextBirthdaysTask() {
-        this.LOG = LogManager.getLogger(this.getClass().getName());
-
-        NEXT_BIRTHDAYS_COUNT = Integer.parseInt(PropertyManager.getProperty(PropertyFields.SHOW_BIRTHDAYS_COUNT));
-
-        if (PersonManager.getInstance().getPersons() != null && !PersonManager.getInstance().getPersons().isEmpty()) {
-            personDB = PersonManager.getInstance().getPersons();
-        }
+        super();
+        String showBirthdaysCountProperty = PropertyManager.getProperty(PropertyFields.SHOW_BIRTHDAYS_COUNT);
+        NEXT_BIRTHDAYS_COUNT = Integer.parseInt(showBirthdaysCountProperty);
     }
 
     /**
@@ -52,47 +44,35 @@ public class UpdateNextBirthdaysTask extends Task<List<Person>> {
     protected List<Person> call() throws Exception {
         LOG.debug("Started {} at {}", this.getClass().getName(), System.currentTimeMillis());
 
-        // Checks if Data is there else aborts this Task.
-        while (personDB == null || PersonManager.getInstance().getPersons().isEmpty()) {
-            personDB = PersonManager.getInstance().getPersons();
-            LOG.info("Waiting for personenDB to be filled!");
+        List<Person> personDB = getPersons();
 
-            Thread.sleep(500);
-            this.timeInWaiting += 500;
-            if (this.timeInWaiting > 10000) {
-                this.cancel();
-                LOG.debug("Thread canceled because it took too long to wait for the list of people!");
-            }
-        }
-
-        /** All upcomming persons / birthdays */
-        final List<Person> upcomming = new ArrayList<>();
+        /** All upcoming persons / birthdays */
+        final List<Person> upcoming = new ArrayList<>();
 
         /** All passed persons / birthdays */
         final List<Person> after = new ArrayList<>();
         /** Final next persons / birthdays */
         final List<Person> nextBirthdays = new ArrayList<>();
 
-        // Fill upcomming and after based on today
-        for (int i = 0; i < personDB.size(); i++) {
-            final Person person = personDB.get(i);
+        // Fill upcoming and after based on today
+        for (final Person person : personDB) {
             int dayOfYear = person.getBirthday().withYear(LocalDate.now().getYear()).getDayOfYear();
             if (dayOfYear >= LocalDate.now().getDayOfYear()) {
-                upcomming.add(person);
+                upcoming.add(person);
             } else {
                 after.add(person);
             }
         }
 
-        upcomming.sort(new BirthdayComparator(false));
+        upcoming.sort(new BirthdayComparator(false));
         after.sort(new BirthdayComparator(false));
 
         int i = 0;
         for (; i < NEXT_BIRTHDAYS_COUNT; i++) {
             try {
-                nextBirthdays.add(upcomming.get(i));
+                nextBirthdays.add(upcoming.get(i));
             } catch (final IndexOutOfBoundsException indexOutOfBoundsException) {
-                this.LOG.debug("Probably not enought Persons to gather the 10 birthdays for next", indexOutOfBoundsException);
+                LOG.debug("Probably not enough Persons to gather the 10 birthdays for next", indexOutOfBoundsException);
                 break;
             }
         }
@@ -102,10 +82,11 @@ public class UpdateNextBirthdaysTask extends Task<List<Person>> {
                 nextBirthdays.add(after.get(j));
                 this.updateProgress(j, NEXT_BIRTHDAYS_COUNT);
             } catch (final IndexOutOfBoundsException indexOutOfBoundsException) {
-                this.LOG.debug("Probably not enought Persons to gather the 10 birthdays for next", indexOutOfBoundsException);
+                LOG.debug("Probably not enought Persons to gather the 10 birthdays for next", indexOutOfBoundsException);
                 break;
             }
         }
+        System.out.println(Arrays.toString(nextBirthdays.toArray()));
         return nextBirthdays;
     }
 }

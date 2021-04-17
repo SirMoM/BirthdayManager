@@ -43,15 +43,14 @@ public class SessionInfos {
     final MainController mainController;
 
     private final StringProperty fileToOpenName = new SimpleStringProperty();
-    private final ObservableList<Person> recentBirthdays = FXCollections.observableArrayList();
     private final List<Person> birthdaysThisWeek = new ArrayList<>();
+    private final ObservableList<Person> recentBirthdays = FXCollections.observableArrayList();
+    private final ObservableList<Person> nextBirthdays = FXCollections.observableArrayList();
+    private final ObservableList<Person> birthdaysThisMonth = FXCollections.observableArrayList();
     private final ObservableList<PersonsInAWeek> personsInAWeekList = FXCollections.observableArrayList();
-    private final ObservableList<Person> birthdaysThisMonat = FXCollections.observableArrayList();
-
+    private StringProperty recentFileName = new SimpleStringProperty();
     private Locale appLocale;
     private File saveFile;
-    private StringProperty recentFileName = new SimpleStringProperty();
-    private ObservableList<Person> nextBirthdays = FXCollections.observableArrayList();
 
     /**
      * Loads the saved properties or gets the default values.
@@ -85,8 +84,8 @@ public class SessionInfos {
     }
 
     /** @return the birthdaysThisMonat */
-    public ObservableList<Person> getBirthdaysThisMonat() {
-        return this.birthdaysThisMonat;
+    public ObservableList<Person> getBirthdaysThisMonth() {
+        return this.birthdaysThisMonth;
     }
 
     /** @return the birthdaysThisWeek */
@@ -102,11 +101,6 @@ public class SessionInfos {
     /** @return the nextBirthdays */
     public ObservableList<Person> getNextBirthdays() {
         return this.nextBirthdays;
-    }
-
-    /** @param nextBirthdays the nextBirthdays to set */
-    public void setNextBirthdays(final ObservableList<Person> nextBirthdays) {
-        this.nextBirthdays = nextBirthdays;
     }
 
     /** @return the personsInAWeekList */
@@ -177,6 +171,7 @@ public class SessionInfos {
         updateNextBirthdaysTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, workerStateEvent -> {
             LOG.debug(endMessage, workerStateEvent.getSource().getClass().getName());
             SessionInfos.this.getNextBirthdays().setAll(updateNextBirthdaysTask.getValue());
+            System.out.println(Arrays.toString(getNextBirthdays().toArray()));
             if (progressBar != null) {
                 // Unbind progress property
                 progressBar.progressProperty().unbind();

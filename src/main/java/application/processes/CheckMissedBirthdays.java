@@ -12,24 +12,19 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * @author Noah Ruben
  * @since 2019-11-02
  */
-public class CheckMissedBirthdays extends Task<List<Person>> {
+public class CheckMissedBirthdays extends PersonTasks<List<Person>> {
 
-    private final Logger LOG;
-    private List<Person> personDB;
+    private static final Logger LOG = LogManager.getLogger(CheckMissedBirthdays.class.getName());
     private int timeInWaiting;
+    private List<Person> personDB;
 
-    public CheckMissedBirthdays() {
-        this.LOG = LogManager.getLogger(this.getClass().getName());
-        if (PersonManager.getInstance().getPersons() != null && !PersonManager.getInstance().getPersons().isEmpty()) {
-            this.personDB = PersonManager.getInstance().getPersons();
-        }
-    }
 
     /*
      * (non-Javadoc)
@@ -38,21 +33,7 @@ public class CheckMissedBirthdays extends Task<List<Person>> {
      */
     @Override
     protected List<Person> call() throws Exception {
-        Thread.sleep(500);
-
-        // Checks if Data is there else aborts this Task.
-        while (personDB == null || PersonManager.getInstance().getPersons().isEmpty()) {
-            personDB = PersonManager.getInstance().getPersons();
-            LOG.info("Waiting for personenDB to be filled!");
-
-            Thread.sleep(500);
-            this.timeInWaiting += 500;
-            if (this.timeInWaiting > 10000) {
-                this.cancel();
-                LOG.debug("Thread canceled because it took too long to wait for the list of people!");
-            }
-        }
-
+        personDB = getPersons();
         // Get and manage last visit to compare with today.
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate lastVisit = LocalDate.parse(PropertyManager.getProperty(PropertyFields.LAST_VISIT), dateTimeFormatter);

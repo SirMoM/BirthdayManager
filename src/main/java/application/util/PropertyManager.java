@@ -18,8 +18,8 @@ import java.util.Properties;
  */
 public class PropertyManager {
     private static final String PROPERTIES_FILE_NAME = "BirthdayManager.properties";
+    private static final Logger LOG = LogManager.getLogger(PropertyManager.class.getName());
     private static PropertyManager propertieManagerSingelton = null;
-    private final Logger LOG = LogManager.getLogger(this.getClass().getName());
     private final Properties properties;
     private final File propertiesFile;
 
@@ -33,15 +33,15 @@ public class PropertyManager {
 
         try {
             if (this.propertiesFile.createNewFile()) {
-                this.LOG.info("Created new properties File");
+                LOG.info("Created new properties File");
                 this.fillWithStandartProperties();
             } else {
                 this.loadProperties();
                 this.fillWithStandartProperties();
-                this.LOG.info("Loaded properties");
+                LOG.info("Loaded properties");
             }
         } catch (final IOException ioException) {
-            this.LOG.catching(Level.FATAL, ioException);
+            LOG.catching(Level.FATAL, ioException);
         }
     }
 
@@ -129,7 +129,7 @@ public class PropertyManager {
         try {
             this.storeProperties("Default properties stored");
         } catch (final IOException ioException) {
-            this.LOG.catching(Level.WARN, ioException);
+            LOG.catching(Level.WARN, ioException);
         }
     }
 

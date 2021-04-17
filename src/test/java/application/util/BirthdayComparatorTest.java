@@ -16,7 +16,7 @@ class BirthdayComparatorTest {
     @Test
     void compareToToday() {
         BirthdayComparator classToTest = new BirthdayComparator(true);
-        assertThat(classToTest.compare(null, person1)).isEqualTo(0);
+        assertThat(classToTest.compare(null, person1)).isZero();
         assertThat(classToTest.compare(null, person2)).isEqualTo(1);
         assertThat(classToTest.compare(null, person3)).isEqualTo(-1);
     }
@@ -24,7 +24,7 @@ class BirthdayComparatorTest {
     @Test
     void compare() {
         BirthdayComparator classToTest = new BirthdayComparator(false);
-        assertThat(classToTest.compare(person1, person1)).isEqualTo(0);
+        assertThat(classToTest.compare(person1, person1)).isZero();
         assertThat(classToTest.compare(person1, person2)).isEqualTo(-1);
         assertThat(classToTest.compare(person1, person3)).isEqualTo(1);
     }
