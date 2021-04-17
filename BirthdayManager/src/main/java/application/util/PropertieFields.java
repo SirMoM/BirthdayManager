@@ -11,6 +11,6 @@ public interface PropertieFields{
 
 	final String LAST_OPEND = "last_opend";
 	final String SAVED_LOCALE = "saved_locale";
-	final String NEXT_BIRTHDAYS_COUNT = "next_birthdays_count";
+	final String SHOW_BIRTHDAYS_COUNT = "show_birthdays_count";
 
 }

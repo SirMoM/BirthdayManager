@@ -35,7 +35,7 @@ public class PropertyManager{
 	}
 
 	private void fillWithStandartProperties(){
-		this.properties.setProperty(arg0, arg1)
+		this.properties.setProperty(PropertieFields.SHOW_BIRTHDAYS_COUNT, "10");
 	}
 
 	/**
