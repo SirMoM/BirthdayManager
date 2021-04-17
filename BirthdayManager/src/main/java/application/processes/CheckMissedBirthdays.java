@@ -3,6 +3,8 @@
  */
 package application.processes;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -47,7 +49,7 @@ public class CheckMissedBirthdays extends Task<List<Person>> {
 	 * @see javafx.concurrent.Task#call()
 	 */
 	@Override
-	protected List<Person> call() throws InterruptedException {
+	protected List<Person> call() throws Exception {
 		Thread.sleep(500);
 		
 		// Checks if Data is there else aborts this Task.
@@ -63,10 +65,12 @@ public class CheckMissedBirthdays extends Task<List<Person>> {
 			}
 		}
 		
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		LocalDate lastVisit = LocalDate.parse(PropertyManager.getProperty(PropertyFields.LAST_VISIT), dateTimeFormatter);
+		PropertyManager.getInstance().getProperties().setProperty(PropertyFields.LAST_VISIT, LocalDate.now().format(dateTimeFormatter));
+		PropertyManager.getInstance().storeProperties("Change last visit");
 		
-		LocalDate lastVisit = LocalDate.parse(PropertyManager.getProperty(PropertyFields.LAST_VISIT),
-				DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-
+		
 		long daysScinceLastVisit = ChronoUnit.DAYS.between(lastVisit, LocalDate.now());
 		if (daysScinceLastVisit >= 2) {
 			List<Person> skippedBirthdays = getBrithdaysSince(lastVisit, LocalDate.now());

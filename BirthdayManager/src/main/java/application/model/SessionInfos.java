@@ -241,46 +241,47 @@ public class SessionInfos {
 					}
 				});
 		new Thread(updateRecentBirthdaysTask).start();
-		
+
 		CheckMissedBirthdays missedBirthdays = new CheckMissedBirthdays();
 		missedBirthdays.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>() {
 
 			@Override
 			public void handle(final WorkerStateEvent workerStateEvent) {
 				List<Person> value = missedBirthdays.getValue();
-				for (Person person : value) {
-					System.out.println(person);
-				}
-				
 				LangResourceManager lRM = new LangResourceManager();
-				
-				final Alert alert = new Alert(AlertType.WARNING);
-				alert.setTitle(lRM.getLocaleString(LangResourceKeys.missedBirthdays));
-				alert.setHeaderText(lRM.getLocaleString(LangResourceKeys.missedBirthdays));
+				if (value == null) {
+					LOG.debug("No missed Birthdays!");
+				} else {
+					final Alert alert = new Alert(AlertType.WARNING);
+					alert.setTitle(lRM.getLocaleString(LangResourceKeys.missedBirthdays));
+					alert.setHeaderText(lRM.getLocaleString(LangResourceKeys.missedBirthdays));
 
-				StringBuilder stringBuilder = new StringBuilder();
+					StringBuilder stringBuilder = new StringBuilder();
 
-				for (Person person : value) {
-					int age = (LocalDate.now().getYear() - person.getBirthday().getYear());
+					for (Person person : value) {
+						int age = (LocalDate.now().getYear() - person.getBirthday().getYear());
 //					stringBuilder.append(lRM.getLocaleString(LangResourceKeys.age) + ": " + age+ "\t");
-					long days = ChronoUnit.DAYS.between(person.getBirthday().withYear(LocalDate.now().getYear()), LocalDate.now());
-					stringBuilder.append(person.namesToString()+ " ");
-					String missedBirthdaysMessage = String.format(lRM.getLocaleString(LangResourceKeys.missedBirthdaysMsg), days, age);
-					stringBuilder.append(missedBirthdaysMessage);
-					stringBuilder.append("\n");
+						long days = ChronoUnit.DAYS.between(person.getBirthday().withYear(LocalDate.now().getYear()),
+								LocalDate.now());
+						stringBuilder.append(person.namesToString() + " ");
+						String missedBirthdaysMessage = String
+								.format(lRM.getLocaleString(LangResourceKeys.missedBirthdaysMsg), days, age);
+						stringBuilder.append(missedBirthdaysMessage);
+						stringBuilder.append("\n");
+					}
+
+					final TextArea textArea = new TextArea(stringBuilder.toString());
+					textArea.setEditable(false);
+					textArea.setWrapText(false);
+
+					alert.getDialogPane().setContent(textArea);
+					alert.showAndWait();
+					LOG.debug(workerStateEvent.getSource().getClass().getName() + " ENDED ");
 				}
-
-				final TextArea textArea = new TextArea(stringBuilder.toString());
-				textArea.setEditable(false);
-				textArea.setWrapText(false);
-
-				alert.getDialogPane().setContent(textArea);
-				alert.showAndWait();
-				LOG.debug(workerStateEvent.getSource().getClass().getName() + " ENDED ");
 			}
 		});
 
-	new Thread(missedBirthdays).start();
+		new Thread(missedBirthdays).start();
 
 	}
 
