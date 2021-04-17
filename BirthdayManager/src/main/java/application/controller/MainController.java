@@ -136,45 +136,25 @@ public class MainController {
 				fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
 			}
 
-			// TODO Extension Filters with internationalisation
+			// TODO Extension Filters with internationalization
 			fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Text Files", "*.txt"),
 					new ExtensionFilter("CSV Files", "*.csv"), new ExtensionFilter("All Files", "*.*"));
 
+			// if the chooser is X the file is null
 			final File selectedFile = fileChooser.showOpenDialog(MainController.this.getStage().getScene().getWindow());
 			if (selectedFile == null) {
 				return;
 			}
-			MainController.this.LOG.debug("Opend file:" + selectedFile.getAbsolutePath());
-			PersonManager.getInstance().setSaveFile(selectedFile);
-			MainController.this.sessionInfos.getRecentFileName().set(selectedFile.getName());
-
-			PropertieManager.getInstance().getProperties().setProperty(PropertieFields.LAST_OPEND,
-					PersonManager.getInstance().getSaveFile().getAbsolutePath());
-			try {
-				PropertieManager.getInstance().storeProperties("Saved recent file.");
-			} catch (IOException ioException) {
-				LOG.catching(Level.FATAL, ioException);
-			}
-			MainController.this.sessionInfos.updateSubLists();
+			MainController.this.openFile(selectedFile);
 		}
 	};
 	final EventHandler<ActionEvent> openFromRecentHandler = new EventHandler<ActionEvent>() {
 		@Override
 		public void handle(final ActionEvent event) {
 			final String lastUsedFilePath = PropertieManager.getPropertie(PropertieFields.LAST_OPEND).toString();
-			MainController.this.LOG.debug("Saved as recend used: " + lastUsedFilePath);
 			final File birthdayFile = new File(lastUsedFilePath);
 
-			PersonManager.getInstance().setSaveFile(birthdayFile);
-
-			PropertieManager.getInstance().getProperties().setProperty(PropertieFields.LAST_OPEND,
-					PersonManager.getInstance().getSaveFile().getAbsolutePath());
-			try {
-				PropertieManager.getInstance().storeProperties("Saved recent file.");
-			} catch (IOException ioException) {
-				LOG.catching(Level.FATAL, ioException);
-			}
-			MainController.this.getSessionInfos().updateSubLists();
+			MainController.this.openFile(birthdayFile);
 		}
 	};
 	public EventHandler<ActionEvent> openFileExternal = new EventHandler<ActionEvent>() {
@@ -338,14 +318,35 @@ public class MainController {
 		try {
 			this.replaceSceneContent("/application/view/BirthdaysOverview.fxml", this.activeController);
 			if (new Boolean(PropertieManager.getPropertie(PropertieFields.OPEN_FILE_ON_START))) {
-				PersonManager.getInstance()
-						.setSaveFile(new File(PropertieManager.getPropertie(PropertieFields.FILE_ON_START)));
-				this.sessionInfos.updateSubLists();
-				this.LOG.debug("OPEN with File");
+				openFile(new File(PropertieManager.getPropertie(PropertieFields.FILE_ON_START)));
 			}
 		} catch (final Exception exception) {
 			this.LOG.catching(Level.ERROR, exception);
 		}
+	}
+
+	/**
+	 * @param selectedFile used to fill the birthday list
+	 */
+	private void openFile(final File selectedFile) {
+		MainController.this.LOG.debug("Opend file:" + selectedFile.getAbsolutePath());
+		// Performance issues from this ?
+		// TODO put this in a TASK
+		PersonManager.getInstance().setSaveFile(selectedFile);
+
+		MainController.this.sessionInfos.getRecentFileName().set(selectedFile.getName());
+		MainController.this.sessionInfos.getFileToOpenName().set(selectedFile.getName());
+
+		PropertieManager.getInstance().getProperties().setProperty(PropertieFields.LAST_OPEND,
+				PersonManager.getInstance().getSaveFile().getAbsolutePath());
+		try {
+			PropertieManager.getInstance().storeProperties("Saved recent file.");
+		} catch (IOException ioException) {
+			LOG.catching(Level.FATAL, ioException);
+		}
+		// Performance issues from this ?
+		// TODO put this in a TASK
+		MainController.this.sessionInfos.updateSubLists();
 	}
 
 }

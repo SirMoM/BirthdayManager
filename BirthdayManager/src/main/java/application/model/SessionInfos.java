@@ -118,6 +118,7 @@ public class SessionInfos {
 	public void resetSubLists() {
 		this.nextBirthdays.clear();
 		this.recentBirthdays.clear();
+		this.personsInAWeekList.clear();
 	}
 
 	/**
