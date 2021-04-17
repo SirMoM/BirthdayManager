@@ -30,4 +30,9 @@ public abstract class Controller implements Initializable {
      * application.util.localisation.LangResourceManager}
      */
     public abstract void updateLocalisation();
+
+    /**
+     * Called to set the focus of the scene.
+     */
+    public abstract void placeFocus();
 }

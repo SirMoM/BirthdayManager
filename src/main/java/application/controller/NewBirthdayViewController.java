@@ -36,66 +36,63 @@ public class NewBirthdayViewController extends Controller {
     private final Person newPerson;
     private final EventHandler<ActionEvent> returnToMainView = event -> NewBirthdayViewController.this.getMainController().goToLastScene();
 
-    private MenuItem recentFiles_MenuItem;
+
     @FXML
     private ResourceBundle resources;
+
     @FXML
     private URL location;
+
     @FXML
     private Menu file_menu;
+
     @FXML
     private MenuItem openFile_MenuItem;
+
     @FXML
     private Menu openRecent_MenuItem;
-    @FXML
-    private MenuItem closeFile_MenuItem;
-    @FXML
-    private MenuItem saveFile_MenuItem;
-    @FXML
-    private MenuItem saveAsFile_MenuItem;
+
     @FXML
     private MenuItem preferences_MenuItem;
+
     @FXML
     private MenuItem quit_MenuItem;
-    @FXML
-    private Menu edit_menu;
-    @FXML
-    private MenuItem newBirthday_MenuItem;
-    @FXML
-    private MenuItem importBirthdays_MenuItem;
-    @FXML
-    private MenuItem deleteBirthdays_MenuItem;
-    @FXML
-    private Menu help_menu;
-    @FXML
-    private MenuItem debug;
-    @FXML
-    private MenuItem refresh_MenuItem;
+
     @FXML
     private Button cancel_Button;
+
     @FXML
     private Button delete_Button;
+
     @FXML
     private Button save_Button;
+
     @FXML
     private Label identifyingPerson_label;
+
     @FXML
     private Label name_Label;
+
     @FXML
     private TextField name_TextField;
+
     @FXML
     private Label middleName_Label;
+
     @FXML
     private TextField middleName_TextField;
+
     @FXML
     private Label surname_Label;
+
     @FXML
     private TextField surname_TextField;
+
     @FXML
     private Label birthday_Label;
+
     @FXML
     private DatePicker birthday_DatePicker;
-
     private final EventHandler<ActionEvent> savePersonHandler = actionEvent -> {
         final String nameFromTextField = NewBirthdayViewController.this.name_TextField.getText();
         final String middleNameFromTextField = NewBirthdayViewController.this.middleName_TextField.getText();
@@ -201,7 +198,7 @@ public class NewBirthdayViewController extends Controller {
      * @see javafx.fxml.Initializable#initialize(java.net.URL,
      * java.util.ResourceBundle)
      */
-    @Override
+    @FXML
     public void initialize(final URL arg0, final ResourceBundle arg1) {
         getMainController().getStage().setWidth(1200);
         this.assertions();
@@ -249,5 +246,14 @@ public class NewBirthdayViewController extends Controller {
             LOG.catching(Level.INFO, nullPointerException);
             LOG.info("No recent File opend ?");
         }
+    }
+
+    @Override
+    public void placeFocus() {
+        name_TextField.requestFocus();
+
+        this.name_TextField.setFocusTraversable(true);
+        this.middleName_TextField.setFocusTraversable(true);
+        this.surname_TextField.setFocusTraversable(true);
     }
 }
