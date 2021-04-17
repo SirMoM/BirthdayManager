@@ -82,5 +82,9 @@ public enum LangResourceKeys{
 
 	autsave_Tooltipp,
 	writeThru_Tooltip,
-	openFileOnStartUp_ToolTipp;
+	openFileOnStartUp_ToolTipp,
+
+	// miscalenius
+
+	person_not_valid_warning;
 }

@@ -16,6 +16,8 @@ import application.util.localisation.LangResourceManager;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -156,6 +158,14 @@ public class NewBirthdayViewController extends Controller{
 				NewBirthdayViewController.this.newPerson.setBirthday(birthdayFromDatePicker);
 			}
 
+			if(birthdayFromDatePicker == null || (surnameFromTextfield.isEmpty() && nameFromTextField.isEmpty() && middleNameFromTextField.isEmpty())){
+				final LangResourceManager langResourceManager = new LangResourceManager();
+				final Alert alert = new Alert(AlertType.WARNING);
+				alert.setTitle(langResourceManager.getLocaleString(LangResourceKeys.person_not_valid_warning));
+				alert.setHeaderText(langResourceManager.getLocaleString(LangResourceKeys.person_not_valid_warning));
+				alert.showAndWait();
+				return;
+			}
 			PersonManager.getInstance().addNewPerson(NewBirthdayViewController.this.newPerson);
 			NewBirthdayViewController.this.getMainController().goToBirthdaysOverview();
 
