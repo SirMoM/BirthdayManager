@@ -163,8 +163,7 @@ public class NewBirthdayViewController extends Controller {
 				NewBirthdayViewController.this.newPerson.setBirthday(birthdayFromDatePicker);
 			}
 
-			if (birthdayFromDatePicker == null || (surnameFromTextfield.isEmpty() && nameFromTextField.isEmpty()
-					&& middleNameFromTextField.isEmpty())) {
+			if (birthdayFromDatePicker == null || surnameFromTextfield.isEmpty() || nameFromTextField.isEmpty()) {
 				final LangResourceManager langResourceManager = new LangResourceManager();
 				final Alert alert = new Alert(AlertType.WARNING);
 				alert.setTitle(langResourceManager.getLocaleString(LangResourceKeys.person_not_valid_warning));
@@ -175,20 +174,19 @@ public class NewBirthdayViewController extends Controller {
 			PersonManager.getInstance().addNewPerson(NewBirthdayViewController.this.newPerson);
 			NewBirthdayViewController.this.getMainController().goToBirthdaysOverview();
 
-			if (new Boolean(PropertyManager.getProperty(PropertyFields.WRITE_THRU))) {
-				SaveBirthdaysToFileTask task = new SaveBirthdaysToFileTask(
-						getMainController().getSessionInfos().getSaveFile());
-				task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+			if (new Boolean(PropertyManager.getProperty(PropertyFields.WRITE_THRU)) && (getMainController().getSessionInfos().getSaveFile() != null)) {
+				SaveBirthdaysToFileTask saveBirthdaysToFileTask = new SaveBirthdaysToFileTask(getMainController().getSessionInfos().getSaveFile());
+				saveBirthdaysToFileTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 
 					@Override
 					public void handle(WorkerStateEvent event) {
 						if (event.getEventType() == WorkerStateEvent.WORKER_STATE_SUCCEEDED) {
-							LOG.debug("Saved changes to file	(via write thru)");
+							LOG.debug("Saved changes to file (via write thru)");
 						}
 					}
 				});
 
-				new Thread(task).start();
+				new Thread(saveBirthdaysToFileTask).start();
 			}
 
 		}

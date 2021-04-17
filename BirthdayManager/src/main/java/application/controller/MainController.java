@@ -24,6 +24,7 @@ import application.util.localisation.LangResourceManager;
 import javafx.application.Platform;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -41,11 +42,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
 /**
- * @author Admin
- * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
- */
-/**
- * @author Admin
+ * @author Noah Ruben
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
 public class MainController {
@@ -57,10 +54,16 @@ public class MainController {
 	@FXML
 	private MenuItem changeLanguage_MenuItem;
 
-	final EventHandler<ActionEvent> closeAppHandler = new EventHandler<ActionEvent>() {
+	@SuppressWarnings("rawtypes")
+	final EventHandler closeAppHandler = new EventHandler<Event>() {
 		@Override
-		public void handle(final ActionEvent event) {
-			boolean autosave = Boolean.getBoolean(PropertyManager.getProperty(PropertyFields.AUTOSAVE));
+		public void handle(final Event event) {
+			boolean autosave = Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.AUTOSAVE));
+
+			if (PersonManager.getInstance().getPersons().isEmpty()) {
+				Platform.exit();
+				System.exit(0);
+			}
 
 			if (autosave && getSessionInfos().getSaveFile() != null) {
 				new Thread(new SaveBirthdaysToFileTask(getSessionInfos().getSaveFile())).start();
@@ -88,7 +91,7 @@ public class MainController {
 							}
 
 							// if the chooser is "x'ed" the file is null
-							final File selectedFile = fileChooser.showOpenDialog(MainController.this.getStage().getScene().getWindow());
+							final File selectedFile = fileChooser.showSaveDialog(MainController.this.getStage().getScene().getWindow());
 							if (selectedFile == null) {
 								final Alert error = new Alert(Alert.AlertType.ERROR);
 								error.showAndWait();
@@ -139,7 +142,7 @@ public class MainController {
 				}
 
 				// if the chooser is "x'ed" the file is null
-				final File selectedFile = fileChooser.showOpenDialog(MainController.this.getStage().getScene().getWindow());
+				final File selectedFile = fileChooser.showSaveDialog(MainController.this.getStage().getScene().getWindow());
 				getSessionInfos().setSaveFile(selectedFile);
 
 			}
@@ -185,6 +188,9 @@ public class MainController {
 			fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Calendars", "*.ics"));
 
 			final File saveFile = fileChooser.showSaveDialog(MainController.this.getStage().getScene().getWindow());
+			if (saveFile == null) {
+				return;
+			}
 			ExportToCalenderTask exportToCalenderTask = null;
 			try {
 				exportToCalenderTask = new ExportToCalenderTask(saveFile);
@@ -251,14 +257,14 @@ public class MainController {
 		public void handle(final ActionEvent event) {
 			// first check if Desktop is supported by Platform or not
 			if (!Desktop.isDesktopSupported()) {
-				System.out.println("Desktop is not supported");
+				LOG.debug("Desktop is not supported");
 				return;
 			}
 
 			final File file = PersonManager.getInstance().getSaveFile();
 
 			final Desktop desktop = Desktop.getDesktop();
-			if (desktop.isSupported(Desktop.Action.EDIT)) {
+			if (desktop.isSupported(Desktop.Action.EDIT) && file != null) {
 				try {
 					desktop.edit(file);
 				} catch (final IOException ioException) {
@@ -277,10 +283,11 @@ public class MainController {
 		this.sessionInfos = new SessionInfos(this);
 		this.LOG = LogManager.getLogger(this.getClass().getName());
 		this.stage.getIcons().add(new Image(this.getClass().getResourceAsStream("/img/icons8-birthday-50.png")));
-		stage.setOnCloseRequest(x -> {
-			Platform.exit();
-			System.exit(0);
-		});
+
+//		stage.setOnCloseRequest(x -> {
+//			Platform.exit();
+//		});
+		stage.setOnCloseRequest(this.closeAppHandler);
 	}
 
 	/**

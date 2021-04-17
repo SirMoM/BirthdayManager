@@ -8,7 +8,7 @@ package application.util.localisation;
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a> All keys
  *      for adressing the right string
  */
-public enum LangResourceKeys{
+public enum LangResourceKeys {
 
 	// Person
 	age,
@@ -85,20 +85,22 @@ public enum LangResourceKeys{
 	countBirthdaysShown_Label,
 	iCalNotification_checkBox,
 
-	//ToolTipps
+	// ToolTipps
 	autsave_Tooltipp,
 	writeThru_Tooltip,
 	openFileOnStartUp_ToolTipp,
 
 	// Alert messages usw.
 	save_before_exit,
-	person_not_valid_warning, 
+	person_not_valid_warning,
 	save_before_exit_question,
-	
+
 	// Miscellaneous
 	yes,
-	no, 
+	no,
 	csv_file,
+	txt_file,
+	all_files,
 	;
-	
+
 }
