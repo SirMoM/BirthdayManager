@@ -18,13 +18,11 @@ import biweekly.property.Classification;
 import biweekly.property.Summary;
 import biweekly.property.Trigger;
 import biweekly.util.Duration;
-import javafx.concurrent.Task;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -35,12 +33,13 @@ public class ExportToCalenderTask extends PersonTasks<Boolean> {
     ICalendar ical;
     ICalWriter writer;
     Boolean succsessfull = true;
+    List<Person> persons;
 
     public ExportToCalenderTask(File file) throws IOException {
         this.ical = new ICalendar();
         writer = new ICalWriter(file, ICalVersion.V2_0);
     }
-    List<Person> persons;
+
     /*
      * (non-Javadoc)
      *

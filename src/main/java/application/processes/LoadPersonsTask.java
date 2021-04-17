@@ -18,8 +18,8 @@ import java.util.List;
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
 public class LoadPersonsTask extends Task<LoadPersonsTask.Result> {
-    private final BufferedReader reader;
     private static final Logger LOG = LogManager.getLogger(LoadPersonsTask.class.getName());
+    private final BufferedReader reader;
     private final boolean csvFile;
 
     /**

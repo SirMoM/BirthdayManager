@@ -36,13 +36,6 @@ public class NewBirthdayViewController extends Controller {
     private final Person newPerson;
     private final EventHandler<ActionEvent> returnToMainView = event -> NewBirthdayViewController.this.getMainController().goToLastScene();
 
-
-    @FXML
-    private ResourceBundle resources;
-
-    @FXML
-    private URL location;
-
     @FXML
     private Menu file_menu;
 
@@ -57,15 +50,6 @@ public class NewBirthdayViewController extends Controller {
 
     @FXML
     private MenuItem quit_MenuItem;
-
-    @FXML
-    private Button cancel_Button;
-
-    @FXML
-    private Button delete_Button;
-
-    @FXML
-    private Button save_Button;
 
     @FXML
     private Label identifyingPerson_label;
@@ -135,13 +119,25 @@ public class NewBirthdayViewController extends Controller {
         }
     };
     @FXML
+    private Button cancel_Button;
+    @FXML
+    private Button delete_Button;
+    @FXML
+    private Button save_Button;
+    @FXML
     private Label openedFile_label;
+    @FXML
+    private ResourceBundle resources;
+    @FXML
+    private URL location;
     @FXML
     private Font x3;
     @FXML
     private Color x4;
     @FXML
     private Label date_label;
+
+    private MenuItem recentFiles_MenuItem;
 
     public NewBirthdayViewController(final MainController mainController) {
         super(mainController);
@@ -230,10 +226,10 @@ public class NewBirthdayViewController extends Controller {
 
     @Override
     public void placeFocus() {
-        name_TextField.requestFocus();
-
         this.name_TextField.setFocusTraversable(true);
         this.middleName_TextField.setFocusTraversable(true);
         this.surname_TextField.setFocusTraversable(true);
+
+        name_TextField.requestFocus();
     }
 }

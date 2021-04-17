@@ -69,6 +69,12 @@ jar {
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }
 
+// Debug infos when building
+tasks.withType(JavaCompile) {
+    options.compilerArgs += "-Xlint:unchecked"
+}
+
+
 tasks.withType(Jar) {
     destinationDirectory = file("$rootDir/build/jar")
 }

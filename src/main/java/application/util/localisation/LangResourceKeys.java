@@ -47,5 +47,4 @@ public enum LangResourceKeys {
 
     // Miscellaneous
     yes, no, csv_file, txt_file, all_files, missedBirthdays, missedBirthdaysMsg,
-    ;
 }

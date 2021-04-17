@@ -7,23 +7,23 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public abstract class PersonTasks<G> extends Task<G> {
 
     private static final Logger LOG = LogManager.getLogger(PersonTasks.class.getName());
-    /** How long the process has be waiting */
+    protected long timeInWaiting = 0;
+    protected long timeToWait = 500;
+    /**
+     * How long the process has be waiting
+     */
     private long waitTimeLimit = 30000;
 
     protected PersonTasks(final long waitTimeLimit) {
         this.waitTimeLimit = waitTimeLimit;
     }
-    protected PersonTasks() {}
-
-    protected long timeInWaiting = 0;
-    protected long timeToWait = 500;
+    protected PersonTasks() {
+    }
 
     protected List<Person> getPersons() throws Exception {
         boolean isEmpty = PersonManager.getInstance().getPersons().isEmpty();
