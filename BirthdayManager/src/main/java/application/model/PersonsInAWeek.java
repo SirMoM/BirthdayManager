@@ -26,7 +26,7 @@ public class PersonsInAWeek {
 		final ArrayList<PersonsInAWeek> personsInAWeekList = new ArrayList<PersonsInAWeek>();
 		for (int i = 0; i < personsToParse.size(); i++) {
 			final LocalDate birthday = personsToParse.get(i).getBirthday();
-			final LocalDate thisYearsBirthday = birthday.withYear(2019);
+			final LocalDate thisYearsBirthday = birthday.withYear(LocalDate.now().getYear());
 
 			switch (thisYearsBirthday.getDayOfWeek()) {
 			case MONDAY:
