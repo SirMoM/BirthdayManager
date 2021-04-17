@@ -1,3 +1,3 @@
 # BirthdayManager
-A small Programm to manage your Birthdays
+A small Program to manage your Birthdays
 https://sirmom.github.io/BirthdayManagerWebsite/

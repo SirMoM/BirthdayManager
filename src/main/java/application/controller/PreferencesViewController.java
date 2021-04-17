@@ -66,7 +66,7 @@ public class PreferencesViewController extends Controller {
     private CheckBox autoSave_CheckBox;
 
     @FXML
-    private Tooltip autsave_Tooltipp;
+    private Tooltip autsave_Tooltip;
 
     @FXML
     private Label miscellaneous_label;
@@ -75,7 +75,7 @@ public class PreferencesViewController extends Controller {
     private CheckBox openFileOnStart_Checkbox;
 
     @FXML
-    private Tooltip openFileOnStartUp_ToolTipp;
+    private Tooltip openFileOnStartUp_ToolTip;
 
     @FXML
     private TextField startupFile_textField;
@@ -99,7 +99,7 @@ public class PreferencesViewController extends Controller {
 
         try {
             PropertyManager.getInstance();
-            fileChooser.setInitialDirectory(new File(PropertyManager.getProperty(PropertyFields.LAST_OPEND)).getParentFile());
+            fileChooser.setInitialDirectory(new File(PropertyManager.getProperty(PropertyFields.LAST_OPENED)).getParentFile());
         } catch (final NullPointerException nullPointerException) {
             fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
         }
@@ -157,7 +157,7 @@ public class PreferencesViewController extends Controller {
         properties.setProperty(PropertyFields.NEW_VERSION_REMINDER, String.valueOf(PreferencesViewController.this.reminder_CheckBox.isSelected()));
 
         try {
-            PropertyManager.getInstance().storeProperties("Saved properies" + LocalDateTime.now());
+            PropertyManager.getInstance().storeProperties("Saved properties" + LocalDateTime.now());
             PreferencesViewController.this.updateLocalisation();
         } catch (final IOException ioException) {
             LOG.catching(ioException);
@@ -182,10 +182,10 @@ public class PreferencesViewController extends Controller {
         assert writeThru_CheckBox != null : "fx:id=\"writeThru_CheckBox\" was not injected: check your FXML file 'PreferencesView.fxml'.";
         assert writeThru_Tooltip != null : "fx:id=\"writeThru_Tooltip\" was not injected: check your FXML file 'PreferencesView.fxml'.";
         assert autoSave_CheckBox != null : "fx:id=\"autoSave_CheckBox\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-        assert autsave_Tooltipp != null : "fx:id=\"autsave_Tooltipp\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+        assert autsave_Tooltip != null : "fx:id=\"autsave_Tooltip\" was not injected: check your FXML file 'PreferencesView.fxml'.";
         assert miscellaneous_label != null : "fx:id=\"miscellaneous_label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
         assert openFileOnStart_Checkbox != null : "fx:id=\"openFileOnStart_Checkbox\" was not injected: check your FXML file 'PreferencesView.fxml'.";
-        assert openFileOnStartUp_ToolTipp != null : "fx:id=\"openFileOnStartUp_ToolTipp\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+        assert openFileOnStartUp_ToolTip != null : "fx:id=\"openFileOnStartUp_ToolTip\" was not injected: check your FXML file 'PreferencesView.fxml'.";
         assert startupFile_textField != null : "fx:id=\"startupFile_textField\" was not injected: check your FXML file 'PreferencesView.fxml'.";
         assert chooseFile_button != null : "fx:id=\"chooseFile_button\" was not injected: check your FXML file 'PreferencesView.fxml'.";
         assert cancel_button != null : "fx:id=\"cancel_button\" was not injected: check your FXML file 'PreferencesView.fxml'.";
@@ -279,7 +279,7 @@ public class PreferencesViewController extends Controller {
 
         this.openFileOnStart_Checkbox.selectedProperty().set(openFileOnStart);
         try {
-            this.startupFile_textField.setText(PropertyManager.getProperty(PropertyFields.LAST_OPEND));
+            this.startupFile_textField.setText(PropertyManager.getProperty(PropertyFields.LAST_OPENED));
         } catch (final NullPointerException nullPointerException) {
             LOG.catching(Level.INFO, nullPointerException);
         }
@@ -320,9 +320,9 @@ public class PreferencesViewController extends Controller {
         this.chooseFile_button.setText(resourceManager.getLocaleString(LangResourceKeys.chooseFile_button));
         this.cancel_button.setText(resourceManager.getLocaleString(LangResourceKeys.cancel_button));
 
-        this.autsave_Tooltipp.setText(resourceManager.getLocaleString(LangResourceKeys.autsave_Tooltipp));
+        this.autsave_Tooltip.setText(resourceManager.getLocaleString(LangResourceKeys.autosave_Tooltip));
         this.writeThru_Tooltip.setText(resourceManager.getLocaleString(LangResourceKeys.writeThru_Tooltip));
-        this.openFileOnStartUp_ToolTipp.setText(resourceManager.getLocaleString(LangResourceKeys.openFileOnStartUp_ToolTipp));
+        this.openFileOnStartUp_ToolTip.setText(resourceManager.getLocaleString(LangResourceKeys.openFileOnStartUp_ToolTip));
 
         this.firstHighlightingColor_Label.setText(resourceManager.getLocaleString(LangResourceKeys.firstHighlightingColor_label));
         this.secondHighlightingColor_Label.setText(resourceManager.getLocaleString(LangResourceKeys.secondHighlightingColor_label));

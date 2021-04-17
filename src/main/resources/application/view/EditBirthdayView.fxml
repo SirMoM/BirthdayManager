@@ -121,7 +121,7 @@
          <bottom>
               <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0" BorderPane.alignment="CENTER">
                   <children>
-                      <Label fx:id="openedFile_label" maxHeight="1.7976931348623157E308" maxWidth="-1.0" text="Opend File" HBox.hgrow="ALWAYS">
+                      <Label fx:id="openedFile_label" maxHeight="1.7976931348623157E308" maxWidth="-1.0" text="Opened File" HBox.hgrow="ALWAYS">
                           <font>
                               <Font size="11.0" fx:id="x3" />
                           </font>

@@ -19,7 +19,7 @@ import java.util.Properties;
 public class PropertyManager {
     private static final String PROPERTIES_FILE_NAME = "BirthdayManager.properties";
     private static final Logger LOG = LogManager.getLogger(PropertyManager.class.getName());
-    private static PropertyManager propertieManagerSingelton = null;
+    private static PropertyManager propertyManagerSingleton = null;
     private final Properties properties;
     private final File propertiesFile;
 
@@ -34,10 +34,10 @@ public class PropertyManager {
         try {
             if (this.propertiesFile.createNewFile()) {
                 LOG.info("Created new properties File");
-                this.fillWithStandartProperties();
+                this.fillWithStandardProperties();
             } else {
                 this.loadProperties();
-                this.fillWithStandartProperties();
+                this.fillWithStandardProperties();
                 LOG.info("Loaded properties");
             }
         } catch (final IOException ioException) {
@@ -51,10 +51,10 @@ public class PropertyManager {
      * @return the only instance {@link PersonManager}
      */
     public static PropertyManager getInstance() {
-        if (propertieManagerSingelton == null) {
-            propertieManagerSingelton = new PropertyManager();
+        if (propertyManagerSingleton == null) {
+            propertyManagerSingleton = new PropertyManager();
         }
-        return propertieManagerSingelton;
+        return propertyManagerSingleton;
     }
 
     /**
@@ -80,7 +80,7 @@ public class PropertyManager {
      *   <li>WRITE_THRU == false
      * </ul>
      */
-    protected void fillWithStandartProperties() {
+    protected void fillWithStandardProperties() {
         final String message = "Added {} property";
         if (this.properties.getProperty(PropertyFields.SAVED_LOCALE) == null) {
             this.properties.setProperty(PropertyFields.SAVED_LOCALE, "en_GB");

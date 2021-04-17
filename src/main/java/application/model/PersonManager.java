@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class PersonManager {
     private static final Logger LOG = LogManager.getLogger(PersonManager.class.getName());
-    private static PersonManager personManagerSingelton = null;
+    private static PersonManager personManagerSingleton = null;
     private SessionInfos sessionInfos;
     private List<Person> personDB;
 
@@ -30,10 +30,10 @@ public class PersonManager {
      * @return the only instance {@link PersonManager}
      */
     public static PersonManager getInstance() {
-        if (personManagerSingelton == null) {
-            personManagerSingelton = new PersonManager();
+        if (personManagerSingleton == null) {
+            personManagerSingleton = new PersonManager();
         }
-        return personManagerSingelton;
+        return personManagerSingleton;
     }
 
     public void setSessionInfos(final SessionInfos sessionInfos) {

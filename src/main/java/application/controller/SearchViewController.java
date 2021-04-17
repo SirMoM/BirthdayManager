@@ -6,7 +6,7 @@ package application.controller;
 import application.model.Person;
 import application.model.PersonManager;
 import application.util.BirthdayComparator;
-import application.util.LevenshteinDistanz;
+import application.util.LevenshteinDistance;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
 import javafx.collections.FXCollections;
@@ -95,9 +95,9 @@ public class SearchViewController extends Controller {
             for (Person person : PersonManager.getInstance().getPersons()) {
                 String searchString = searchText.toUpperCase();
 
-                boolean surname = person.getSurname() != null && LevenshteinDistanz.calculate(person.getSurname().toUpperCase(), searchString) <= 2;
-                boolean name = person.getName() != null && LevenshteinDistanz.calculate(person.getName().toUpperCase(), searchString) <= 2;
-                boolean misc = person.getMisc() != null && LevenshteinDistanz.calculate(person.getMisc().toUpperCase(), searchString) <= 2;
+                boolean surname = person.getSurname() != null && LevenshteinDistance.calculate(person.getSurname().toUpperCase(), searchString) <= 2;
+                boolean name = person.getName() != null && LevenshteinDistance.calculate(person.getName().toUpperCase(), searchString) <= 2;
+                boolean misc = person.getMisc() != null && LevenshteinDistance.calculate(person.getMisc().toUpperCase(), searchString) <= 2;
 
                 if (surname || name || misc) {
                     getSearchResults().add(person);

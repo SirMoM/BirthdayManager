@@ -51,7 +51,7 @@ public class MainController {
     private static final String USER_HOME = "user.home";
     private static final Logger LOG = LogManager.getLogger(MainController.class.getName());
 
-    final EventHandler<ActionEvent> openPreferencesHander = event -> {
+    final EventHandler<ActionEvent> openPreferencesHandler = event -> {
         LOG.trace("Open Preferences");
         MainController.this.openPreferences();
     };
@@ -61,7 +61,7 @@ public class MainController {
         fileChooser.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
 
         try {
-            fileChooser.setInitialDirectory(new File(PropertyManager.getProperty(PropertyFields.LAST_OPEND)).getParentFile());
+            fileChooser.setInitialDirectory(new File(PropertyManager.getProperty(PropertyFields.LAST_OPENED)).getParentFile());
         } catch (final NullPointerException nullPointerException) {
             fileChooser.setInitialDirectory(new File(System.getProperty(USER_HOME)));
         }
@@ -108,7 +108,7 @@ public class MainController {
                     fileChooser.getExtensionFilters().add(new ExtensionFilter(new LangResourceManager().getLocaleString(LangResourceKeys.csv_file), CSV_FILE_EXTENSION));
 
                     try {
-                        fileChooser.setInitialDirectory(new File(PropertyManager.getProperty(PropertyFields.LAST_OPEND)).getParentFile());
+                        fileChooser.setInitialDirectory(new File(PropertyManager.getProperty(PropertyFields.LAST_OPENED)).getParentFile());
                     } catch (final NullPointerException nullPointerException) {
                         fileChooser.setInitialDirectory(new File(System.getProperty(USER_HOME)));
                     }
@@ -140,7 +140,7 @@ public class MainController {
             fileChooser.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
             fileChooser.getExtensionFilters().add(new ExtensionFilter(new LangResourceManager().getLocaleString(LangResourceKeys.csv_file), CSV_FILE_EXTENSION));
             try {
-                fileChooser.setInitialDirectory(new File(PropertyManager.getProperty(PropertyFields.LAST_OPEND)).getParentFile());
+                fileChooser.setInitialDirectory(new File(PropertyManager.getProperty(PropertyFields.LAST_OPENED)).getParentFile());
             } catch (final NullPointerException nullPointerException) {
                 fileChooser.setInitialDirectory(new File(System.getProperty(USER_HOME)));
             }
@@ -181,7 +181,7 @@ public class MainController {
         fileChooser.getExtensionFilters().add(new ExtensionFilter(new LangResourceManager().getLocaleString(LangResourceKeys.csv_file), CSV_FILE_EXTENSION));
 
         try {
-            fileChooser.setInitialDirectory(new File(PropertyManager.getProperty(PropertyFields.LAST_OPEND)).getParentFile());
+            fileChooser.setInitialDirectory(new File(PropertyManager.getProperty(PropertyFields.LAST_OPENED)).getParentFile());
         } catch (final NullPointerException nullPointerException) {
             fileChooser.setInitialDirectory(new File(System.getProperty(USER_HOME)));
         }
@@ -198,7 +198,7 @@ public class MainController {
         }
     };
     final EventHandler<ActionEvent> openFromRecentHandler = event -> {
-        final String lastUsedFilePath = PropertyManager.getProperty(PropertyFields.LAST_OPEND);
+        final String lastUsedFilePath = PropertyManager.getProperty(PropertyFields.LAST_OPENED);
         final File birthdayFile = new File(lastUsedFilePath);
 
         try {
@@ -228,7 +228,7 @@ public class MainController {
                 LOG.debug("EXPORTED");
                 final Alert alert = new Alert(AlertType.INFORMATION);
                 alert.setTitle("Exported");
-                alert.setHeaderText("All bithdays have been exported to " + saveFile.getAbsolutePath() + "!");
+                alert.setHeaderText("All birthdays have been exported to " + saveFile.getAbsolutePath() + "!");
                 alert.showAndWait();
             });
             if (MainController.this.getActiveController() instanceof BirthdaysOverviewController) {
@@ -245,7 +245,7 @@ public class MainController {
     private MenuItem changeLanguage_MenuItem;
 
     /**
-     * @param stage the mainstage for the application
+     * @param stage the main stage for the application
      */
     public MainController(final Stage stage) {
         lastScenes = new Stack<>();
@@ -266,7 +266,7 @@ public class MainController {
     }
 
     /**
-     * @return the session infos for the spezific App-Instance
+     * @return the session infos for the specific App-Instance
      */
     public SessionInfos getSessionInfos() {
         return this.sessionInfos;
@@ -280,7 +280,7 @@ public class MainController {
     }
 
     /**
-     * Swiches scenes to the BirthdayOverview. Generates a new Controller.
+     * Switches scenes to the BirthdayOverview. Generates a new Controller.
      *
      * @see BirthdaysOverviewController
      */
@@ -329,7 +329,7 @@ public class MainController {
     }
 
     /**
-     * Swiches scenes to the BirthdayOverview. Generates a new Controller.
+     * Switches scenes to the BirthdayOverview. Generates a new Controller.
      *
      * @see EditBirthdayViewController
      */
@@ -368,7 +368,7 @@ public class MainController {
         MainController.this.sessionInfos.getRecentFileName().set(selectedFile.getName());
         MainController.this.sessionInfos.getFileToOpenName().set(selectedFile.getName());
 
-        PropertyManager.getInstance().getProperties().setProperty(PropertyFields.LAST_OPEND, getSessionInfos().getSaveFile().getAbsolutePath());
+        PropertyManager.getInstance().getProperties().setProperty(PropertyFields.LAST_OPENED, getSessionInfos().getSaveFile().getAbsolutePath());
         try {
             PropertyManager.getInstance().storeProperties("Saved recent file.");
         } catch (final IOException ioException) {

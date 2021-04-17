@@ -39,8 +39,8 @@ public enum LangResourceKeys {
     // Search View
     search, enableFuzzy_RadioButton, enableRegEx_RadioButton, advancedSettings_TitledPane,
 
-    // ToolTipps
-    autsave_Tooltipp, writeThru_Tooltip, openFileOnStartUp_ToolTipp,
+    // ToolTips
+    autosave_Tooltip, writeThru_Tooltip, openFileOnStartUp_ToolTip,
 
     // Alert messages usw.
     save_before_exit, person_not_valid_warning, save_before_exit_question,

@@ -215,12 +215,12 @@ public class NewBirthdayViewController extends Controller {
 
         this.openFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromFileChooserHandler);
         try {
-            this.recentFiles_MenuItem = new MenuItem(new File(PropertyManager.getProperty(PropertyFields.LAST_OPEND)).getName());
+            this.recentFiles_MenuItem = new MenuItem(new File(PropertyManager.getProperty(PropertyFields.LAST_OPENED)).getName());
             this.recentFiles_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromRecentHandler);
             this.openRecent_MenuItem.getItems().add(this.recentFiles_MenuItem);
         } catch (NullPointerException nullPointerException) {
             LOG.catching(Level.INFO, nullPointerException);
-            LOG.info("No recent File opend ?");
+            LOG.info("No recent File opened ?");
         }
     }
 
