@@ -186,8 +186,6 @@ public class NewBirthdayViewController extends Controller{
 	};
 
 	/**
-	 * @param person the person to edit
-	 *
 	 * @see application.controller.Controller#Controller(MainController)
 	 */
 	public NewBirthdayViewController(final MainController mainController){
