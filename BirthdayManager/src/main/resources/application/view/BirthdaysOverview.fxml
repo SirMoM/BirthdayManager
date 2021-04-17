@@ -82,7 +82,7 @@
                         </ListView>
                      </children>
                   </VBox>
-                  <AnchorPane>
+                  <AnchorPane fx:id="deleteButtons_Pane">
                      <children>
                         <Button defaultButton="true" mnemonicParsing="false" prefHeight="50.0" prefWidth="150.0" text="Delete" textFill="RED" AnchorPane.leftAnchor="100.0" AnchorPane.topAnchor="50.0" />
                         <Button cancelButton="true" mnemonicParsing="false" prefHeight="50.0" prefWidth="150.0" text="Cancle" AnchorPane.rightAnchor="100.0" AnchorPane.topAnchor="50.0" />
