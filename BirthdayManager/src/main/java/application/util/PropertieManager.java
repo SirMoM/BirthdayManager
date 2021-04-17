@@ -75,12 +75,13 @@ public class PropertieManager {
 	 * </ul>
 	 */
 	private void fillWithStandartProperties() {
-		this.properties.setProperty(PropertieFields.SHOW_BIRTHDAYS_COUNT, "10");
+		this.properties.setProperty(PropertieFields.SHOW_BIRTHDAYS_COUNT, "15");
 		this.properties.setProperty(PropertieFields.SAVED_LOCALE, "en_GB");
 		this.properties.setProperty(PropertieFields.AUTOSAVE, "true");
 		this.properties.setProperty(PropertieFields.WRITE_THRU, "true");
 		this.properties.setProperty(PropertieFields.OPEN_FILE_ON_START, "true");
 		this.properties.setProperty(PropertieFields.HIGHLIGHT_TODAY_COLOR, "mediumseagreen");
+		this.properties.setProperty(PropertieFields.EXPORT_WITH_ALARM, "true");
 		try {
 			this.storeProperties("Default properties stored");
 		} catch (final IOException ioException) {

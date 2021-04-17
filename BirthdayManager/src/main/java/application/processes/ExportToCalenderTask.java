@@ -10,12 +10,19 @@ import java.util.Date;
 
 import application.model.Person;
 import application.model.PersonManager;
+import application.util.PropertieFields;
+import application.util.PropertieManager;
 import biweekly.ICalVersion;
 import biweekly.ICalendar;
+import biweekly.component.VAlarm;
 import biweekly.component.VEvent;
 import biweekly.io.text.ICalWriter;
+import biweekly.parameter.Related;
+import biweekly.property.Action;
 import biweekly.property.Classification;
 import biweekly.property.Summary;
+import biweekly.property.Trigger;
+import biweekly.util.Duration;
 import javafx.concurrent.Task;
 
 /**
@@ -61,7 +68,6 @@ public class ExportToCalenderTask extends Task<Boolean> {
 	private void createCalender() {
 		int size = PersonManager.getInstance().getPersonDB().size();
 		for (int i = 0; i < size; i++) {
-			updateProgress(i, size);
 			Person person = PersonManager.getInstance().getPersonDB().get(i);
 			VEvent event = new VEvent();
 			Summary summary = event.setSummary(person.namesToString());
@@ -70,7 +76,16 @@ public class ExportToCalenderTask extends Task<Boolean> {
 					.from(person.getBirthday().withYear(2019).atStartOfDay(ZoneId.systemDefault()).toInstant());
 			event.setDateStart(start, false);
 			event.setClassification(Classification.PUBLIC);
+
+			if (new Boolean(PropertieManager.getPropertie(PropertieFields.EXPORT_WITH_ALARM))) {
+				Duration dayBefore = Duration.builder().prior(true).days(1).build();
+				Duration onBirthday = Duration.builder().prior(false).hours(8).build();
+				event.addAlarm(new VAlarm(Action.display(), new Trigger(dayBefore, Related.START)));
+				event.addAlarm(new VAlarm(Action.display(), new Trigger(onBirthday, Related.START)));
+			}
+
 			this.ical.addEvent(event);
+			updateProgress(i, size);
 		}
 
 	}
