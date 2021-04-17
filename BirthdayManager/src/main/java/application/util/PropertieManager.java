@@ -7,10 +7,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class PropertyManager{
+public class PropertieManager{
 
 	private final Logger LOG = LogManager.getLogger(this.getClass().getName());
 
@@ -23,19 +24,38 @@ public class PropertyManager{
 	 *
 	 * @throws IOException
 	 */
-	public PropertyManager() throws IOException{
+	public PropertieManager() throws IOException{
 		this.properties = new Properties();
 		this.propertiesFile = new File(System.getProperty("java.io.tmpdir") + this.PROPERTIE_FILE_NAME);
-		this.LOG.info("Propertie File" + this.propertiesFile.getAbsolutePath());
+		this.LOG.info("Propertie File " + this.propertiesFile.getAbsolutePath());
 
 		if(this.propertiesFile.createNewFile()){
 			this.LOG.info("Created new properties File");
 			this.fillWithStandartProperties();
+			this.LOG.info("Loaded default properties");
+		} else{
+			this.loadProperties();
+			this.LOG.info("Loaded properties");
 		}
 	}
 
 	private void fillWithStandartProperties(){
 		this.properties.setProperty(PropertieFields.SHOW_BIRTHDAYS_COUNT, "10");
+		this.properties.setProperty(PropertieFields.SAVED_LOCALE, "en_EN");
+		this.properties.setProperty(PropertieFields.AUTOSAVE, "false");
+		this.properties.setProperty(PropertieFields.WRITE_THRU, "false");
+		try{
+			this.storeProperties("Default properties stored");
+		} catch (final IOException ioException){
+			this.LOG.catching(Level.WARN, ioException);
+		}
+	}
+
+	/**
+	 * @return the properties
+	 */
+	public String getPropertie(final String key){
+		return this.properties.get(key).toString();
 	}
 
 	/**
@@ -43,13 +63,6 @@ public class PropertyManager{
 	 */
 	public Properties getProperties(){
 		return this.properties;
-	}
-
-	/**
-	 * @return the properties
-	 */
-	public String getProperty(final String key){
-		return this.properties.get(key).toString();
 	}
 
 	public void loadProperties() throws FileNotFoundException, IOException{
