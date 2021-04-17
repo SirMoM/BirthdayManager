@@ -191,6 +191,7 @@ public class BirthdaysOverviewController extends Controller {
 				final int indexOf = PersonManager.getInstance().getPersonDB().indexOf(selectedItems.get(0));
 				PersonManager.getInstance().deletePerson(PersonManager.getInstance().get(indexOf));
 				BirthdaysOverviewController.this.getMainController().getSessionInfos().updateSubLists();
+				BirthdaysOverviewController.this.nextBdaysList.refresh();
 			}
 
 		}
@@ -222,9 +223,12 @@ public class BirthdaysOverviewController extends Controller {
 		public void handle(final ActionEvent event) {
 			BirthdaysOverviewController.this.nextBdaysList.setItems(
 					BirthdaysOverviewController.this.getMainController().getSessionInfos().getRecentBirthdays());
-			BirthdaysOverviewController.this.nextBdaysList.refresh();
 			BirthdaysOverviewController.this.nextBirthday_Label
 					.setText(new LangResourceManager().getLocaleString(LangResourceKeys.str_recentBirthday_Label));
+			BirthdaysOverviewController.this.nextBdaysList.setStyle(null);
+			BirthdaysOverviewController.this.nextBdaysList.setCellFactory(null);
+			BirthdaysOverviewController.this.nextBdaysList.refresh();
+			
 		}
 	};
 
@@ -234,9 +238,11 @@ public class BirthdaysOverviewController extends Controller {
 		public void handle(final ActionEvent event) {
 			BirthdaysOverviewController.this.nextBdaysList.setItems(
 					BirthdaysOverviewController.this.getMainController().getSessionInfos().getNextBirthdays());
-			BirthdaysOverviewController.this.nextBdaysList.refresh();
 			BirthdaysOverviewController.this.nextBirthday_Label
 					.setText(new LangResourceManager().getLocaleString(LangResourceKeys.str_nextBirthday_Label));
+			BirthdaysOverviewController.this.nextBdaysList.setStyle(null);
+			BirthdaysOverviewController.this.nextBdaysList.setCellFactory(factory);
+			BirthdaysOverviewController.this.nextBdaysList.refresh();
 		}
 	};
 
