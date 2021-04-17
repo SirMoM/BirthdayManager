@@ -45,6 +45,7 @@ public class SessionInfos{
 	 * Loads the saved properties or gets the default values
 	 */
 	public SessionInfos(){
+		LOG.info("SessionInfos created");
 		this.propertieManager = new PropertieManager();
 		final String localePropertieString = this.propertieManager.getPropertie(PropertieFields.SAVED_LOCALE);
 		LOG.debug("Loaded locale propertie " + localePropertieString);
@@ -174,9 +175,9 @@ public class SessionInfos{
 	private void updateBirthdaysThisWeek(){
 		final List<Person> temp = PersonManager.getInstance().getPersonDB();
 		temp.sort(new BirthdayComparator(true));
-
 		final int week = LocalDate.now().get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
 		System.out.println("WEEK" + week);
+
 		for(final Person person : temp){
 			final LocalDate birthday = person.getBirthday().withYear(2019);
 			if(birthday.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) == week){
