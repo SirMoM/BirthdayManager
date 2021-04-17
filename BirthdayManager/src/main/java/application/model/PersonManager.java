@@ -70,14 +70,11 @@ public class PersonManager {
 	}
 
 	/**
-	 * @param person
+	 * @param person The person to delete
 	 */
 	public void deletePerson(final Person person) {
 		this.personDB.remove(person);
 		this.changesProperty.set(true);
-//		if (this.writeThru) {TODO DELETE THIS
-//			this.saveToFile();
-//		}
 	}
 
 	public Person getPersonFromIndex(final int indexPerson) {

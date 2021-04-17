@@ -38,6 +38,8 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
 
 /**
+ * This holds a lot of information for the app.
+ * 
  * @author Noah Ruben
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
@@ -58,7 +60,8 @@ public class SessionInfos {
 	private final ObservableList<Person> birthdaysThisMonat = FXCollections.observableArrayList();
 
 	/**
-	 * Loads the saved properties or gets the default values
+	 * Loads the saved properties or gets the default values.
+	 * @param mainController The {@link MainController} of the application.
 	 */
 	public SessionInfos(MainController mainController) {
 		LOG.info("SessionInfos created");

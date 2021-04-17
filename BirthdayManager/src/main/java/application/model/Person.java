@@ -33,15 +33,15 @@ public class Person {
 
 	/**
 	 * Parsing lines in the format: birthday;name;sonstiges
-	 * <p>
 	 * <ul>
 	 * <li>the name is expected like this: name, surname, misc
 	 * <li>the birthday is expected like this: dd.MM.yyyy
 	 * </ul>
 	 *
-	 * the name and surname are mandatory
+	 * <p><b>The name and surname are mandatory</b></p>
 	 *
-	 * @param txtLine a read line from the Text-file
+	 * @param txtLine a read line from the file
+	 * @param line which line of the file is parsed right now
 	 * @return a new Person resulting from the given String
 	 */
 	public static Person parseFromCSVLine(final String txtLine, final int line) {
@@ -347,11 +347,10 @@ public class Person {
 	}
 
 	/**
-	 * String representation of the person.
-	 * <p>
-	 * with the formate
-	 * <p>
+	 * String representation of the person with the formate: <br>
 	 * <code>name misc surname</code>=<code>dd.mm.yyyy</code>
+	 * 
+	 * @return The String representation of the person for a TXT-file.
 	 */
 	public String toTXTString() {
 		final StringBuilder builder = new StringBuilder();

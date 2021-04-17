@@ -121,7 +121,8 @@ public class PropertyManager {
 	}
 
 	/**
-	 * @return the a propertie
+	 * @param key For the property
+	 * @return a property as String
 	 */
 	public static String getProperty(final String key) {
 		String propertie = null;
@@ -133,29 +134,14 @@ public class PropertyManager {
 		return propertie;
 	}
 
-	/**
-	 * @return the properties
-	 */
 	public Properties getProperties() {
 		return this.properties;
 	}
 
-	/**
-	 * @see Properties
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
 	public void loadProperties() throws FileNotFoundException, IOException {
 		this.properties.load(new FileInputStream(this.propertiesFile));
 	}
 
-	/**
-	 * @see Properties
-	 *
-	 * @param comments
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
 	public void storeProperties(final String comments) throws FileNotFoundException, IOException {
 		this.properties.store(new FileWriter(this.propertiesFile), comments);
 	}

@@ -13,6 +13,13 @@ import java.util.List;
  */
 public class PersonsInAWeek {
 
+	/**
+	 * <b>May not use all Persons of the List.</b><br>
+	 * Parses a {@link List} of {@link Person}'s into {@link PersonsInAWeek}
+	 * 
+	 * @param list The List of persons which will be parsed into a {@link PersonsInAWeek}.
+	 * @return a {@link PersonsInAWeek} Object from the String.
+	 */
 	static public List<PersonsInAWeek> parseAList(final List<Person> list) {
 		final List<Person> personsToParse = list;
 		Person mondayPerson = null;
@@ -92,13 +99,15 @@ public class PersonsInAWeek {
 	private Person fridayPerson;
 
 	/**
-	 * @param mondayPerson
-	 * @param tuesdayPerson
-	 * @param wednesdayPerson
-	 * @param thursdayPerson
-	 * @param fridayPerson
-	 * @param saturdayPerson
-	 * @param sundayPerson
+	 * @param mondayPerson the Person for the Monday slot.
+	 * @param tuesdayPerson the Person for the Tuesday slot.
+	 * @param wednesdayPerson the Person for the Wednesday slot.
+	 * @param thursdayPerson the Person for the Thursday slot.
+	 * @param fridayPerson the Person for the Friday slot.
+	 * @param saturdayPerson the Person for the Saturday slot.
+	 * @param sundayPerson the Person for the Sunday slot.
+	 * 
+	 * @see Person
 	 */
 	public PersonsInAWeek(final Person mondayPerson, final Person tuesdayPerson, final Person wednesdayPerson,
 			final Person thursdayPerson, final Person fridayPerson, final Person saturdayPerson,
