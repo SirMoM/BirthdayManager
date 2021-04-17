@@ -29,7 +29,7 @@ public class UpdateAllSubBirthdayListsTask extends Task<Boolean>{
 	private final Logger LOG = LogManager.getLogger(this.getClass().getName());
 
 	/**
-	 * @param birthdaysOverviewController
+	 * @param sessionInfos the session infos of the application
 	 */
 	public UpdateAllSubBirthdayListsTask(final SessionInfos sessionInfos){
 		super();
@@ -37,6 +37,11 @@ public class UpdateAllSubBirthdayListsTask extends Task<Boolean>{
 		this.NEXT_BIRTHDAYS_COUNT = Integer.parseInt(sessionInfos.getPropertiesHandler().getProperties().getProperty(PropertieFields.SHOW_BIRTHDAYS_COUNT));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see javafx.concurrent.Task#call()
+	 */
 	@Override
 	protected Boolean call() throws Exception{
 		final List<Person> allPersons = PersonManager.getInstance().getPersonDB();
@@ -54,10 +59,22 @@ public class UpdateAllSubBirthdayListsTask extends Task<Boolean>{
 		return true;
 	}
 
+	/**
+	 * Fills the BirthdaysThisMonth
+	 *
+	 * @param temp the {@link List} of persons where the Birthdays this month are
+	 *             extracted
+	 */
 	private void updateBirthdaysThisMonth(final List<Person> temp){
-		// TODO do it
+		// TODO updateBirthdaysThisMonth
 	}
 
+	/**
+	 * Fills the BirthdaysThisWeek
+	 *
+	 * @param temp the {@link List} of persons where the Birthdays this week are
+	 *             extracted
+	 */
 	private void updateBirthdaysThisWeek(final List<Person> temp){
 		final int week = LocalDate.now().get(IsoFields.WEEK_BASED_YEAR);
 
@@ -71,7 +88,10 @@ public class UpdateAllSubBirthdayListsTask extends Task<Boolean>{
 	}
 
 	/**
-	 * @param temp
+	 * Fills the NextBirthdays
+	 *
+	 * @param temp the {@link List} of persons where the next Birthdays are
+	 *             extracted
 	 */
 	private void updateNextBirthdays(final List<Person> temp){
 		this.sessionInfos.getNextBirthdays().clear();
@@ -93,7 +113,10 @@ public class UpdateAllSubBirthdayListsTask extends Task<Boolean>{
 	}
 
 	/**
-	 * @param temp
+	 * Fills the RecentBirthdays
+	 *
+	 * @param temp the {@link List} of persons where the recent Birthdays are
+	 *             extracted
 	 */
 	private void updateRecentBirthdays(final List<Person> temp){
 		// TODO Jahres übergreifend XD

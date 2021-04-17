@@ -23,7 +23,11 @@ public class PersonManager{
 	final static Logger LOG = LogManager.getLogger(PersonManager.class);
 	private static PersonManager personManagerSingelton = null;
 
-	// static method to create instance of PersonManager class
+	/**
+	 * Static method to create instance of PersonManager class
+	 *
+	 * @return the only instance {@link PersonManager}
+	 */
 	public static PersonManager getInstance(){
 		if(personManagerSingelton == null){
 			personManagerSingelton = new PersonManager();
@@ -36,11 +40,16 @@ public class PersonManager{
 
 	private File saveFile;
 
-	// private constructor restricted to this class itself
+	/**
+	 * Private constructor restricted to this class itself.
+	 */
 	private PersonManager(){
 		this.setPersonDB(new ArrayList<Person>());
 	}
 
+	/**
+	 * Checks if the Save-File exists. If not create the File.
+	 */
 	private void checkSaveFile(){
 		if(!this.saveFile.exists()){
 			try{
@@ -51,6 +60,9 @@ public class PersonManager{
 		}
 	}
 
+	/**
+	 * @param person
+	 */
 	public void deletePerson(final Person person){
 		this.personDB.remove(person);
 		if(this.writeThru){
@@ -59,12 +71,19 @@ public class PersonManager{
 	}
 
 	/**
-	 * @return the personDB
+	 * @return the personDB ==> the {@link ArrayList} which contains the Persons
 	 */
 	public List<Person> getPersonDB(){
 		return this.personDB;
 	}
 
+	/**
+	 * Populates the {@link ArrayList} which contains the Persons ==>
+	 * {@link #personDB}
+	 *
+	 * @throws FileNotFoundException if the File is not found
+	 * @throws IOException           if a new File could not be read
+	 */
 	private void populateList() throws IOException, FileNotFoundException{
 		this.personDB.clear();
 		String line;
@@ -75,10 +94,21 @@ public class PersonManager{
 		bufferedReader.close();
 	}
 
+	/**
+	 * Saves the {@link ArrayList} {@link #personDB} to the {@link #saveFile}
+	 *
+	 * @return a boolean which indicates if the save was completed
+	 */
 	public boolean save(){
 		return this.saveToFile();
 	}
 
+	/**
+	 * Saves the {@link ArrayList} {@link #personDB} to the selectedFile
+	 *
+	 * @param selectedFile a new saveFile
+	 * @return a boolean which indicates if the save was completed
+	 */
 	public boolean save(final File selectedFile){
 		try{
 			final FileWriter fileWriter = new FileWriter(selectedFile);
@@ -106,6 +136,12 @@ public class PersonManager{
 		return true;
 	}
 
+	/**
+	 * Private saves the {@link ArrayList} {@link #personDB} to the
+	 * {@link #saveFile}
+	 *
+	 * @return a boolean which indicates if the save was completed
+	 */
 	private boolean saveToFile(){
 		this.saveFile.delete();
 		LOG.info("Deleted File", this.saveFile);
@@ -171,6 +207,10 @@ public class PersonManager{
 		this.saveFile = saveFile;
 	}
 
+	/**
+	 * @param personToUpdate the person which will be updated
+	 * @param updatedPerson  the person which was updated
+	 */
 	public void updatePerson(final Person personToUpdate, final Person updatedPerson){
 		this.personDB.set(this.personDB.indexOf(personToUpdate), updatedPerson);
 		if(this.writeThru){

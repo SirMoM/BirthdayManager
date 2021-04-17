@@ -43,8 +43,7 @@ public class SessionInfos{
 	private final ObservableMap<Integer, Person> birthdaysThisMonat = FXCollections.observableHashMap();
 
 	/**
-	 * @param configHandler
-	 * @throws IOException
+	 * Loades the saved properties or gets the default values
 	 */
 	public SessionInfos(){
 		super();
@@ -98,10 +97,9 @@ public class SessionInfos{
 		return this.birthdaysThisWeek;
 	}
 
-	public PropertieManager getPropertiesHandler(){
-		return this.configHandler;
-	}
-
+	/**
+	 * @return fileToOpen
+	 */
 	public File getFileToOpen(){
 		return this.fileToOpen;
 	}
@@ -134,6 +132,10 @@ public class SessionInfos{
 		return this.nextBirthdays;
 	}
 
+	public PropertieManager getPropertiesHandler(){
+		return this.configHandler;
+	}
+
 	/**
 	 * @return the recentBirthdays
 	 */
@@ -148,6 +150,9 @@ public class SessionInfos{
 		return this.recentFileName;
 	}
 
+	/**
+	 * resets the nextBirthdays and recentBirthdays
+	 */
 	public void resetSubLists(){
 		this.nextBirthdays.clear();
 		this.recentBirthdays.clear();
@@ -160,6 +165,9 @@ public class SessionInfos{
 		this.appLocale = appLocale;
 	}
 
+	/**
+	 * @param fileToOpen the File to open aka the save file
+	 */
 	public void setFileToOpen(final File fileToOpen){
 		this.fileToOpen = fileToOpen;
 		if(fileToOpen != null){

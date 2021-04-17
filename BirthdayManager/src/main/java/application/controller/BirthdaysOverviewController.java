@@ -252,12 +252,17 @@ public class BirthdaysOverviewController extends Controller{
 		}
 	};
 
+	/**
+	 *
+	 * @see application.controller.Controller#Controller(MainController)
+	 */
 	public BirthdaysOverviewController(final MainController mainController){
 		super(mainController);
 	}
 
 	/**
-	 * all Assertions for the controller
+	 * All assertions for the controller. Checks if all FXML-Components have been
+	 * loaded properly.
 	 */
 	private void assertion(){
 		assert this.file_menu != null : "fx:id=\"file_menu\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
@@ -303,6 +308,12 @@ public class BirthdaysOverviewController extends Controller{
 		assert this.date_label != null : "fx:id=\"date_label\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see javafx.fxml.Initializable#initialize(java.net.URL,
+	 * java.util.ResourceBundle)
+	 */
 	@Override
 	public void initialize(final URL location, final ResourceBundle resources){
 		this.assertion();
@@ -344,7 +355,13 @@ public class BirthdaysOverviewController extends Controller{
 
 	}
 
-	private void updateLocalisation(){
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see application.controller.Controller#updateLocalisation()
+	 */
+	@Override
+	public void updateLocalisation(){
 		final LangResourceManager resourceManager = this.getMainController().getSessionInfos().getLangResourceManager();
 
 		this.nextBirthday_Label.setText(resourceManager.getLocaleString(LangResourceKeys.str_nextBirthday_Label));

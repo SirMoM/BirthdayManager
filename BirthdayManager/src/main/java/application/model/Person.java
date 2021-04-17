@@ -17,6 +17,14 @@ import javafx.beans.property.StringProperty;
  * @author Noah Ruben
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
+/**
+ * @author Admin
+ * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
+ */
+/**
+ * @author Admin
+ * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
+ */
 public class Person{
 	protected final static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 	private StringProperty surname;
@@ -32,8 +40,9 @@ public class Person{
 	}
 
 	/**
-	 *
+	 * @param lineFromFile a read line from the rext file
 	 */
+	// TODO DO the parsing elsewhere
 	public Person(final String lineFromFile){
 		super();
 		this.surname = new SimpleStringProperty();
@@ -57,9 +66,13 @@ public class Person{
 	}
 
 	/**
-	 * @param surname
-	 * @param name
-	 * @param birthday
+	 * Creates a new person with all attributes
+	 *
+	 * @param surname  The surname of the person
+	 * @param name     The name of the person
+	 * @param misc     The middle name of the person of or everything if it could
+	 *                 not get parsed properly
+	 * @param birthday the Birthday of the person
 	 */
 	public Person(final String surname, final String name, final String misc, final LocalDate birthday){
 		super();
@@ -82,28 +95,28 @@ public class Person{
 	}
 
 	/**
-	 * @return the birthday
+	 * @return the birthday of the person
 	 */
 	public LocalDate getBirthday(){
 		return this.birthday.getValue();
 	}
 
 	/**
-	 * @return the misc
+	 * @return the middle name / everything of the person
 	 */
 	public String getMisc(){
 		return this.misc.get();
 	}
 
 	/**
-	 * @return the name
+	 * @return the name of the person
 	 */
 	public String getName(){
 		return this.name.get();
 	}
 
 	/**
-	 * @return the surname
+	 * @return the surname of the person
 	 */
 	public String getSurname(){
 		return this.surname.get();
@@ -117,7 +130,7 @@ public class Person{
 	}
 
 	/**
-	 * @param misc the misc to set
+	 * @param misc the middle name to set
 	 */
 	public void setMisc(final String misc){
 		this.misc.set(misc);
@@ -137,6 +150,9 @@ public class Person{
 		this.surname.set(surname);
 	}
 
+	/**
+	 * @return a CSV-String representation of the person.
+	 */
 	public String toCSVString(){
 		final StringBuilder builder = new StringBuilder();
 		if(this.getName() != null){
@@ -158,6 +174,9 @@ public class Person{
 		return builder.toString();
 	}
 
+	/**
+	 * @return a ExtendedString of the person for Debugging
+	 */
 	public String toExtendedString(){
 		final StringBuilder builder = new StringBuilder();
 		builder.append("Person: ");
@@ -211,6 +230,13 @@ public class Person{
 		return builder.toString();
 	}
 
+	/**
+	 * String representation of the person.
+	 * <p>
+	 * with the formate
+	 * <p>
+	 * <code>name misc surname</code>=<code>dd.mm.yyyy</code>
+	 */
 	public String toTXTString(){
 		final StringBuilder builder = new StringBuilder();
 		if(this.getName() != null){

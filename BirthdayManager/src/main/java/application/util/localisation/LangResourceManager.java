@@ -21,7 +21,7 @@ public class LangResourceManager{
 	ResourceBundle langResourceBundle = null;
 
 	/**
-	 *
+	 * @param locale the {@link Locale} which determinate the application language
 	 */
 	public LangResourceManager(final Locale locale){
 		try{
@@ -34,6 +34,9 @@ public class LangResourceManager{
 		}
 	}
 
+	/**
+	 * @param locale the {@link Locale} which determinate the application language
+	 */
 	public void changeLocale(final Locale locale){
 		try{
 			this.langResourceBundle = PropertyResourceBundle.getBundle(this.LANG_BUNDLE_BASE_NAME, locale);
@@ -46,6 +49,10 @@ public class LangResourceManager{
 
 	}
 
+	/**
+	 * @param langResourceKey A key from {@link LangResourceKeys}
+	 * @return the component string in the correct language
+	 */
 	public String getLocaleString(final LangResourceKeys langResourceKey){
 		return this.langResourceBundle.getString(langResourceKey.name());
 	}

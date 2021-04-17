@@ -228,16 +228,29 @@ public class EditBirthdayViewController extends Controller{
 		}
 	};
 
+	/**
+	 *
+	 * @see application.controller.Controller#Controller(MainController)
+	 */
 	public EditBirthdayViewController(final MainController mainController){
 		super(mainController);
 		this.personToEdit = new Person();
 	}
 
+	/**
+	 * @param person the person to edit
+	 *
+	 * @see application.controller.Controller#Controller(MainController)
+	 */
 	public EditBirthdayViewController(final MainController mainController, final Person person){
 		super(mainController);
 		this.personToEdit = person;
 	}
 
+	/**
+	 * All assertions for the controller. Checks if all FXML-Components have been
+	 * loaded properly.
+	 */
 	private void assertions(){
 		assert this.file_menu != null : "fx:id=\"file_menu\" was not injected: check your FXML file 'EditBirthdayView.fxml'.";
 		assert this.openFile_MenuItem != null : "fx:id=\"openFile_MenuItem\" was not injected: check your FXML file 'EditBirthdayView.fxml'.";
@@ -274,6 +287,9 @@ public class EditBirthdayViewController extends Controller{
 		assert this.date_label != null : "fx:id=\"date_label\" was not injected: check your FXML file 'EditBirthdayView.fxml'.";
 	}
 
+	/**
+	 * Binds the JavaFX Components to their {@link EventHandler}.
+	 */
 	private void bindComponents(){
 		this.cancel_Button.addEventHandler(ActionEvent.ANY, this.exitHandler);
 		this.save_Button.addEventHandler(ActionEvent.ANY, this.savePersonHandler);
@@ -287,6 +303,12 @@ public class EditBirthdayViewController extends Controller{
 		return this.personToEdit;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see javafx.fxml.Initializable#initialize(java.net.URL,
+	 * java.util.ResourceBundle)
+	 */
 	@Override
 	public void initialize(final URL arg0, final ResourceBundle arg1){
 		this.assertions();
@@ -295,6 +317,9 @@ public class EditBirthdayViewController extends Controller{
 		this.loadPerson();
 	}
 
+	/**
+	 * Loads the person data in the view.
+	 */
 	private void loadPerson(){
 		this.name_TextField.setText(this.personToEdit.getName());
 		this.surname_TextField.setText(this.personToEdit.getSurname());
@@ -302,7 +327,13 @@ public class EditBirthdayViewController extends Controller{
 		this.middleName_TextField.setText(this.personToEdit.getMisc());
 	}
 
-	private void updateLocalisation(){
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see application.controller.Controller#updateLocalisation()
+	 */
+	@Override
+	public void updateLocalisation(){
 		final LangResourceManager resourceManager = this.getMainController().getSessionInfos().getLangResourceManager();
 
 		this.file_menu.setText(resourceManager.getLocaleString(LangResourceKeys.file_menu));
