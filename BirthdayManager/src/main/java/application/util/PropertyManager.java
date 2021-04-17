@@ -53,9 +53,9 @@ public class PropertyManager {
 			if (this.propertiesFile.createNewFile()) {
 				this.LOG.info("Created new properties File");
 				this.fillWithStandartProperties();
-				this.LOG.info("Loaded default properties");
 			} else {
 				this.loadProperties();
+				this.fillWithStandartProperties();
 				this.LOG.info("Loaded properties");
 			}
 		} catch (final FileNotFoundException fileNotFoundException) {
@@ -75,14 +75,38 @@ public class PropertyManager {
 	 * </ul>
 	 */
 	protected void fillWithStandartProperties() {
-		this.properties.setProperty(PropertyFields.SAVED_LOCALE, "en_GB");
-		this.properties.setProperty(PropertyFields.AUTOSAVE, "true");
-		this.properties.setProperty(PropertyFields.WRITE_THRU, "true");
-		this.properties.setProperty(PropertyFields.OPEN_FILE_ON_START, "false");
-		this.properties.setProperty(PropertyFields.SHOW_BIRTHDAYS_COUNT, "15");
-		this.properties.setProperty(PropertyFields.FIRST_HIGHLIGHT_COLOR, "#ff000066");
-		this.properties.setProperty(PropertyFields.SECOND_HIGHLIGHT_COLOR, "#ffcc6666");
-		this.properties.setProperty(PropertyFields.EXPORT_WITH_ALARM, "true");
+		if (this.properties.getProperty(PropertyFields.SAVED_LOCALE) == null) {
+			this.properties.setProperty(PropertyFields.SAVED_LOCALE, "en_GB");
+			LOG.info("Added " + PropertyFields.SAVED_LOCALE + " propery");
+		}
+		if (this.properties.getProperty(PropertyFields.AUTOSAVE) == null) {
+			this.properties.setProperty(PropertyFields.AUTOSAVE, "true");
+			LOG.info("Added " + PropertyFields.AUTOSAVE + " propery");
+		}
+		if (this.properties.getProperty(PropertyFields.WRITE_THRU) == null) {
+			this.properties.setProperty(PropertyFields.WRITE_THRU, "true");
+			LOG.info("Added " + PropertyFields.WRITE_THRU + " propery");
+		}
+		if (this.properties.getProperty(PropertyFields.OPEN_FILE_ON_START) == null) {
+			this.properties.setProperty(PropertyFields.OPEN_FILE_ON_START, "false");
+			LOG.info("Added " + PropertyFields.OPEN_FILE_ON_START + " propery");
+		}
+		if (this.properties.getProperty(PropertyFields.SHOW_BIRTHDAYS_COUNT) == null) {
+			this.properties.setProperty(PropertyFields.SHOW_BIRTHDAYS_COUNT, "15");
+			LOG.info("Added " + PropertyFields.SHOW_BIRTHDAYS_COUNT + " propery");
+		}
+		if (this.properties.getProperty(PropertyFields.FIRST_HIGHLIGHT_COLOR) == null) {
+			this.properties.setProperty(PropertyFields.FIRST_HIGHLIGHT_COLOR, "#ff000066");
+			LOG.info("Added " + PropertyFields.FIRST_HIGHLIGHT_COLOR + " propery");
+		}
+		if (this.properties.getProperty(PropertyFields.SECOND_HIGHLIGHT_COLOR) == null) {
+			this.properties.setProperty(PropertyFields.SECOND_HIGHLIGHT_COLOR, "#ffcc6666");
+			LOG.info("Added " + PropertyFields.SECOND_HIGHLIGHT_COLOR + " propery");
+		}
+		if (this.properties.getProperty(PropertyFields.EXPORT_WITH_ALARM) == null) {
+			this.properties.setProperty(PropertyFields.EXPORT_WITH_ALARM, "true");
+			LOG.info("Added " + PropertyFields.EXPORT_WITH_ALARM + " propery");
+		}
 		try {
 			this.storeProperties("Default properties stored");
 		} catch (final IOException ioException) {
