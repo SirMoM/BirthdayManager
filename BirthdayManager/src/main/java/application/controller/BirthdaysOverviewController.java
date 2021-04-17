@@ -195,9 +195,11 @@ public class BirthdaysOverviewController extends Controller {
 				PersonManager.getInstance().deletePerson(PersonManager.getInstance().get(indexOf));
 				BirthdaysOverviewController.this.getMainController().getSessionInfos().updateSubLists();
 				
-				ObservableList<Person> list = BirthdaysOverviewController.this.nextBdaysList.getItems(); 
-				BirthdaysOverviewController.this.nextBdaysList.setItems(null);
-				BirthdaysOverviewController.this.nextBdaysList.setItems(list);
+				ObservableList<Person> list = BirthdaysOverviewController.this.nextBdaysList.getItems();
+				BirthdaysOverviewController.this.nextBdaysList.setStyle(null);
+				BirthdaysOverviewController.this.nextBdaysList.setCellFactory(null);
+				BirthdaysOverviewController.this.nextBdaysList.refresh();
+				BirthdaysOverviewController.this.nextBdaysList.setCellFactory(factory);
 				BirthdaysOverviewController.this.nextBdaysList.refresh(); 
 			}
 
