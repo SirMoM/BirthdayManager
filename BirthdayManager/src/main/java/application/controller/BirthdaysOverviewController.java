@@ -20,9 +20,7 @@ import application.util.ConfigFields;
 import application.util.ConfigHandler;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -31,6 +29,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -45,11 +44,6 @@ import javafx.stage.FileChooser.ExtensionFilter;
  */
 public class BirthdaysOverviewController extends Controller{
 	protected final static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-
-	private ObservableList<Person> nextBirthdays;
-	private ObservableMap<DayOfWeek, Person> birthdaysThisWeek;
-	private ObservableMap<Integer, Person> birthdaysThisMonth;
-	private ObservableList<Person> recentBirthdays;
 
 	private MenuItem recentFiles_MenuItem;
 
@@ -192,7 +186,12 @@ public class BirthdaysOverviewController extends Controller{
 
 		@Override
 		public void handle(ActionEvent arg0){
-			BirthdaysOverviewController.this.getMainController().goToEditBirthdayView();
+			ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
+			if(selectedItems.isEmpty()){
+				return;
+			} else{
+				BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(selectedItems.get(0));
+			}
 		}
 	};
 
@@ -228,13 +227,13 @@ public class BirthdaysOverviewController extends Controller{
 				@Override
 				public void handle(WorkerStateEvent t){
 					List<Person> result = loadBirthdaysFromFileTask.getValue();
-					BirthdaysOverviewController.this.getMainController().getSessionInfos().getAllPersons().addAll(result);
+					BirthdaysOverviewController.this.getMainController().getSessionInfos().setAllPersons(result);
 					BirthdaysOverviewController.this.openedFile_label.setText(selectedFile.getName());
 					if(result.isEmpty()){
 						System.out.println("failed");
 					} else{
 						System.out.println("loaded birthdays from file");
-						UpdateAllSubBirthdayListsTask updateAllSubBirthdayLists = new UpdateAllSubBirthdayListsTask(BirthdaysOverviewController.this);
+						UpdateAllSubBirthdayListsTask updateAllSubBirthdayLists = new UpdateAllSubBirthdayListsTask(BirthdaysOverviewController.this.getMainController().getSessionInfos());
 						new Thread(updateAllSubBirthdayLists).start();
 					}
 				}
@@ -270,13 +269,13 @@ public class BirthdaysOverviewController extends Controller{
 				@Override
 				public void handle(WorkerStateEvent t){
 					List<Person> result = loadBirthdaysFromFileTask.getValue();
-					BirthdaysOverviewController.this.getMainController().getSessionInfos().getAllPersons().addAll(result);
+					BirthdaysOverviewController.this.getMainController().getSessionInfos().setAllPersons(result);
 					BirthdaysOverviewController.this.openedFile_label.setText(birthdayFile.getName());
 					if(result.isEmpty()){
 						System.out.println("failed");
 					} else{
 						System.out.println("loaded birthdays from file");
-						UpdateAllSubBirthdayListsTask updateAllSubBirthdayLists = new UpdateAllSubBirthdayListsTask(BirthdaysOverviewController.this);
+						UpdateAllSubBirthdayListsTask updateAllSubBirthdayLists = new UpdateAllSubBirthdayListsTask(BirthdaysOverviewController.this.getMainController().getSessionInfos());
 						new Thread(updateAllSubBirthdayLists).start();
 					}
 				}
@@ -288,7 +287,7 @@ public class BirthdaysOverviewController extends Controller{
 	final EventHandler<ActionEvent> updateListsHandler = new EventHandler<ActionEvent>(){
 		@Override
 		public void handle(ActionEvent event){
-			UpdateAllSubBirthdayListsTask updateAllSubBirthdayLists = new UpdateAllSubBirthdayListsTask(BirthdaysOverviewController.this);
+			UpdateAllSubBirthdayListsTask updateAllSubBirthdayLists = new UpdateAllSubBirthdayListsTask(BirthdaysOverviewController.this.getMainController().getSessionInfos());
 			updateAllSubBirthdayLists.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>(){
 				@Override
 				public void handle(WorkerStateEvent t){
@@ -308,7 +307,7 @@ public class BirthdaysOverviewController extends Controller{
 
 		@Override
 		public void handle(ActionEvent event){
-			BirthdaysOverviewController.this.nextBdaysList.setItems(BirthdaysOverviewController.this.recentBirthdays);
+			BirthdaysOverviewController.this.nextBdaysList.setItems(BirthdaysOverviewController.this.getMainController().getSessionInfos().getRecentBirthdays());
 			BirthdaysOverviewController.this.nextBdaysList.refresh();
 			BirthdaysOverviewController.this.nextBirthday_Label.setText(BirthdaysOverviewController.this.getMainController().getSessionInfos().getLangResourceManager().getLocaleString(LangResourceKeys.str_recentBirthday_Label));
 		}
@@ -318,7 +317,7 @@ public class BirthdaysOverviewController extends Controller{
 
 		@Override
 		public void handle(ActionEvent event){
-			BirthdaysOverviewController.this.nextBdaysList.setItems(BirthdaysOverviewController.this.nextBirthdays);
+			BirthdaysOverviewController.this.nextBdaysList.setItems(BirthdaysOverviewController.this.getMainController().getSessionInfos().getNextBirthdays());
 			BirthdaysOverviewController.this.nextBdaysList.refresh();
 			BirthdaysOverviewController.this.nextBirthday_Label.setText(BirthdaysOverviewController.this.getMainController().getSessionInfos().getLangResourceManager().getLocaleString(LangResourceKeys.str_nextBirthday_Label));
 		}
@@ -336,38 +335,6 @@ public class BirthdaysOverviewController extends Controller{
 
 	public BirthdaysOverviewController(MainController mainController){
 		super(mainController);
-		this.nextBirthdays = FXCollections.observableArrayList();
-		this.birthdaysThisWeek = FXCollections.observableHashMap();
-		this.birthdaysThisMonth = FXCollections.observableHashMap();
-		this.recentBirthdays = FXCollections.observableArrayList();
-	}
-
-	/**
-	 * @return the birthdaysThisMonth
-	 */
-	public ObservableMap<Integer, Person> getBirthdaysThisMonth(){
-		return this.birthdaysThisMonth;
-	}
-
-	/**
-	 * @return the birthdaysThisWeek
-	 */
-	public ObservableMap<DayOfWeek, Person> getBirthdaysThisWeek(){
-		return this.birthdaysThisWeek;
-	}
-
-	/**
-	 * @return the nextBirthdays
-	 */
-	public ObservableList<Person> getNextBirthdays(){
-		return this.nextBirthdays;
-	}
-
-	/**
-	 * @return the recentBirthdays
-	 */
-	public ObservableList<Person> getRecentBirthdays(){
-		return this.recentBirthdays;
 	}
 
 	@Override
@@ -418,19 +385,21 @@ public class BirthdaysOverviewController extends Controller{
 		this.updateLocalisation();
 
 		// EventHandlers
-		this.openFile_MenuItem.addEventHandler(ActionEvent.ANY, this.openFromFileChooserHandler);
-		this.refresh_MenuItem.addEventHandler(ActionEvent.ANY, this.updateListsHandler);
+
 		this.openBirthday_MenuItem.addEventHandler(ActionEvent.ANY, this.openBirthday);
 		this.debug.addEventHandler(ActionEvent.ACTION, this.updateListsHandler);
+		this.refresh_MenuItem.addEventHandler(ActionEvent.ANY, this.updateListsHandler);
 
 		this.showNextBirthdays_MenuItem.addEventHandler(ActionEvent.ANY, this.showNextBirthdaysHandler);
 		this.showLastBirthdays_MenuItem.addEventHandler(ActionEvent.ANY, this.showRecentBirthdaysHandler);
-		this.changeLanguage_MenuItem.addEventHandler(ActionEvent.ANY, this.changeLanguageHandler);
 
-		this.nextBdaysList.setItems(this.nextBirthdays);
-		this.week_tableView.setItems(this.getRecentBirthdays());
+		this.nextBdaysList.setItems(this.getMainController().getSessionInfos().getNextBirthdays());
 
 		this.date_label.setText(DATE_FORMATTER.format(LocalDate.now()));
+		this.nextBdaysList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+
+		this.openFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromFileChooserHandler);
+		this.changeLanguage_MenuItem.addEventHandler(ActionEvent.ANY, this.changeLanguageHandler);
 		String property = null;
 		try{
 			property = new ConfigHandler().getProperties().getProperty(ConfigFields.LAST_OPEND);
@@ -441,34 +410,7 @@ public class BirthdaysOverviewController extends Controller{
 		} catch (Exception e){
 			e.printStackTrace();
 		}
-	}
 
-	/**
-	 * @param birthdaysThisMonth the birthdaysThisMonth to set
-	 */
-	public void setBirthdaysThisMonth(ObservableMap<Integer, Person> birthdaysThisMonth){
-		this.birthdaysThisMonth = birthdaysThisMonth;
-	}
-
-	/**
-	 * @param birthdaysThisWeek the birthdaysThisWeek to set
-	 */
-	public void setBirthdaysThisWeek(ObservableMap<DayOfWeek, Person> birthdaysThisWeek){
-		this.birthdaysThisWeek = birthdaysThisWeek;
-	}
-
-	/**
-	 * @param nextBirthdays the nextBirthdays to set
-	 */
-	public void setNextBirthdays(ObservableList<Person> nextBirthdays){
-		this.nextBirthdays = nextBirthdays;
-	}
-
-	/**
-	 * @param recentBirthdays the recentBirthdays to set
-	 */
-	public void setRecentBirthdays(ObservableList<Person> recentBirthdays){
-		this.recentBirthdays = recentBirthdays;
 	}
 
 	private void updateLocalisation(){

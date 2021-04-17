@@ -8,8 +8,8 @@ import java.time.temporal.IsoFields;
 import java.util.ArrayList;
 import java.util.List;
 
-import application.controller.BirthdaysOverviewController;
 import application.model.Person;
+import application.model.SessionInfos;
 import application.util.BirthdayComparator;
 import application.util.ConfigFields;
 import javafx.concurrent.Task;
@@ -20,16 +20,16 @@ import javafx.concurrent.Task;
  */
 public class UpdateAllSubBirthdayListsTask extends Task<Boolean>{
 
-	private BirthdaysOverviewController birthdaysOverviewController;
 	final int NEXT_BIRTHDAYS_COUNT;
+	private SessionInfos sessionInfos;
 
 	/**
 	 * @param birthdaysOverviewController
 	 */
-	public UpdateAllSubBirthdayListsTask(BirthdaysOverviewController birthdaysOverviewController){
+	public UpdateAllSubBirthdayListsTask(SessionInfos sessionInfos){
 		super();
-		this.birthdaysOverviewController = birthdaysOverviewController;
-		this.NEXT_BIRTHDAYS_COUNT = Integer.parseInt(this.birthdaysOverviewController.getMainController().getSessionInfos().getConfigHandler().getProperties().getProperty(ConfigFields.NEXT_BIRTHDAYS_COUNT));
+		this.sessionInfos = sessionInfos;
+		this.NEXT_BIRTHDAYS_COUNT = Integer.parseInt(sessionInfos.getConfigHandler().getProperties().getProperty(ConfigFields.NEXT_BIRTHDAYS_COUNT));
 	}
 
 	private void updateBirthdaysThisMonth(List<Person> temp){
@@ -43,7 +43,7 @@ public class UpdateAllSubBirthdayListsTask extends Task<Boolean>{
 		for(Person person : temp){
 			if(week == person.getBirthday().get().get(IsoFields.WEEK_BASED_YEAR)){
 				System.out.println(person);
-				this.birthdaysOverviewController.getBirthdaysThisWeek().put(person.getBirthday().get().getDayOfWeek(), person);
+//				this.sessionInfos.getBirthdaysThisWeek().put(person.getBirthday().get().getDayOfWeek(), person);
 			}
 
 		}
@@ -54,6 +54,7 @@ public class UpdateAllSubBirthdayListsTask extends Task<Boolean>{
 	 * @param temp
 	 */
 	private void updateNextBirthdays(final List<Person> temp){
+		this.sessionInfos.getNextBirthdays().clear();
 		int birthdaysSize = temp.size() - 1;
 		int i = 0;
 		for(; i < this.NEXT_BIRTHDAYS_COUNT; i++){
@@ -61,13 +62,13 @@ public class UpdateAllSubBirthdayListsTask extends Task<Boolean>{
 			if(tempPerson.getBirthday().get().getDayOfYear() < LocalDate.now().getDayOfYear()){
 				break;
 			} else{
-				this.birthdaysOverviewController.getNextBirthdays().add(tempPerson);
+				this.sessionInfos.getNextBirthdays().add(tempPerson);
 			}
 		}
 		Person tempPerson = null;
 		for(; i < this.NEXT_BIRTHDAYS_COUNT; i++){
 			tempPerson = temp.get(birthdaysSize - i);
-			this.birthdaysOverviewController.getNextBirthdays().add(tempPerson);
+			this.sessionInfos.getNextBirthdays().add(tempPerson);
 		}
 	}
 
@@ -76,17 +77,18 @@ public class UpdateAllSubBirthdayListsTask extends Task<Boolean>{
 	 */
 	private void updateRecentBirthdays(final List<Person> temp){
 		// TODO Jahres übergreifend XD
-		int i = 0;
+		this.sessionInfos.getRecentBirthdays().clear();
+		int i = 10;
 		for(; i == 0; i++){
 			Person tempPerson = temp.get(i);
 			if(tempPerson.getBirthday().get().getDayOfYear() > LocalDate.now().getDayOfYear()){
 				break;
 			}
 		}
-		int x = 10 + i;
-		for(; i < x; i++){
+		int x = temp.size() - (this.NEXT_BIRTHDAYS_COUNT - i);
+		for(; i < this.NEXT_BIRTHDAYS_COUNT; i++){
 			Person tempPerson = temp.get(i);
-			this.birthdaysOverviewController.getRecentBirthdays().add(tempPerson);
+			this.sessionInfos.getRecentBirthdays().add(tempPerson);
 		}
 
 	}
@@ -95,12 +97,7 @@ public class UpdateAllSubBirthdayListsTask extends Task<Boolean>{
 	protected Boolean call() throws Exception{
 		System.out.println("UpdateAllSubBirthdayListsTask.call()");
 
-		List<Person> allPersons = this.birthdaysOverviewController.getMainController().getSessionInfos().getAllPersons();
-
-		this.birthdaysOverviewController.getNextBirthdays().clear();
-		this.birthdaysOverviewController.getRecentBirthdays().clear();
-		this.birthdaysOverviewController.getBirthdaysThisWeek().clear();
-		this.birthdaysOverviewController.getBirthdaysThisMonth().clear();
+		List<Person> allPersons = this.sessionInfos.getAllPersons();
 
 		BirthdayComparator birthdayComparator = new BirthdayComparator(true);
 		List<Person> temp = new ArrayList<>(allPersons);

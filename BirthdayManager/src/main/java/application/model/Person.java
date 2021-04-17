@@ -26,6 +26,12 @@ public class Person{
 	private ObjectProperty<LocalDate> birthday;
 
 	/**
+	 * Create an empty person
+	 */
+	public Person(){
+	}
+
+	/**
 	 * 
 	 */
 	public Person(String lineFromFile){

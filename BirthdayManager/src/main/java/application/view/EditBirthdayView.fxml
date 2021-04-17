@@ -21,40 +21,34 @@
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
-        <Menu mnemonicParsing="false" text="File">
+        <Menu fx:id="file_menu" mnemonicParsing="false" text="File">
           <items>
-            <MenuItem mnemonicParsing="false" text="New" />
             <MenuItem fx:id="openFile_MenuItem" mnemonicParsing="false" text="Open…" />
             <Menu fx:id="openRecent_MenuItem" mnemonicParsing="false" text="Open Recent" />
             <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" text="Close" />
-            <MenuItem mnemonicParsing="false" text="Save" />
-            <MenuItem mnemonicParsing="false" text="Save As…" />
-            <MenuItem mnemonicParsing="false" text="Revert" />
+            <MenuItem fx:id="closeFile_MenuItem" mnemonicParsing="false" text="Close" />
+            <MenuItem fx:id="saveFile_MenuItem" mnemonicParsing="false" text="Save" />
+            <MenuItem fx:id="saveAsFile_MenuItem" mnemonicParsing="false" text="Save As…" />
+                  <MenuItem fx:id="exporteFile_MenuItem" mnemonicParsing="false" text="Export..." />
             <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" text="Preferences…" />
+            <MenuItem fx:id="preferences_MenuItem" mnemonicParsing="false" text="Preferences…" />
             <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" text="Quit" />
+            <MenuItem fx:id="quit_MenuItem" mnemonicParsing="false" text="Quit" />
           </items>
         </Menu>
-        <Menu mnemonicParsing="false" text="Edit">
+        <Menu fx:id="edit_menu" mnemonicParsing="false" text="Edit">
           <items>
-            <MenuItem fx:id="showNextBirthdays_MenuItem" mnemonicParsing="false" text="Zeige nächste Geburtstage" />
-            <MenuItem fx:id="showLastBirthdays_MenuItem" mnemonicParsing="false" text="Zeige die letzten Geburtstage" />
             <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" text="Cut" />
-            <MenuItem mnemonicParsing="false" text="Copy" />
-            <MenuItem mnemonicParsing="false" text="Paste" />
-            <MenuItem mnemonicParsing="false" text="Delete" />
-            <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" text="Select All" />
-            <MenuItem mnemonicParsing="false" text="Unselect All" />
+            <MenuItem fx:id="newBirthday_MenuItem" mnemonicParsing="false" text="New Birthday" />
+            <MenuItem fx:id="importBirthdays_MenuItem" mnemonicParsing="false" text="Import Birthdays" />
+            <MenuItem fx:id="deleteBirthdays_MenuItem" mnemonicParsing="false" text="Delete" />
           </items>
         </Menu>
-        <Menu mnemonicParsing="false" text="Help">
+        <Menu fx:id="help_menu" mnemonicParsing="false" text="Help">
           <items>
             <MenuItem fx:id="debug" mnemonicParsing="false" text="Debug" />
                   <MenuItem fx:id="refresh_MenuItem" mnemonicParsing="false" text="Refresh" />
+                  <MenuItem fx:id="changeLanguage_MenuItem" mnemonicParsing="false" text="Change Language" />
           </items>
         </Menu>
       </menus>
@@ -65,7 +59,7 @@
                <children>
                   <HBox alignment="CENTER" prefHeight="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <Button mnemonicParsing="false" text="Cancel">
+                        <Button fx:id="cancel_Button" mnemonicParsing="false" text="Cancel">
                            <opaqueInsets>
                               <Insets />
                            </opaqueInsets>
@@ -73,7 +67,12 @@
                               <Insets left="100.0" right="100.0" />
                            </HBox.margin>
                         </Button>
-                        <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" text="Save">
+                        <Button fx:id="delete_Button" mnemonicParsing="false" text="Delete">
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                        </Button>
+                        <Button fx:id="save_Button" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" text="Save">
                            <opaqueInsets>
                               <Insets />
                            </opaqueInsets>
@@ -92,7 +91,7 @@
          <center>
             <VBox alignment="BASELINE_CENTER">
                <children>
-                  <Label text="Name">
+                  <Label fx:id="identifyingPerson_label" text="Name">
                      <VBox.margin>
                         <Insets />
                      </VBox.margin>
@@ -100,32 +99,42 @@
                         <Insets top="225.0" />
                      </padding>
                   </Label>
-                  <Label text="Vorname">
+                  <Label fx:id="name_Label" text="Vorname">
                      <padding>
                         <Insets top="50.0" />
                      </padding>
                   </Label>
-                  <TextField>
+                  <TextField fx:id="name_TextField">
                      <VBox.margin>
-                        <Insets left="100.0" right="100.0" />
+                        <Insets left="250.0" right="250.0" />
                      </VBox.margin>
                   </TextField>
-                  <Label layoutX="590.0" layoutY="31.0" text="Nachname">
+                  <Label fx:id="middleName_Label" layoutX="590.0" layoutY="256.0" text="Zweitname">
                      <padding>
                         <Insets top="50.0" />
                      </padding>
                   </Label>
-                  <TextField layoutX="10.0" layoutY="52.0">
+                  <TextField fx:id="middleName_TextField" layoutX="110.0" layoutY="327.0">
                      <VBox.margin>
-                        <Insets left="100.0" right="100.0" />
+                        <Insets left="250.0" right="250.0" />
                      </VBox.margin>
                   </TextField>
-                  <Label layoutX="590.0" layoutY="73.0" text="Birthday">
+                  <Label fx:id="surname_Label" layoutX="590.0" layoutY="31.0" text="Nachname">
                      <padding>
                         <Insets top="50.0" />
                      </padding>
                   </Label>
-                  <DatePicker>
+                  <TextField fx:id="surname_TextField" layoutX="10.0" layoutY="52.0">
+                     <VBox.margin>
+                        <Insets left="250.0" right="250.0" />
+                     </VBox.margin>
+                  </TextField>
+                  <Label fx:id="birthday_Label" layoutX="590.0" layoutY="73.0" text="Birthday">
+                     <padding>
+                        <Insets top="50.0" />
+                     </padding>
+                  </Label>
+                  <DatePicker fx:id="birthday_DatePicker">
                      <VBox.margin>
                         <Insets />
                      </VBox.margin>
