@@ -20,7 +20,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="819.0" prefWidth="613.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -60,7 +60,7 @@
          <items>
             <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity">
                <children>
-                  <VBox>
+                  <VBox prefHeight="767.0" prefWidth="535.0">
                      <children>
                         <Label fx:id="nextBirthday_Label" alignment="CENTER" contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="Die nächsten Geburtstage" textAlignment="CENTER" underline="true">
                            <font>
@@ -70,7 +70,7 @@
                               <Insets top="2.0" />
                            </VBox.margin>
                         </Label>
-                        <ListView fx:id="nextBdaysList" minHeight="-Infinity" prefHeight="709.0" prefWidth="601.0">
+                        <ListView fx:id="nextBdaysList" minHeight="-Infinity" prefHeight="709.0" prefWidth="542.0">
                            <contextMenu>
                               <ContextMenu>
                                  <items>
@@ -83,7 +83,7 @@
                   </VBox>
                </children>
             </VBox>
-            <TabPane prefHeight="770.0" prefWidth="188.0" tabClosingPolicy="UNAVAILABLE" tabMaxHeight="1000.0" tabMaxWidth="1000.0" visible="false">
+            <TabPane prefHeight="770.0" prefWidth="188.0" tabClosingPolicy="UNAVAILABLE" tabMaxHeight="1000.0" tabMaxWidth="1000.0">
               <tabs>
                   <Tab fx:id="week_tap" text="Woche">
                     <content>

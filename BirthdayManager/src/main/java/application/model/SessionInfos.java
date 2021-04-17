@@ -4,7 +4,6 @@
 package application.model;
 
 import java.io.File;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.IsoFields;
 import java.util.ArrayList;
@@ -22,7 +21,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
 
 /**
  * @author Noah Ruben
@@ -39,7 +37,8 @@ public class SessionInfos{
 	private ObservableList<Person> nextBirthdays = FXCollections.observableArrayList();
 	private final ObservableList<Person> recentBirthdays = FXCollections.observableArrayList();
 
-	private final ObservableMap<DayOfWeek, Person> birthdaysThisWeek = FXCollections.observableHashMap();
+	private final List<Person> birthdaysThisWeek = new ArrayList<Person>();
+	private ObservableList<PersonsInAWeek> personsInAWeekList = FXCollections.observableArrayList();
 	private final ObservableList<Person> birthdaysThisMonat = FXCollections.observableArrayList();
 
 	/**
@@ -75,7 +74,7 @@ public class SessionInfos{
 	/**
 	 * @return the birthdaysThisWeek
 	 */
-	public ObservableMap<DayOfWeek, Person> getBirthdaysThisWeek(){
+	private List<Person> getBirthdaysThisWeek(){
 		return this.birthdaysThisWeek;
 	}
 
@@ -91,6 +90,13 @@ public class SessionInfos{
 	 */
 	public ObservableList<Person> getNextBirthdays(){
 		return this.nextBirthdays;
+	}
+
+	/**
+	 * @return the personsInAWeekList
+	 */
+	public ObservableList<PersonsInAWeek> getPersonsInAWeekList(){
+		return this.personsInAWeekList;
 	}
 
 	/**
@@ -168,15 +174,22 @@ public class SessionInfos{
 	private void updateBirthdaysThisWeek(){
 		final List<Person> temp = PersonManager.getInstance().getPersonDB();
 		temp.sort(new BirthdayComparator(true));
-		final int week = LocalDate.now().get(IsoFields.WEEK_BASED_YEAR);
 
+		final int week = LocalDate.now().get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+		System.out.println("WEEK" + week);
 		for(final Person person : temp){
-			if(person.getBirthday().get(IsoFields.WEEK_BASED_YEAR) == week){
-				this.birthdaysThisWeek.put(person.getBirthday().getDayOfWeek(), person);
+			final LocalDate birthday = person.getBirthday().withYear(2019);
+			if(birthday.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) == week){
+				this.birthdaysThisWeek.add(person);
 			}
-
 		}
 
+		final List<PersonsInAWeek> parseAList = PersonsInAWeek.parseAList(this.getBirthdaysThisWeek());
+		this.personsInAWeekList = FXCollections.observableArrayList();
+		for(final PersonsInAWeek personsInAWeek : parseAList){
+			this.personsInAWeekList.add(personsInAWeek);
+		}
+		System.out.println(this.personsInAWeekList);
 	}
 
 	/**
