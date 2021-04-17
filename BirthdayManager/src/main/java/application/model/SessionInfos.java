@@ -98,7 +98,7 @@ public class SessionInfos{
 		return this.birthdaysThisWeek;
 	}
 
-	public PropertieManager getConfigHandler(){
+	public PropertieManager getPropertiesHandler(){
 		return this.configHandler;
 	}
 

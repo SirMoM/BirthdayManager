@@ -34,7 +34,7 @@ public class UpdateAllSubBirthdayListsTask extends Task<Boolean>{
 	public UpdateAllSubBirthdayListsTask(final SessionInfos sessionInfos){
 		super();
 		this.sessionInfos = sessionInfos;
-		this.NEXT_BIRTHDAYS_COUNT = Integer.parseInt(sessionInfos.getConfigHandler().getProperties().getProperty(PropertieFields.SHOW_BIRTHDAYS_COUNT));
+		this.NEXT_BIRTHDAYS_COUNT = Integer.parseInt(sessionInfos.getPropertiesHandler().getProperties().getProperty(PropertieFields.SHOW_BIRTHDAYS_COUNT));
 	}
 
 	@Override
