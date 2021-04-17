@@ -8,11 +8,16 @@ plugins {
     id 'maven-publish'
     id 'maven'
     id 'net.researchgate.release' version '2.8.1'
+    id 'com.github.sherter.google-java-format' version '0.9'
 }
 
 // Variables
 def main_class = 'application.AppStart'
-static def getDate() { return new Date().format('dd.MM.yyyy HH:mm:ss')}
+
+static def getDate() { return new Date().format('dd.MM.yyyy HH:mm:ss') }
+
+verifyGoogleJavaFormat.enabled = false
+
 repositories {
     // Use JCenter for resolving dependencies.
     jcenter()
@@ -49,11 +54,11 @@ application {
 
 jar {
     manifest {
-        attributes  'Implementation-Title': rootProject.name,
-                    'Implementation-Version': getArchiveVersion(),
-                    'Main-Class': main_class,
-                    'Build-Time-ISO-8601': getDate(),
-                    'Multi-Release': 'true'
+        attributes 'Implementation-Title': rootProject.name,
+                'Implementation-Version': getArchiveVersion(),
+                'Main-Class': main_class,
+                'Build-Time-ISO-8601': getDate(),
+                'Multi-Release': 'true'
     }
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }
