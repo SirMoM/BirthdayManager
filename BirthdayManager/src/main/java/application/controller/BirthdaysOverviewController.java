@@ -7,6 +7,7 @@ import java.net.URL;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import application.model.Person;
@@ -121,7 +122,7 @@ public class BirthdaysOverviewController extends Controller{
 	private Tab week_tap;
 
 	@FXML
-	private TableColumn<DayOfWeek, Person> monday_column1;
+	private TableColumn<Map, DayOfWeek> monday_column1;
 
 	@FXML
 	private TableColumn<DayOfWeek, Person> tuesday_column1;
@@ -176,6 +177,21 @@ public class BirthdaysOverviewController extends Controller{
 
 	@FXML
 	private Label date_label;
+
+	private final EventHandler<ActionEvent> deletePersonHandler = new EventHandler<ActionEvent>(){
+		@Override
+		public void handle(final ActionEvent event){
+			final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
+			if(selectedItems.isEmpty()){
+				return;
+			} else{
+				final int indexOf = PersonManager.getInstance().getPersonDB().indexOf(selectedItems.get(0));
+				PersonManager.getInstance().deletePerson(PersonManager.getInstance().get(indexOf));
+				BirthdaysOverviewController.this.getMainController().getSessionInfos().updateSubLists();
+			}
+
+		}
+	};
 
 	final EventHandler<ActionEvent> openBirthday = new EventHandler<ActionEvent>(){
 		@Override
@@ -334,6 +350,9 @@ public class BirthdaysOverviewController extends Controller{
 		this.date_label.setText(DATE_FORMATTER.format(LocalDate.now()));
 		this.openedFile_label.textProperty().bind(this.getMainController().getSessionInfos().getFileToOpenName());
 
+		this.deleteBirthdays_MenuItem.addEventHandler(ActionEvent.ANY, this.deletePersonHandler);
+		this.deleteBirthdays_MenuItem.setAccelerator(new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN));
+
 	}
 
 	/**
@@ -413,5 +432,6 @@ public class BirthdaysOverviewController extends Controller{
 		this.friday_column2.setText(resourceManager.getLocaleString(LangResourceKeys.friday_column2));
 		this.saturday_column2.setText(resourceManager.getLocaleString(LangResourceKeys.saturday_column2));
 		this.sunday_column2.setText(resourceManager.getLocaleString(LangResourceKeys.sunday_column2));
+
 	}
 }

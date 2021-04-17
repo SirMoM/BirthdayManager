@@ -4,10 +4,10 @@
 package application.model;
 
 import java.io.File;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.IsoFields;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -39,8 +39,8 @@ public class SessionInfos{
 	private ObservableList<Person> nextBirthdays = FXCollections.observableArrayList();
 	private final ObservableList<Person> recentBirthdays = FXCollections.observableArrayList();
 
-	private final ObservableMap<Object, Object> birthdaysThisWeek = FXCollections.observableHashMap();
-	private final ObservableMap<Integer, Person> birthdaysThisMonat = FXCollections.observableHashMap();
+	private final ObservableMap<DayOfWeek, Person> birthdaysThisWeek = FXCollections.observableHashMap();
+	private final ObservableList<Person> birthdaysThisMonat = FXCollections.observableArrayList();
 
 	/**
 	 * Loads the saved properties or gets the default values
@@ -68,14 +68,14 @@ public class SessionInfos{
 	/**
 	 * @return the birthdaysThisMonat
 	 */
-	public ObservableMap<Integer, Person> getBirthdaysThisMonat(){
+	public ObservableList<Person> getBirthdaysThisMonat(){
 		return this.birthdaysThisMonat;
 	}
 
 	/**
 	 * @return the birthdaysThisWeek
 	 */
-	public ObservableMap<Object, Object> getBirthdaysThisWeek(){
+	public ObservableMap<DayOfWeek, Person> getBirthdaysThisWeek(){
 		return this.birthdaysThisWeek;
 	}
 
@@ -91,6 +91,13 @@ public class SessionInfos{
 	 */
 	public ObservableList<Person> getNextBirthdays(){
 		return this.nextBirthdays;
+	}
+
+	/**
+	 * @return the propertieManager
+	 */
+	public PropertieManager getPropertieManager(){
+		return this.propertieManager;
 	}
 
 	public PropertieManager getPropertiesHandler(){
@@ -161,8 +168,14 @@ public class SessionInfos{
 	private void updateBirthdaysThisWeek(){
 		final List<Person> temp = PersonManager.getInstance().getPersonDB();
 		temp.sort(new BirthdayComparator(true));
-
 		final int week = LocalDate.now().get(IsoFields.WEEK_BASED_YEAR);
+
+		for(final Person person : temp){
+			if(person.getBirthday().get(IsoFields.WEEK_BASED_YEAR) == week){
+				this.birthdaysThisWeek.put(person.getBirthday().getDayOfWeek(), person);
+			}
+
+		}
 
 	}
 
@@ -177,32 +190,32 @@ public class SessionInfos{
 		final List<Person> temp = PersonManager.getInstance().getPersonDB();
 		final List<Person> upcomming = new ArrayList<Person>();
 		final List<Person> after = new ArrayList<Person>();
-		
-		for (Person person : temp) {
-			if (person.getBirthday().getDayOfYear() >= LocalDate.now().getDayOfYear() ) {
+
+		for(final Person person : temp){
+			if(person.getBirthday().getDayOfYear() >= LocalDate.now().getDayOfYear()){
 				upcomming.add(person);
-			}else {
+			} else{
 				after.add(person);
 			}
-			
+
 		}
-		
+
 		upcomming.sort(new BirthdayComparator(false));
 		after.sort(new BirthdayComparator(false));
 		int i = 0;
 		for(; i < NEXT_BIRTHDAYS_COUNT; i++){
-			try {
+			try{
 				this.getNextBirthdays().add(upcomming.get(i));
-			} catch (IndexOutOfBoundsException indexOutOfBoundsException) {
+			} catch (final IndexOutOfBoundsException indexOutOfBoundsException){
 				LOG.debug("Probably not enought Persons to geather the 10 birthdays for next", indexOutOfBoundsException);
 				break;
 			}
 		}
 		int j = 0;
 		for(; j < NEXT_BIRTHDAYS_COUNT - i; j++){
-			try {
+			try{
 				this.getNextBirthdays().add(after.get(j));
-			} catch (IndexOutOfBoundsException indexOutOfBoundsException) {
+			} catch (final IndexOutOfBoundsException indexOutOfBoundsException){
 				LOG.debug("Probably not enought Persons to geather the 10 birthdays for next", indexOutOfBoundsException);
 				break;
 			}
@@ -219,33 +232,33 @@ public class SessionInfos{
 		final List<Person> temp = PersonManager.getInstance().getPersonDB();
 		final List<Person> upcomming = new ArrayList<Person>();
 		final List<Person> after = new ArrayList<Person>();
-		
-		for (Person person : temp) {
+
+		for(final Person person : temp){
 //			if (person.getBirthday().getDayOfYear() >= LocalDate.now().getDayOfYear() ) {
-			if (person.getBirthday().getDayOfYear() >= LocalDate.now().getDayOfYear() ) {
+			if(person.getBirthday().getDayOfYear() >= LocalDate.now().getDayOfYear()){
 				upcomming.add(person);
-			}else {
+			} else{
 				after.add(person);
 			}
-			
+
 		}
-		
+
 		upcomming.sort(new BirthdayComparator(false));
 		after.sort(new BirthdayComparator(false));
 		int i = 0;
 		for(; i < NEXT_BIRTHDAYS_COUNT; i++){
-			try {
-				this.getRecentBirthdays().add(after.get((after.size() -1) - i ));
-			} catch (IndexOutOfBoundsException indexOutOfBoundsException) {
+			try{
+				this.getRecentBirthdays().add(after.get((after.size() - 1) - i));
+			} catch (final IndexOutOfBoundsException indexOutOfBoundsException){
 				LOG.debug("Probably not enought Persons to geather the 10 birthdays for recent", indexOutOfBoundsException);
 				break;
 			}
 		}
 		int j = 0;
 		for(; j < NEXT_BIRTHDAYS_COUNT - i; j++){
-			try {
-				this.getRecentBirthdays().add(after.get((upcomming.size() -1) - j ));
-			} catch (IndexOutOfBoundsException indexOutOfBoundsException) {
+			try{
+				this.getRecentBirthdays().add(after.get((upcomming.size() - 1) - j));
+			} catch (final IndexOutOfBoundsException indexOutOfBoundsException){
 				LOG.debug("Probably not enought Persons to geather the 10 birthdays for recent", indexOutOfBoundsException);
 				break;
 			}
