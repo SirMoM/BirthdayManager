@@ -32,7 +32,7 @@ import java.util.ResourceBundle;
 public class NewBirthdayViewController extends Controller {
 
     private final Person newPerson;
-    private final EventHandler<ActionEvent> returnToMainView = event -> NewBirthdayViewController.this.getMainController().goToBirthdaysOverview();
+    private final EventHandler<ActionEvent> returnToMainView = event -> NewBirthdayViewController.this.getMainController().goToLastScene();
 
     private MenuItem recentFiles_MenuItem;
     @FXML
@@ -122,7 +122,7 @@ public class NewBirthdayViewController extends Controller {
             return;
         }
         PersonManager.getInstance().addNewPerson(NewBirthdayViewController.this.newPerson);
-        NewBirthdayViewController.this.getMainController().goToBirthdaysOverview();
+        NewBirthdayViewController.this.getMainController().goToLastScene();
 
         if (Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.WRITE_THRU)) && (getMainController().getSessionInfos().getSaveFile() != null)) {
             SaveBirthdaysToFileTask saveBirthdaysToFileTask = new SaveBirthdaysToFileTask(getMainController().getSessionInfos().getSaveFile());

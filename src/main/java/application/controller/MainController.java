@@ -40,6 +40,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Stack;
 
 /**
  * @author Noah Ruben
@@ -72,7 +73,6 @@ public class MainController {
         new Thread(new SaveBirthdaysToFileTask(saveFile)).start();
     };
     private final SessionInfos sessionInfos;
-
     final EventHandler closeAppHandler = event -> {
         final boolean autosave = Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.AUTOSAVE));
 
@@ -133,7 +133,6 @@ public class MainController {
         }
     };
     final EventHandler<ActionEvent> closeFileHandler = event -> MainController.this.sessionInfos.resetSubLists();
-
     final EventHandler<ActionEvent> saveToFileHandler = event -> {
         if (MainController.this.getSessionInfos().getSaveFile() == null) {
             final FileChooser fileChooser = new FileChooser();
@@ -157,7 +156,6 @@ public class MainController {
             new Thread(new SaveBirthdaysToFileTask(MainController.this.getSessionInfos().getSaveFile())).start();
         }
     };
-
     public final EventHandler<ActionEvent> openFileExternal = event -> {
         // first check if Desktop is supported by Platform or not
         if (!Desktop.isDesktopSupported()) {
@@ -176,6 +174,7 @@ public class MainController {
             }
         }
     };
+    private final Stack<Scene> lastScenes = new Stack();
     private Controller activeController = null;
     final EventHandler<ActionEvent> exportToCalendarHandler = event -> {
         final FileChooser fileChooser = new FileChooser();
@@ -339,17 +338,17 @@ public class MainController {
         }
     }
 
-    /**
-     * @param fxmlPath   the path of the FXML-File representing the view
-     * @param controller the associated Controller
-     */
-    public void gotoNextScene(final String fxmlPath, final Initializable controller) {
-        try {
-            this.replaceSceneContent(fxmlPath, controller);
-        } catch (final Exception exception) {
-            this.LOG.catching(Level.ERROR, exception);
-        }
-    }
+//    /**
+//     * @param fxmlPath   the path of the FXML-File representing the view
+//     * @param controller the associated Controller
+//     */
+//    public void gotoNextScene(final String fxmlPath, final Initializable controller) {
+//        try {
+//            this.replaceSceneContent(fxmlPath, controller);
+//        } catch (final Exception exception) {
+//            this.LOG.catching(Level.ERROR, exception);
+//        }
+//    }
 
     /**
      * @param selectedFile used to fill the birthday list
@@ -434,6 +433,7 @@ public class MainController {
         loader.setController(controller);
         final Parent root = loader.load();
         final Scene scene = new Scene(root);
+        lastScenes.push(this.stage.getScene());
         this.stage.setScene(scene);
         setStyle();
 
@@ -441,11 +441,18 @@ public class MainController {
         this.stage.show();
     }
 
+    public void goToLastScene() {
+        getSessionInfos().updateSubLists();
+
+        Scene scene = lastScenes.pop();
+        this.stage.setScene(scene);
+        setStyle();
+        this.stage.show();
+    }
+
     public void settingsChanged() {
-        Scene scene = getStage().getScene();
         goToBirthdaysOverview();
         this.getActiveController().updateLocalisation();
-
     }
 
     /**
@@ -453,7 +460,6 @@ public class MainController {
      */
     public void start() {
         this.setActiveController(new BirthdaysOverviewController(this));
-        checkVersionAndAlert();
         try {
             this.replaceSceneContent("/application/view/BirthdaysOverview.fxml", this.getActiveController());
             if (Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.OPEN_FILE_ON_START))) {
@@ -465,18 +471,18 @@ public class MainController {
                 if (file != null && !file.isEmpty()) {
                     this.openFile(new File(PropertyManager.getProperty(PropertyFields.FILE_ON_START)));
                 } else {
-                    this.LOG.warn("Should have opend a file upon start but no file to open was found!");
+                    this.LOG.warn("Should have opened a file upon start but no file to open was found!");
                 }
             }
 
         } catch (final Exception exception) {
             this.LOG.catching(Level.ERROR, exception);
         }
+        checkVersionAndAlert();
     }
 
-    // TODO "real" Alert
     private void checkVersionAndAlert() {
-        if(Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.NEW_VERSION_REMINDER))){
+        if (Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.NEW_VERSION_REMINDER))) {
             LOG.debug("Don't check for new version!");
             return;
         }
@@ -507,7 +513,7 @@ public class MainController {
                 ButtonType dialogResult = alert.showAndWait().orElse(ButtonType.CLOSE);
                 System.out.println(checkBox.isSelected());
                 if (checkBox.isSelected()) {
-                  PropertyManager.getInstance().getProperties().setProperty(PropertyFields.NEW_VERSION_REMINDER, String.valueOf(checkBox.isSelected()));
+                    PropertyManager.getInstance().getProperties().setProperty(PropertyFields.NEW_VERSION_REMINDER, String.valueOf(checkBox.isSelected()));
                     try {
                         PropertyManager.getInstance().storeProperties("");
                     } catch (IOException e) {

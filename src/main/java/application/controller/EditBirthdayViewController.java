@@ -5,6 +5,7 @@ package application.controller;
 
 import application.model.Person;
 import application.model.PersonManager;
+import application.model.SessionInfos;
 import application.processes.SaveBirthdaysToFileTask;
 import application.util.PropertyFields;
 import application.util.PropertyManager;
@@ -35,10 +36,10 @@ public class EditBirthdayViewController extends Controller {
     static final Logger LOG = LogManager.getLogger();
 
     private final Person personToEdit;
-    private final EventHandler<ActionEvent> exitHandler = event -> EditBirthdayViewController.this.getMainController().goToBirthdaysOverview();
+    private final EventHandler<ActionEvent> exitHandler = event -> EditBirthdayViewController.this.getMainController().goToLastScene();
     private final EventHandler<ActionEvent> deletePersonHandler = event -> {
         PersonManager.getInstance().deletePerson(EditBirthdayViewController.this.personToEdit);
-        EditBirthdayViewController.this.getMainController().goToBirthdaysOverview();
+        EditBirthdayViewController.this.getMainController().goToLastScene();
     };
     private MenuItem recentFiles_MenuItem;
     @FXML
@@ -108,6 +109,7 @@ public class EditBirthdayViewController extends Controller {
     @FXML
     private Label date_label;
     private int indexPerson = -1;
+
     private final EventHandler<ActionEvent> savePersonHandler = actionEvent -> {
         boolean anyChangeAtAll = false;
         final String nameFromTextField = EditBirthdayViewController.this.name_TextField.getText();
@@ -146,7 +148,8 @@ public class EditBirthdayViewController extends Controller {
             }
             final Person updatedPerson = new Person(surnameFromTextfield, nameFromTextField, middleNameFromTextField, birthdayFromDatePicker);
             PersonManager.getInstance().updatePerson(EditBirthdayViewController.this.indexPerson, updatedPerson);
-            EditBirthdayViewController.this.getMainController().goToBirthdaysOverview();
+            EditBirthdayViewController.this.getMainController().goToLastScene();
+
         }
         if (Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.WRITE_THRU))) {
             SaveBirthdaysToFileTask task = new SaveBirthdaysToFileTask(getMainController().getSessionInfos().getSaveFile());

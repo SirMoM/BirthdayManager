@@ -158,7 +158,7 @@ public class SearchViewController extends Controller {
     private Button closeSearch_Button;
 
     private final EventHandler<ActionEvent> returnToPreviousView = actionEvent -> {
-        SearchViewController.this.getMainController().goToBirthdaysOverview();
+        SearchViewController.this.getMainController().goToLastScene();
     };
 
     public SearchViewController(MainController mainController) {

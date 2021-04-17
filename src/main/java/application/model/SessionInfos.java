@@ -29,10 +29,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.IllegalFormatException;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * This holds a lot of information for the app.
@@ -63,15 +60,17 @@ public class SessionInfos {
      */
     public SessionInfos(MainController mainController) {
         LOG.info("SessionInfos created");
+
         this.mainController = mainController;
         final String localePropertieString = PropertyManager.getProperty(PropertyFields.SAVED_LOCALE);
+
         LOG.debug("Loaded locale propertie {}", localePropertieString);
 
         try {
             this.getRecentFileName().set(new File(PropertyManager.getProperty(PropertyFields.LAST_OPEND)).getName());
         } catch (final NullPointerException nullPointerException) {
-            LOG.catching(Level.TRACE, nullPointerException);
-            LOG.info("Don't worry just could not load recent File");
+            LOG.catching(Level.WARN, nullPointerException);
+            LOG.warn("\nDon't worry just could not load recent File");
         }
     }
 
@@ -258,4 +257,6 @@ public class SessionInfos {
     public void setSaveFile(File saveFile) {
         this.saveFile = saveFile;
     }
+
+
 }
