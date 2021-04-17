@@ -309,6 +309,7 @@ public class BirthdaysOverviewController extends Controller{
 		// EventHandlers
 		this.saveFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().saveToFileHandler);
 		this.closeFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().closeFileHandler);
+		this.saveAsFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().exportToFileHandler);
 		this.openBirthday_MenuItem.addEventHandler(ActionEvent.ANY, this.openBirthday);
 		this.debug.addEventHandler(ActionEvent.ACTION, this.updateListsHandler);
 		this.refresh_MenuItem.addEventHandler(ActionEvent.ANY, this.updateListsHandler);

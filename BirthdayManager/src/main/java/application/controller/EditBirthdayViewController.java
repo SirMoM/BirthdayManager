@@ -4,7 +4,6 @@
 package application.controller;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -16,8 +15,7 @@ import org.apache.logging.log4j.Logger;
 import application.model.Person;
 import application.model.PersonManager;
 import application.processes.UpdateAllSubBirthdayListsTask;
-import application.util.ConfigFields;
-import application.util.ConfigHandler;
+import application.util.PropertieFields;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
 import javafx.concurrent.WorkerStateEvent;
@@ -157,6 +155,7 @@ public class EditBirthdayViewController extends Controller{
 			final String nameFromTextField = EditBirthdayViewController.this.name_TextField.getText();
 			final String middleNameFromTextField = EditBirthdayViewController.this.middleName_TextField.getText();
 			final String surnameFromTextfield = EditBirthdayViewController.this.surname_TextField.getText();
+
 			try{
 				if(!nameFromTextField.matches(EditBirthdayViewController.this.personToEdit.getName())){
 					anyChangeAtAll = !anyChangeAtAll;
@@ -172,6 +171,7 @@ public class EditBirthdayViewController extends Controller{
 				}
 			} catch (final NullPointerException exception){
 				LOG.catching(Level.INFO, exception);
+				LOG.info(EditBirthdayViewController.this.personToEdit.toExtendedString());
 				anyChangeAtAll = true;
 			}
 
@@ -331,15 +331,10 @@ public class EditBirthdayViewController extends Controller{
 		this.openFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromFileChooserHandler);
 		this.changeLanguage_MenuItem.addEventHandler(ActionEvent.ANY, this.changeLanguageHandler);
 		String property = null;
-		try{
-			property = new ConfigHandler().getProperties().getProperty(ConfigFields.LAST_OPEND);
-			this.recentFiles_MenuItem = new MenuItem(new File(property).getName());
-			this.recentFiles_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromRecentHandler);
-			this.openRecent_MenuItem.getItems().add(this.recentFiles_MenuItem);
-		} catch (final IOException ioException){
-			LOG.catching(ioException);
-		}
-
+		property = this.getMainController().getSessionInfos().getConfigHandler().getProperty(PropertieFields.LAST_OPEND);
+		this.recentFiles_MenuItem = new MenuItem(new File(property).getName());
+		this.recentFiles_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromRecentHandler);
+		this.openRecent_MenuItem.getItems().add(this.recentFiles_MenuItem);
 	}
 
 }

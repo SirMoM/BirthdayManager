@@ -9,7 +9,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,19 +80,49 @@ public class PersonManager{
 		return this.saveToFile();
 	}
 
-	private boolean saveToFile(){
-//		this.saveFile.delete();
-//		this.checkSaveFile();
-
+	public boolean save(final File selectedFile){
 		try{
-			final FileWriter fileWriter = new FileWriter(this.saveFile);
-			if(Files.probeContentType(this.saveFile.toPath()).matches("csv")){
+			final FileWriter fileWriter = new FileWriter(selectedFile);
+			if(this.saveFile.getAbsolutePath().endsWith(".csv")){
+				LOG.debug("Saving to CSV");
 				for(final Person person : this.personDB){
 					fileWriter.write(person.toCSVString());
 					fileWriter.write(System.lineSeparator());
 					fileWriter.flush();
 				}
 			} else{
+				LOG.debug("Saving to TXT");
+				for(final Person person : this.personDB){
+					fileWriter.write(person.toTXTString());
+					fileWriter.write(System.lineSeparator());
+					fileWriter.flush();
+				}
+
+			}
+			fileWriter.close();
+		} catch (final IOException ioException){
+			LOG.catching(ioException);
+			return false;
+		}
+		return true;
+	}
+
+	private boolean saveToFile(){
+		this.saveFile.delete();
+		LOG.info("Deleted File", this.saveFile);
+		this.checkSaveFile();
+
+		try{
+			final FileWriter fileWriter = new FileWriter(this.saveFile);
+			if(this.saveFile.getAbsolutePath().endsWith(".csv")){
+				LOG.debug("Saving to CSV");
+				for(final Person person : this.personDB){
+					fileWriter.write(person.toCSVString());
+					fileWriter.write(System.lineSeparator());
+					fileWriter.flush();
+				}
+			} else{
+				LOG.debug("Saving to TXT");
 				for(final Person person : this.personDB){
 					fileWriter.write(person.toTXTString());
 					fileWriter.write(System.lineSeparator());
@@ -133,6 +162,13 @@ public class PersonManager{
 			LOG.catching(Level.INFO, nullPointerException);
 			LOG.info("Don't worry this is normal!");
 		}
+	}
+
+	/**
+	 * @param saveFile the saveFile to set
+	 */
+	public void setSaveFilePlain(final File saveFile){
+		this.saveFile = saveFile;
 	}
 
 	public void updatePerson(final Person personToUpdate, final Person updatedPerson){

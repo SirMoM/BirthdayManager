@@ -63,18 +63,18 @@ public class Person{
 	 */
 	public Person(final String surname, final String name, final String misc, final LocalDate birthday){
 		super();
-		if(surname.isEmpty()){
-			this.surname = new SimpleStringProperty(null);
+		if(surname == null || surname.isEmpty()){
+			this.surname = new SimpleStringProperty();
 		} else{
 			this.surname = new SimpleStringProperty(surname);
 		}
-		if(name.isEmpty()){
-			this.name = new SimpleStringProperty(null);
+		if(name == null || name.isEmpty()){
+			this.name = new SimpleStringProperty();
 		} else{
 			this.name = new SimpleStringProperty(name);
 		}
-		if(misc.isEmpty()){
-			this.misc = new SimpleStringProperty(null);
+		if(misc == null || misc.isEmpty()){
+			this.misc = new SimpleStringProperty();
 		} else{
 			this.misc = new SimpleStringProperty(misc);
 		}
@@ -152,7 +152,6 @@ public class Person{
 			builder.append(";");
 		}
 		if(this.getBirthday() != null){
-			builder.append(";");
 			builder.append(this.getBirthday());
 		}
 

@@ -10,8 +10,8 @@ import java.util.Locale;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import application.util.ConfigFields;
-import application.util.ConfigHandler;
+import application.util.PropertieFields;
+import application.util.PropertyManager;
 import application.util.localisation.LangResourceManager;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -28,7 +28,7 @@ public class SessionInfos{
 	final private LangResourceManager langResources;
 
 	private File fileToOpen;
-	private ConfigHandler configHandler;
+	private PropertyManager configHandler;
 	private Locale appLocale;
 	private final PersonManager personManager = PersonManager.getInstance();
 
@@ -48,10 +48,10 @@ public class SessionInfos{
 	public SessionInfos(){
 		super();
 		try{
-			this.configHandler = new ConfigHandler();
+			this.configHandler = new PropertyManager();
 
 			// load locale or set Germany as default
-			final String savedLocaleProperty = this.configHandler.getPropertie(ConfigFields.SAVED_LOCALE).replace(" ", "");
+			final String savedLocaleProperty = this.configHandler.getProperty(PropertieFields.SAVED_LOCALE).replace(" ", "");
 			if(!savedLocaleProperty.isEmpty()){
 				final String[] savedLocalePropertySplit = savedLocaleProperty.split("_");
 				this.appLocale = new Locale(savedLocalePropertySplit[0], savedLocalePropertySplit[1]);
@@ -70,7 +70,7 @@ public class SessionInfos{
 		}
 		this.langResources = new LangResourceManager(this.appLocale);
 		this.fileToOpenName = new SimpleStringProperty();
-		this.getRecentFileName().set(new File(this.configHandler.getPropertie(ConfigFields.LAST_OPEND)).getName());
+		this.getRecentFileName().set(new File(this.configHandler.getProperty(PropertieFields.LAST_OPEND)).getName());
 	}
 
 	/**
@@ -94,7 +94,7 @@ public class SessionInfos{
 		return this.birthdaysThisWeek;
 	}
 
-	public ConfigHandler getConfigHandler(){
+	public PropertyManager getConfigHandler(){
 		return this.configHandler;
 	}
 
