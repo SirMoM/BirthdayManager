@@ -3,6 +3,7 @@
  */
 package application.controller;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
@@ -11,7 +12,12 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
+import org.apache.logging.log4j.Level;
+
 import application.util.PropertieFields;
+import application.util.localisation.LangResourceKeys;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -23,6 +29,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 
@@ -75,12 +84,25 @@ public class PreferencesViewController extends Controller{
 	@FXML
 	private Button save_button;
 
+	ChangeListener<Boolean> openFileOnStartCheckboxChangeListener = new ChangeListener<Boolean>(){
+
+		@Override
+		public void changed(final ObservableValue<? extends Boolean> observable, final Boolean oldValue, final Boolean newValue){
+			PreferencesViewController.this.startupFile_textField.setDisable(!newValue);
+			PreferencesViewController.this.chooseFile_button.setDisable(!newValue);
+		}
+	};
+
 	private final EventHandler<ActionEvent> savePropertiesHandler = new EventHandler<ActionEvent>(){
 
 		@Override
 		public void handle(final ActionEvent arg0){
 
 			PreferencesViewController.this.propertiesToEdit.setProperty(PropertieFields.SAVED_LOCALE, PreferencesViewController.this.language_CompoBox.getValue().toString());
+			PreferencesViewController.this.propertiesToEdit.setProperty(PropertieFields.AUTOSAVE, PreferencesViewController.this.autoSave_CheckBox.selectedProperty().getValue().toString());
+			PreferencesViewController.this.propertiesToEdit.setProperty(PropertieFields.WRITE_THRU, PreferencesViewController.this.writeThru_CheckBox.selectedProperty().getValue().toString());
+			PreferencesViewController.this.propertiesToEdit.setProperty(PropertieFields.OPEN_FILE_ON_START, PreferencesViewController.this.openFileOnStart_Checkbox.selectedProperty().getValue().toString());
+			PreferencesViewController.this.propertiesToEdit.setProperty(PropertieFields.FILE_ON_START, PreferencesViewController.this.startupFile_textField.getText());
 
 			try{
 				PreferencesViewController.this.getMainController().getSessionInfos().getPropertiesHandler().storeProperties("Saved properies" + LocalDateTime.now().toString());
@@ -91,6 +113,37 @@ public class PreferencesViewController extends Controller{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+	};
+
+	private final EventHandler<ActionEvent> exitHandler = new EventHandler<ActionEvent>(){
+
+		@Override
+		public void handle(final ActionEvent event){
+			final Stage stage = (Stage) PreferencesViewController.this.cancel_button.getScene().getWindow();
+			stage.close();
+			PreferencesViewController.this.LOG.trace("Close preferences");
+		}
+	};
+
+	private final EventHandler<ActionEvent> chooseFileHandler = new EventHandler<ActionEvent>(){
+
+		@Override
+		public void handle(final ActionEvent event){
+			final FileChooser fileChooser = new FileChooser();
+			fileChooser.setTitle(PreferencesViewController.this.getMainController().getSessionInfos().getLangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
+
+			try{
+				fileChooser.setInitialDirectory(new File(PreferencesViewController.this.getMainController().getSessionInfos().getPropertiesHandler().getPropertie(PropertieFields.LAST_OPEND).toString()).getParentFile());
+			} catch (final NullPointerException nullPointerException){
+				fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+			}
+			fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Text Files", "*.txt"), new ExtensionFilter("CSV Files", "*.csv"), new ExtensionFilter("All Files", "*.*"));
+
+			final File saveFile = fileChooser.showOpenDialog(PreferencesViewController.this.getMainController().getStage().getScene().getWindow());
+
+			PreferencesViewController.this.startupFile_textField.setText(saveFile.getAbsolutePath());
+			((Stage) PreferencesViewController.this.cancel_button.getParent().getScene().getWindow()).toFront();
 		}
 	};
 
@@ -125,10 +178,12 @@ public class PreferencesViewController extends Controller{
 	 * Binds the JavaFX Components to their {@link EventHandler}.
 	 */
 	private void bindComponents(){
-		this.fillComboBoxLanguages();
+		this.chooseFile_button.addEventHandler(ActionEvent.ANY, this.chooseFileHandler);
+
+		this.openFileOnStart_Checkbox.selectedProperty().addListener(this.openFileOnStartCheckboxChangeListener);
 
 		this.save_button.addEventHandler(ActionEvent.ANY, this.savePropertiesHandler);
-
+		this.cancel_button.addEventHandler(ActionEvent.ANY, this.exitHandler);
 	}
 
 	/**
@@ -193,11 +248,27 @@ public class PreferencesViewController extends Controller{
 	 * Loads the preferences of this application-
 	 */
 	private void loadPreferences(){
+		this.fillComboBoxLanguages();
 		this.propertiesToEdit = this.getMainController().getSessionInfos().getPropertiesHandler().getProperties();
 		final String displayLanguage = new Locale(this.propertiesToEdit.getProperty(PropertieFields.SAVED_LOCALE)).getDisplayLanguage();
 		this.LOG.info(new Locale(displayLanguage).getDisplayLanguage());
 		this.language_CompoBox.getSelectionModel().select(new Locale(displayLanguage));
+		this.writeThru_CheckBox.selectedProperty().set(new Boolean(this.propertiesToEdit.getProperty(PropertieFields.WRITE_THRU)));
+		this.autoSave_CheckBox.selectedProperty().set(new Boolean(this.propertiesToEdit.getProperty(PropertieFields.AUTOSAVE)));
 
+		final Boolean openFileOnStart = new Boolean(this.propertiesToEdit.getProperty(PropertieFields.OPEN_FILE_ON_START));
+
+		this.openFileOnStart_Checkbox.selectedProperty().set(openFileOnStart);
+		try{
+			this.startupFile_textField.setText(this.getMainController().getSessionInfos().getPropertiesHandler().getPropertie(PropertieFields.LAST_OPEND));
+		} catch (final NullPointerException nullPointerException){
+			this.LOG.catching(Level.INFO, nullPointerException);
+		}
+		if(openFileOnStart){
+			this.startupFile_textField.setText(this.propertiesToEdit.getProperty(PropertieFields.FILE_ON_START));
+		}
+		this.startupFile_textField.setDisable(!openFileOnStart);
+		this.chooseFile_button.setDisable(!openFileOnStart);
 	}
 
 	/*
