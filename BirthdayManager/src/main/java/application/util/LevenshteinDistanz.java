@@ -4,8 +4,6 @@ import java.util.Arrays;
 /**
  * @author Noah Ruben
  *
- *
- * @created 02.02.2020
  */
 public class LevenshteinDistanz {
 	public static int calculate(String x, String y) {
