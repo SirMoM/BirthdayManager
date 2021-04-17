@@ -3,10 +3,14 @@
  */
 package application.controller;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.ResourceBundle;
 
 import javax.swing.event.ChangeEvent;
@@ -27,6 +31,11 @@ import application.util.PropertieFields;
 import application.util.PropertieManager;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
+import biweekly.ICalVersion;
+import biweekly.ICalendar;
+import biweekly.component.VEvent;
+import biweekly.io.text.ICalWriter;
+import biweekly.property.Summary;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 >>>>>>> refs/rewritten/origin-master
@@ -92,6 +101,9 @@ public class BirthdaysOverviewController extends Controller {
 
 	@FXML
 	private MenuItem saveAsFile_MenuItem;
+
+	@FXML // fx:id="exportToCalendar_MenuItem"
+	private MenuItem exportToCalendar_MenuItem; // Value injected by FXMLLoader
 
 	@FXML
 	private MenuItem preferences_MenuItem;
@@ -408,6 +420,27 @@ public class BirthdaysOverviewController extends Controller {
 		this.saveFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().saveToFileHandler);
 		this.saveFile_MenuItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
 		this.saveAsFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().exportToFileHandler);
+
+		this.exportToCalendar_MenuItem.setOnAction(x -> {
+			ICalendar ical = new ICalendar();
+
+			for (Person person : PersonManager.getInstance().getPersonDB()) {
+				System.out.println(person);
+				VEvent event = new VEvent();
+				Summary summary = event.setSummary(person.toString());
+				summary.setLanguage("de-DE");
+				Date start = Date.from(person.getBirthday().atStartOfDay(ZoneId.systemDefault()).toInstant());
+				event.setDateStart(start, false);
+				ical.addEvent(event);
+				ICalWriter writer = null;
+				try {
+					writer = new ICalWriter(new File("testCal.ics"), ICalVersion.V2_0);
+					writer.write(ical);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 
 		this.preferences_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openPreferencesHander);
 

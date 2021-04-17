@@ -9,7 +9,7 @@ package application.util;
  * @author Noah Ruben
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
-public interface PropertieFields{
+public interface PropertieFields {
 
 	final String LAST_OPEND = "last_opend";
 	final String SAVED_LOCALE = "saved_locale";
@@ -19,5 +19,5 @@ public interface PropertieFields{
 	final String OPEN_FILE_ON_START = "open_file_on_start";
 	final String FILE_ON_START = "file_on_start";
 	final String HIGHLIGHT_TODAY_COLOR = "highlight_today_color";
-
+	final String EXPORT_WITH_ALARM = "export_with_alarm";
 }
