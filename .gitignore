@@ -210,6 +210,9 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+#Jenv
+/.java-version
+
 ### Windows ###
 # Windows thumbnail cache files
 Thumbs.db
@@ -263,3 +266,7 @@ gradle-app.setting
 /gradle/wrapper/gradle-wrapper.properties
 /gradlew
 /gradlew.bat
+
+# Ignore Gradle build output directory
+build
+
