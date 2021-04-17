@@ -18,5 +18,6 @@ public interface PropertieFields{
 	final String AUTOSAVE = "autosave";
 	final String OPEN_FILE_ON_START = "open_file_on_start";
 	final String FILE_ON_START = "file_on_start";
+	final String HIGHLIGHT_TODAY_COLOR = "highlight_today_color";
 
 }
