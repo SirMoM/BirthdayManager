@@ -318,7 +318,12 @@ public class MainController {
 		try {
 			this.replaceSceneContent("/application/view/BirthdaysOverview.fxml", this.activeController);
 			if (new Boolean(PropertieManager.getPropertie(PropertieFields.OPEN_FILE_ON_START))) {
-				openFile(new File(PropertieManager.getPropertie(PropertieFields.FILE_ON_START)));
+				String file = PropertieManager.getPropertie(PropertieFields.FILE_ON_START);
+				if (file != null) {
+					openFile(new File(PropertieManager.getPropertie(PropertieFields.FILE_ON_START)));
+				} else {
+					LOG.warn("Should have opend a file upon start but no file to open was found!");
+				}
 			}
 		} catch (final Exception exception) {
 			this.LOG.catching(Level.ERROR, exception);
