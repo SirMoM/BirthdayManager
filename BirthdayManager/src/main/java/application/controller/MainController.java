@@ -67,7 +67,16 @@ public class MainController{
 			}
 
 			if(autosave && MainController.this.getSessionInfos().getSaveFile() != null){
-				new Thread(new SaveBirthdaysToFileTask(MainController.this.getSessionInfos().getSaveFile())).start();
+				SaveBirthdaysToFileTask saveBirthdaysToFileTask = new SaveBirthdaysToFileTask(MainController.this.getSessionInfos().getSaveFile());
+				saveBirthdaysToFileTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>() {
+
+					@Override
+					public void handle(WorkerStateEvent event) {
+						Platform.exit();
+						System.exit(0);
+					}
+				});
+				new Thread(saveBirthdaysToFileTask).start();
 			} else{
 				MainController.this.LOG.debug(MainController.this.getSessionInfos().getSaveFile());
 				final LangResourceManager lRM = new LangResourceManager();
@@ -99,15 +108,22 @@ public class MainController{
 								return;
 							} else{
 								MainController.this.getSessionInfos().setSaveFile(selectedFile);
-								new Thread(new SaveBirthdaysToFileTask(MainController.this.getSessionInfos().getSaveFile())).start();
+								SaveBirthdaysToFileTask saveBirthdaysToFileTask = new SaveBirthdaysToFileTask(MainController.this.getSessionInfos().getSaveFile());
+								saveBirthdaysToFileTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>() {
+
+									@Override
+									public void handle(WorkerStateEvent event) {
+										Platform.exit();
+										System.exit(0);
+									}
+								});
+								new Thread(saveBirthdaysToFileTask).start();
 							}
 
 						}
 					}
 				});
 			}
-			Platform.exit();
-			System.exit(0);
 		}
 
 	};
