@@ -15,17 +15,17 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
-public class AppStart extends Application{
+public class AppStart extends Application {
 
-	public static void main(final String[] args){
+	public static void main(final String[] args) {
 		launch(args);
 	}
 
 	@Override
-	public void init() throws Exception{
-		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler(){
+	public void init() throws Exception {
+		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 			@Override
-			public void uncaughtException(final Thread thread, final Throwable throwable){
+			public void uncaughtException(final Thread thread, final Throwable throwable) {
 				LogManager.getLogger(PersonManager.class).catching(Level.FATAL, throwable);
 				LogManager.getLogger(PersonManager.class).catching(Level.FATAL, throwable.getCause());
 				final Alert alert = new Alert(AlertType.WARNING);
@@ -33,7 +33,7 @@ public class AppStart extends Application{
 				alert.setHeaderText("Someting went wrong! \n Consider sending me the log.");
 
 				final StringBuilder stringBuilder = new StringBuilder("Stacktrace: \n");
-				for(int i = 0; i < throwable.getStackTrace().length; i++){
+				for (int i = 0; i < throwable.getStackTrace().length; i++) {
 					stringBuilder.append(throwable.getStackTrace()[i]);
 					stringBuilder.append(System.getProperty("line.separator"));
 				}
@@ -61,7 +61,8 @@ public class AppStart extends Application{
 	}
 
 	@Override
-	public void start(final Stage stage){
+	public void start(final Stage stage) {
+
 		final MainController mainController = new MainController(stage);
 		mainController.start();
 	}
