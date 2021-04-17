@@ -26,10 +26,9 @@ import javafx.collections.ObservableList;
  * @author Noah Ruben
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
-public class SessionInfos{
+public class SessionInfos {
 	final static Logger LOG = LogManager.getLogger();
 
-	final private PropertieManager propertieManager;
 	private Locale appLocale;
 	private final StringProperty fileToOpenName = new SimpleStringProperty();
 	private StringProperty recentFileName = new SimpleStringProperty();
@@ -44,15 +43,14 @@ public class SessionInfos{
 	/**
 	 * Loads the saved properties or gets the default values
 	 */
-	public SessionInfos(){
+	public SessionInfos() {
 		LOG.info("SessionInfos created");
-		this.propertieManager = new PropertieManager();
-		final String localePropertieString = this.propertieManager.getPropertie(PropertieFields.SAVED_LOCALE);
+		final String localePropertieString = PropertieManager.getPropertie(PropertieFields.SAVED_LOCALE);
 		LOG.debug("Loaded locale propertie " + localePropertieString);
 
-		try{
-			this.getRecentFileName().set(new File(this.propertieManager.getPropertie(PropertieFields.LAST_OPEND)).getName());
-		} catch (final NullPointerException nullPointerException){
+		try {
+			this.getRecentFileName().set(new File(PropertieManager.getPropertie(PropertieFields.LAST_OPEND)).getName());
+		} catch (final NullPointerException nullPointerException) {
 			LOG.catching(Level.TRACE, nullPointerException);
 			LOG.info("Don't worry just could not load recent File");
 		}
@@ -61,74 +59,63 @@ public class SessionInfos{
 	/**
 	 * @return the appLocale
 	 */
-	public Locale getAppLocale(){
+	public Locale getAppLocale() {
 		return this.appLocale;
 	}
 
 	/**
 	 * @return the birthdaysThisMonat
 	 */
-	public ObservableList<Person> getBirthdaysThisMonat(){
+	public ObservableList<Person> getBirthdaysThisMonat() {
 		return this.birthdaysThisMonat;
 	}
 
 	/**
 	 * @return the birthdaysThisWeek
 	 */
-	private List<Person> getBirthdaysThisWeek(){
+	private List<Person> getBirthdaysThisWeek() {
 		return this.birthdaysThisWeek;
 	}
 
 	/**
 	 * @return the fileToOpenName
 	 */
-	public StringProperty getFileToOpenName(){
+	public StringProperty getFileToOpenName() {
 		return this.fileToOpenName;
 	}
 
 	/**
 	 * @return the nextBirthdays
 	 */
-	public ObservableList<Person> getNextBirthdays(){
+	public ObservableList<Person> getNextBirthdays() {
 		return this.nextBirthdays;
 	}
 
 	/**
 	 * @return the personsInAWeekList
 	 */
-	public ObservableList<PersonsInAWeek> getPersonsInAWeekList(){
+	public ObservableList<PersonsInAWeek> getPersonsInAWeekList() {
 		return this.personsInAWeekList;
-	}
-
-	/**
-	 * @return the propertieManager
-	 */
-	public PropertieManager getPropertieManager(){
-		return this.propertieManager;
-	}
-
-	public PropertieManager getPropertiesHandler(){
-		return this.propertieManager;
 	}
 
 	/**
 	 * @return the recentBirthdays
 	 */
-	public ObservableList<Person> getRecentBirthdays(){
+	public ObservableList<Person> getRecentBirthdays() {
 		return this.recentBirthdays;
 	}
 
 	/**
 	 * @return the recentFileName
 	 */
-	public StringProperty getRecentFileName(){
+	public StringProperty getRecentFileName() {
 		return this.recentFileName;
 	}
 
 	/**
 	 * resets the nextBirthdays and recentBirthdays
 	 */
-	public void resetSubLists(){
+	public void resetSubLists() {
 		this.nextBirthdays.clear();
 		this.recentBirthdays.clear();
 	}
@@ -136,21 +123,21 @@ public class SessionInfos{
 	/**
 	 * @param appLocale the appLocale to set
 	 */
-	public void setAppLocale(final Locale appLocale){
+	public void setAppLocale(final Locale appLocale) {
 		this.appLocale = appLocale;
 	}
 
 	/**
 	 * @param nextBirthdays the nextBirthdays to set
 	 */
-	public void setNextBirthdays(final ObservableList<Person> nextBirthdays){
+	public void setNextBirthdays(final ObservableList<Person> nextBirthdays) {
 		this.nextBirthdays = nextBirthdays;
 	}
 
 	/**
 	 * @param recentFileName the recentFileName to set
 	 */
-	public void setRecentFileName(final StringProperty recentFileName){
+	public void setRecentFileName(final StringProperty recentFileName) {
 		this.recentFileName = recentFileName;
 	}
 
@@ -160,7 +147,7 @@ public class SessionInfos{
 	 * @param temp the {@link List} of persons where the Birthdays this month are
 	 *             extracted
 	 */
-	private void updateBirthdaysThisMonth(){
+	private void updateBirthdaysThisMonth() {
 		// TODO updateBirthdaysThisMonth
 		final List<Person> temp = PersonManager.getInstance().getPersonDB();
 		temp.sort(new BirthdayComparator(true));
@@ -172,21 +159,21 @@ public class SessionInfos{
 	 * @param temp the {@link List} of persons where the Birthdays this week are
 	 *             extracted
 	 */
-	private void updateBirthdaysThisWeek(){
+	private void updateBirthdaysThisWeek() {
 		final List<Person> temp = PersonManager.getInstance().getPersonDB();
 		temp.sort(new BirthdayComparator(true));
 		final int week = LocalDate.now().get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
 		System.out.println("WEEK" + week);
 
-		for(final Person person : temp){
+		for (final Person person : temp) {
 			final LocalDate birthday = person.getBirthday().withYear(2019);
-			if(birthday.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) == week){
+			if (birthday.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) == week) {
 				this.birthdaysThisWeek.add(person);
 			}
 		}
 
 		final List<PersonsInAWeek> parseAList = PersonsInAWeek.parseAList(this.getBirthdaysThisWeek());
-		for(final PersonsInAWeek personsInAWeek : parseAList){
+		for (final PersonsInAWeek personsInAWeek : parseAList) {
 			this.personsInAWeekList.add(personsInAWeek);
 		}
 		System.out.println(this.personsInAWeekList);
@@ -198,16 +185,17 @@ public class SessionInfos{
 	 * @param temp the {@link List} of persons where the next Birthdays are
 	 *             extracted
 	 */
-	private void updateNextBirthdays(){
-		final int NEXT_BIRTHDAYS_COUNT = Integer.parseInt(this.getPropertiesHandler().getPropertie(PropertieFields.SHOW_BIRTHDAYS_COUNT));
+	private void updateNextBirthdays() {
+		final int NEXT_BIRTHDAYS_COUNT = Integer
+				.parseInt(PropertieManager.getPropertie(PropertieFields.SHOW_BIRTHDAYS_COUNT));
 		final List<Person> temp = PersonManager.getInstance().getPersonDB();
 		final List<Person> upcomming = new ArrayList<Person>();
 		final List<Person> after = new ArrayList<Person>();
 
-		for(final Person person : temp){
-			if(person.getBirthday().getDayOfYear() >= LocalDate.now().getDayOfYear()){
+		for (final Person person : temp) {
+			if (person.getBirthday().getDayOfYear() >= LocalDate.now().getDayOfYear()) {
 				upcomming.add(person);
-			} else{
+			} else {
 				after.add(person);
 			}
 
@@ -216,20 +204,22 @@ public class SessionInfos{
 		upcomming.sort(new BirthdayComparator(false));
 		after.sort(new BirthdayComparator(false));
 		int i = 0;
-		for(; i < NEXT_BIRTHDAYS_COUNT; i++){
-			try{
+		for (; i < NEXT_BIRTHDAYS_COUNT; i++) {
+			try {
 				this.getNextBirthdays().add(upcomming.get(i));
-			} catch (final IndexOutOfBoundsException indexOutOfBoundsException){
-				LOG.debug("Probably not enought Persons to geather the 10 birthdays for next", indexOutOfBoundsException);
+			} catch (final IndexOutOfBoundsException indexOutOfBoundsException) {
+				LOG.debug("Probably not enought Persons to geather the 10 birthdays for next",
+						indexOutOfBoundsException);
 				break;
 			}
 		}
 		int j = 0;
-		for(; j < NEXT_BIRTHDAYS_COUNT - i; j++){
-			try{
+		for (; j < NEXT_BIRTHDAYS_COUNT - i; j++) {
+			try {
 				this.getNextBirthdays().add(after.get(j));
-			} catch (final IndexOutOfBoundsException indexOutOfBoundsException){
-				LOG.debug("Probably not enought Persons to geather the 10 birthdays for next", indexOutOfBoundsException);
+			} catch (final IndexOutOfBoundsException indexOutOfBoundsException) {
+				LOG.debug("Probably not enought Persons to geather the 10 birthdays for next",
+						indexOutOfBoundsException);
 				break;
 			}
 		}
@@ -240,17 +230,18 @@ public class SessionInfos{
 	 *
 	 * @param temp the {@link List} of persons where the Birthdays are listed
 	 */
-	private void updateRecentBirthdays(){
-		final int NEXT_BIRTHDAYS_COUNT = Integer.parseInt(this.getPropertiesHandler().getPropertie(PropertieFields.SHOW_BIRTHDAYS_COUNT));
+	private void updateRecentBirthdays() {
+		final int NEXT_BIRTHDAYS_COUNT = Integer
+				.parseInt(PropertieManager.getPropertie(PropertieFields.SHOW_BIRTHDAYS_COUNT));
 		final List<Person> temp = PersonManager.getInstance().getPersonDB();
 		final List<Person> upcomming = new ArrayList<Person>();
 		final List<Person> after = new ArrayList<Person>();
 
-		for(final Person person : temp){
+		for (final Person person : temp) {
 //			if (person.getBirthday().getDayOfYear() >= LocalDate.now().getDayOfYear() ) {
-			if(person.getBirthday().getDayOfYear() >= LocalDate.now().getDayOfYear()){
+			if (person.getBirthday().getDayOfYear() >= LocalDate.now().getDayOfYear()) {
 				upcomming.add(person);
-			} else{
+			} else {
 				after.add(person);
 			}
 
@@ -259,20 +250,22 @@ public class SessionInfos{
 		upcomming.sort(new BirthdayComparator(false));
 		after.sort(new BirthdayComparator(false));
 		int i = 0;
-		for(; i < NEXT_BIRTHDAYS_COUNT; i++){
-			try{
+		for (; i < NEXT_BIRTHDAYS_COUNT; i++) {
+			try {
 				this.getRecentBirthdays().add(after.get((after.size() - 1) - i));
-			} catch (final IndexOutOfBoundsException indexOutOfBoundsException){
-				LOG.debug("Probably not enought Persons to geather the 10 birthdays for recent", indexOutOfBoundsException);
+			} catch (final IndexOutOfBoundsException indexOutOfBoundsException) {
+				LOG.debug("Probably not enought Persons to geather the 10 birthdays for recent",
+						indexOutOfBoundsException);
 				break;
 			}
 		}
 		int j = 0;
-		for(; j < NEXT_BIRTHDAYS_COUNT - i; j++){
-			try{
+		for (; j < NEXT_BIRTHDAYS_COUNT - i; j++) {
+			try {
 				this.getRecentBirthdays().add(after.get((upcomming.size() - 1) - j));
-			} catch (final IndexOutOfBoundsException indexOutOfBoundsException){
-				LOG.debug("Probably not enought Persons to geather the 10 birthdays for recent", indexOutOfBoundsException);
+			} catch (final IndexOutOfBoundsException indexOutOfBoundsException) {
+				LOG.debug("Probably not enought Persons to geather the 10 birthdays for recent",
+						indexOutOfBoundsException);
 				break;
 			}
 		}
@@ -290,14 +283,14 @@ public class SessionInfos{
 	 * <li>{@link #birthdaysThisMonat}
 	 * </ul>
 	 */
-	public void updateSubLists(){
+	public void updateSubLists() {
 		this.resetSubLists();
-		try{
+		try {
 			this.updateNextBirthdays();
 			this.updateRecentBirthdays();
 			this.updateBirthdaysThisWeek();
 			this.updateBirthdaysThisMonth();
-		} catch (final IndexOutOfBoundsException outOfBoundsException){
+		} catch (final IndexOutOfBoundsException outOfBoundsException) {
 			LOG.catching(Level.INFO, outOfBoundsException);
 			LOG.info("Probably not enought Persons to geather the next 10 birthdays");
 		}

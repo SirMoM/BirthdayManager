@@ -16,7 +16,7 @@ import org.junit.Test;
  * @author Admin
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
-public class PropertieManagerTest{
+public class PropertieManagerTest {
 
 	private PropertieManager classToTest;
 
@@ -24,8 +24,8 @@ public class PropertieManagerTest{
 	 * @throws java.lang.Exception
 	 */
 	@Before
-	public void setUp() throws Exception{
-		this.classToTest = new PropertieManager();
+	public void setUp() throws Exception {
+		this.classToTest = PropertieManager.getInstance();
 	}
 
 	/**
@@ -33,10 +33,10 @@ public class PropertieManagerTest{
 	 * {@link application.util.PropertieManager#getPropertie(java.lang.String)}.
 	 */
 	@Test
-	public final void testGetPropertie(){
-		assertThat(this.classToTest.getPropertie(PropertieFields.SHOW_BIRTHDAYS_COUNT), is("10"));
-		assertThat(this.classToTest.getPropertie(PropertieFields.WRITE_THRU), is("false"));
-		assertThat(this.classToTest.getPropertie(PropertieFields.AUTOSAVE), is("false"));
+	public final void testGetPropertie() {
+		assertThat(PropertieManager.getPropertie(PropertieFields.SHOW_BIRTHDAYS_COUNT), is("10"));
+		assertThat(PropertieManager.getPropertie(PropertieFields.WRITE_THRU), is("false"));
+		assertThat(PropertieManager.getPropertie(PropertieFields.AUTOSAVE), is("false"));
 	}
 
 	/**
@@ -46,14 +46,14 @@ public class PropertieManagerTest{
 	 * @throws FileNotFoundException
 	 */
 	@Test
-	public final void testStoreLoadProperties() throws FileNotFoundException, IOException{
-		final PropertieManager tempPropertieManager = new PropertieManager();
+	public final void testStoreLoadProperties() throws FileNotFoundException, IOException {
+		final PropertieManager tempPropertieManager = PropertieManager.getInstance();
 		tempPropertieManager.getProperties().setProperty("test", "test");
 		tempPropertieManager.storeProperties("test");
 
 		this.classToTest.loadProperties();
 
-		assertThat(this.classToTest.getPropertie("test"), is("test"));
+		assertThat(PropertieManager.getPropertie("test"), is("test"));
 
 	}
 }
