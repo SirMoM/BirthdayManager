@@ -7,6 +7,7 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 
+import application.model.Person;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -412,7 +413,11 @@ public class MainController{
 			@Override
 			public void handle(final WorkerStateEvent event){
 				PersonManager.getInstance().getPersons().clear();
-				PersonManager.getInstance().getPersons().addAll(loadPersonsTask.getValue());
+				LoadPersonsTask.Result result = loadPersonsTask.getValue();
+				PersonManager.getInstance().getPersons().addAll(result.getPersons());
+				for (Person.PersonCouldNotBeParsedException error: result.getErrors()) {
+					logAndAlertParsingError(error);
+				}
 				MainController.this.LOG.debug("Loaded birthdays from File");
 				MainController.this.sessionInfos.updateSubLists();
 			}
@@ -507,5 +512,11 @@ public class MainController{
 			this.LOG.catching(Level.ERROR, exception);
 		}
 	}
-
+	private void logAndAlertParsingError(Person.PersonCouldNotBeParsedException personCouldNotBeParsedException){
+		LOG.warn(personCouldNotBeParsedException);
+		final Alert alert = new Alert(Alert.AlertType.WARNING);
+		alert.setTitle("ERROR: Parsing failed");
+		alert.setContentText(personCouldNotBeParsedException.getMessage());
+		alert.showAndWait();
+	}
 }

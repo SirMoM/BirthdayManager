@@ -147,11 +147,11 @@ public class Person {
 	 *
 	 * <p><b>The name and surname are mandatory</b></p>
 	 *
-	 * @param txtLine a read line from the file
-	 * @param line which line of the file is parsed right now
+	 * @param line a read line from the file
+	 * @param lineNumber which line of the file is parsed right now
 	 * @return a new Person resulting from the given String
 	 */
-	public static Person parseFromCSVLine(final String txtLine, final int line) throws PersonCouldNotBeParsedException {
+	public static Person parseFromCSVLine(final String line, final int lineNumber) throws PersonCouldNotBeParsedException {
 		String name = null;
 		String surname = null;
 		String misc = null;
@@ -159,9 +159,9 @@ public class Person {
 		String whatCouldNotBeParsed = "";
 
 		try {
-			final String[] splitLine = txtLine.split(",");
+			final String[] splitLine = line.split(",");
 			if (splitLine.length == 1) {
-				throw new PersonCouldNotBeParsedException(line, "the whole line");
+				throw new PersonCouldNotBeParsedException(lineNumber, "the whole line", line);
 			}
 			whatCouldNotBeParsed = "birthday";
 			birthday = parse(splitLine[0], Person.DATE_FORMATTER);
@@ -180,25 +180,16 @@ public class Person {
 			}
 			return new Person(surname, name, misc, birthday);
 		} catch (IndexOutOfBoundsException | DateTimeParseException exception) {
-
-			// TODO Use this to inform the User
-			/*final Alert alert = new Alert(AlertType.WARNING);
-			alert.setTitle("ERROR: Parsing failed");
-			alert.setHeaderText("Line " + line + " could not be parsed: ");
-			alert.setContentText("This attribute could not be parsed: " + whatCouldNotBeParsed + "\n" + txtLine);
-			alert.showAndWait();
-			return null;*/
-			throw new PersonCouldNotBeParsedException(line, whatCouldNotBeParsed);
-
+			throw new PersonCouldNotBeParsedException(lineNumber, whatCouldNotBeParsed, line);
 		}
 
 	}
 
 	/**
-	 * @param txtLine a read line from the Text-file
+	 * @param line a read line from the Text-file
 	 * @return a new Person resulting from the given String
 	 */
-	public static Person parseFromTXTLine(final String txtLine, final int line) throws PersonCouldNotBeParsedException {
+	public static Person parseFromTXTLine(final String line, final int lineNumber) throws PersonCouldNotBeParsedException {
 		String name = null;
 		String surname = null;
 		String misc = null;
@@ -206,9 +197,9 @@ public class Person {
 		String whatCouldNotBeParsed = "";
 
 		try {
-			final String[] splitLine = txtLine.split("=");
+			final String[] splitLine = line.split("=");
 			if (splitLine.length == 1) {
-				throw new PersonCouldNotBeParsedException(line, "the whole line");
+				throw new PersonCouldNotBeParsedException(lineNumber, "the whole line", line);
 			}
 			whatCouldNotBeParsed = "birthday";
 			birthday = parse(splitLine[1], Person.DATE_FORMATTER);
@@ -230,15 +221,7 @@ public class Person {
 			}
 			return new Person(surname, name, misc, birthday);
 		} catch (IndexOutOfBoundsException | DateTimeParseException exception) {
-
-			// TODO Use this to inform the User
-			/*final Alert alert = new Alert(AlertType.WARNING);
-			alert.setTitle("ERROR: Parsing failed");
-			alert.setHeaderText("Line " + line + " could not be parsed: ");
-			alert.setContentText("This attribute could not be parsed: " + whatCouldNotBeParsed + "\n" + txtLine);
-			alert.showAndWait();
-			return null;*/
-			throw new PersonCouldNotBeParsedException(line, whatCouldNotBeParsed);
+			throw new PersonCouldNotBeParsedException(lineNumber, whatCouldNotBeParsed, line);
 		}
 	}
 
@@ -365,18 +348,20 @@ public class Person {
 		return builder.toString();
 	}
 
-	static class PersonCouldNotBeParsedException extends Exception{
-		public int line = -1;
-		public String whatCouldNotBeParsed;
+	public static class PersonCouldNotBeParsedException extends Exception{
+		private int lineNumber = -1;
+		private String whatCouldNotBeParsed;
+		private String line;
 
-		public PersonCouldNotBeParsedException(int line, String whatCouldNotBeParsed ){
-			this.line = line;
+		public PersonCouldNotBeParsedException(int lineNumber, String whatCouldNotBeParsed, String fullLine ){
+			this.lineNumber = lineNumber;
+			this.line = fullLine;
 			this.whatCouldNotBeParsed = whatCouldNotBeParsed;
 		}
 
 		@Override
 		public String getMessage() {
-			return "Could not parse Person from line: " + line + "\n Could not parse field: " + whatCouldNotBeParsed;
+			return "Could not parse Person from line: " + line + "\n Could not parse field: " + whatCouldNotBeParsed + ".\nLine was: " + line;
 		}
 	}
 }
