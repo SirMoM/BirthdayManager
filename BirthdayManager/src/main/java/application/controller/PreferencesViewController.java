@@ -3,12 +3,16 @@
  */
 package application.controller;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
 import application.util.PropertieFields;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -71,6 +75,25 @@ public class PreferencesViewController extends Controller{
 	@FXML
 	private Button save_button;
 
+	private final EventHandler<ActionEvent> savePropertiesHandler = new EventHandler<ActionEvent>(){
+
+		@Override
+		public void handle(final ActionEvent arg0){
+
+			PreferencesViewController.this.propertiesToEdit.setProperty(PropertieFields.SAVED_LOCALE, PreferencesViewController.this.language_CompoBox.getValue().toString());
+
+			try{
+				PreferencesViewController.this.getMainController().getSessionInfos().getPropertiesHandler().storeProperties("Saved properies" + LocalDateTime.now().toString());
+			} catch (final FileNotFoundException e){
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (final IOException e){
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	};
+
 	/**
 	 *
 	 * @see application.controller.Controller#Controller(MainController)
@@ -104,13 +127,28 @@ public class PreferencesViewController extends Controller{
 	private void bindComponents(){
 		this.fillComboBoxLanguages();
 
+		this.save_button.addEventHandler(ActionEvent.ANY, this.savePropertiesHandler);
+
 	}
 
 	/**
 	 * Fills the {@link ComboBox} with the available languages.
 	 */
 	private void fillComboBoxLanguages(){
-		this.language_CompoBox.getItems().addAll(Locale.GERMAN, Locale.ENGLISH);
+		final StringConverter<Locale> converter = new StringConverter<Locale>(){
+
+			@Override
+			public Locale fromString(final String string){
+				return new Locale(string);
+			}
+
+			@Override
+			public String toString(final Locale locale){
+				return locale.getDisplayLanguage();
+			}
+		};
+		this.language_CompoBox.setConverter(converter);
+		this.language_CompoBox.getItems().addAll(Locale.GERMANY, Locale.UK);
 
 		this.language_CompoBox.setCellFactory(new Callback<ListView<Locale>, ListCell<Locale>>(){
 
@@ -126,6 +164,7 @@ public class PreferencesViewController extends Controller{
 						super.updateItem(item, empty);
 						if(item == null || empty){
 							this.setGraphic(null);
+							PreferencesViewController.this.LOG.info("empty dropbox item");
 						} else{
 							this.setText(item.getDisplayLanguage());
 						}
@@ -134,19 +173,6 @@ public class PreferencesViewController extends Controller{
 			}
 
 		});
-		final StringConverter<Locale> converter = new StringConverter<Locale>(){
-
-			@Override
-			public Locale fromString(final String string){
-				return new Locale(string);
-			}
-
-			@Override
-			public String toString(final Locale locale){
-				return locale.getDisplayLanguage();
-			}
-		};
-		this.language_CompoBox.setConverter(converter);
 	}
 
 	/*
@@ -159,8 +185,8 @@ public class PreferencesViewController extends Controller{
 	public void initialize(final URL location, final ResourceBundle resources){
 		this.assertions();
 		this.bindComponents();
-		this.loadPreferences();
 		this.updateLocalisation();
+		this.loadPreferences();
 	}
 
 	/**
@@ -168,7 +194,10 @@ public class PreferencesViewController extends Controller{
 	 */
 	private void loadPreferences(){
 		this.propertiesToEdit = this.getMainController().getSessionInfos().getPropertiesHandler().getProperties();
-		this.language_CompoBox.setValue(new Locale(this.propertiesToEdit.getProperty(PropertieFields.SAVED_LOCALE)));
+		final String displayLanguage = new Locale(this.propertiesToEdit.getProperty(PropertieFields.SAVED_LOCALE)).getDisplayLanguage();
+		this.LOG.info(new Locale(displayLanguage).getDisplayLanguage());
+		this.language_CompoBox.getSelectionModel().select(new Locale(displayLanguage));
+
 	}
 
 	/*

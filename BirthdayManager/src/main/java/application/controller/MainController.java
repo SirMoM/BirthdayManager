@@ -41,7 +41,7 @@ import javafx.stage.Stage;
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
 public class MainController{
-	private final Logger LOG = LogManager.getLogger(this.getClass().getName());
+	private Logger LOG;
 	private final Stage stage;
 	private final SessionInfos sessionInfos;
 
@@ -70,6 +70,7 @@ public class MainController{
 		@Override
 		public void handle(final ActionEvent event){
 			MainController.this.openPreferences();
+			MainController.this.LOG = LogManager.getLogger(this.getClass().getName());
 		}
 	};
 	final EventHandler<ActionEvent> saveToFileHandler = new EventHandler<ActionEvent>(){
@@ -105,7 +106,7 @@ public class MainController{
 			try{
 				fileChooser.setInitialDirectory(new File(MainController.this.getSessionInfos().getPropertiesHandler().getPropertie(PropertieFields.LAST_OPEND).toString()).getParentFile());
 			} catch (final NullPointerException nullPointerException){
-				fileChooser.setInitialDirectory(new File("C:\\Users\\Admin"));
+				fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
 			}
 
 			// TODO Extension Filters with internationalisation
@@ -136,7 +137,7 @@ public class MainController{
 		@Override
 		public void handle(final ActionEvent event){
 			final String lastUsedFilePath = MainController.this.getSessionInfos().getPropertiesHandler().getPropertie(PropertieFields.LAST_OPEND).toString();
-			MainController.this.LOG.debug(lastUsedFilePath);
+			MainController.this.LOG.debug("Saved as recend used: " + lastUsedFilePath);
 			final File birthdayFile = new File(lastUsedFilePath);
 
 			MainController.this.getSessionInfos().setFileToOpen(birthdayFile);
@@ -165,6 +166,7 @@ public class MainController{
 	public MainController(final Stage stage){
 		this.stage = stage;
 		this.sessionInfos = new SessionInfos();
+		this.LOG = LogManager.getLogger(this.getClass().getName());
 	}
 
 	/**
