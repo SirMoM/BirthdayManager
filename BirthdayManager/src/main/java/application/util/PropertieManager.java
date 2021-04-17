@@ -31,7 +31,7 @@ public class PropertieManager{
 		this.properties = new Properties();
 //		this.propertiesFile = new File(System.getProperty("java.io.tmpdir") + this.PROPERTIE_FILE_NAME);
 		this.propertiesFile = new File(this.PROPERTIE_FILE_NAME);
-		this.LOG.info("Propertie File " + this.propertiesFile.getAbsolutePath());
+//		this.LOG.info("Propertie File " + this.propertiesFile.getAbsolutePath());
 
 		try{
 			if(this.propertiesFile.createNewFile()){
@@ -40,7 +40,7 @@ public class PropertieManager{
 				this.LOG.info("Loaded default properties");
 			} else{
 				this.loadProperties();
-				this.LOG.info("Loaded properties");
+//				this.LOG.info("Loaded properties");
 			}
 		} catch (final FileNotFoundException fileNotFoundException){
 			this.LOG.catching(Level.FATAL, fileNotFoundException);
