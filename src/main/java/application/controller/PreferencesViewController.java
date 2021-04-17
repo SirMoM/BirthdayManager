@@ -145,9 +145,8 @@ public class PreferencesViewController extends Controller {
             PreferencesViewController.this.LOG.catching(Level.INFO, nullPointerException);
             PreferencesViewController.this.LOG.info("startupFile_textField was not properly set ?");
         }
-
-        properties.setProperty(PropertyFields.FIRST_HIGHLIGHT_COLOR, "#" + Integer.toHexString(PreferencesViewController.this.first_ColorPicker.getValue().hashCode()));
-        properties.setProperty(PropertyFields.SECOND_HIGHLIGHT_COLOR, "#" + Integer.toHexString(PreferencesViewController.this.second_ColorPicker.getValue().hashCode()));
+        properties.setProperty(PropertyFields.FIRST_HIGHLIGHT_COLOR, PreferencesViewController.this.first_ColorPicker.getValue().toString().replace("0x", "#"));
+        properties.setProperty(PropertyFields.SECOND_HIGHLIGHT_COLOR, PreferencesViewController.this.second_ColorPicker.getValue().toString().replace("0x", "#"));
         properties.setProperty(PropertyFields.SHOW_BIRTHDAYS_COUNT, PreferencesViewController.this.countBirthdaysShown_Spinner.getValue().toString());
 
         try {
