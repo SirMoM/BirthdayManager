@@ -466,10 +466,8 @@ public class MainController{
 		loader.setLocation(this.getClass().getResource(fxmlPath));
 		loader.setController(controller);
 		final Parent root = loader.load();
-		// TODO DO i really want this
-		// new JMetro(JMetro.Style.LIGHT).applyTheme(root);
 		final Scene scene = new Scene(root);
-		scene.getStylesheets().add("test.css");
+		scene.getStylesheets().add("dark-mode.css");
 		this.stage.setScene(scene);
 
 		// Show the GUI
