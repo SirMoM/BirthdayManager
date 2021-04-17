@@ -2,6 +2,7 @@ package application;
 
 import application.controller.MainController;
 import application.model.PersonManager;
+import application.util.ApplicationSetup;
 import javafx.application.Application;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -64,6 +65,8 @@ public class AppStart extends Application {
 
     @Override
     public void start(final Stage stage) throws IOException {
+        ApplicationSetup.setup();
+
         final MainController mainController = new MainController(stage);
         mainController.start();
     }

@@ -261,7 +261,6 @@ public class EditBirthdayViewController extends Controller {
         this.birthday_Label.setText(resourceManager.getLocaleString(LangResourceKeys.birthday_Label));
 
         this.openFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromFileChooserHandler);
-        this.recentFiles_MenuItem = new MenuItem(new File(PropertyManager.getProperty(PropertyFields.LAST_OPENED)).getName());
         this.recentFiles_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromRecentHandler);
         this.openRecent_MenuItem.getItems().add(this.recentFiles_MenuItem);
     }
@@ -269,7 +268,6 @@ public class EditBirthdayViewController extends Controller {
     @Override
     public void placeFocus() {
         name_TextField.requestFocus();
-
         this.name_TextField.setFocusTraversable(true);
         this.middleName_TextField.setFocusTraversable(true);
         this.surname_TextField.setFocusTraversable(true);

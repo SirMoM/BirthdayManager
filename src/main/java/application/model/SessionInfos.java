@@ -63,12 +63,8 @@ public class SessionInfos {
 
         LOG.debug("Loaded locale property {}", localePropertyString);
 
-        try {
-            recentFileNames.loadFromProperties(PropertyManager.getProperty(PropertyFields.LAST_OPENED));
-        } catch (final NullPointerException nullPointerException) {
-            LOG.catching(Level.WARN, nullPointerException);
-            LOG.warn("Don't worry just could not load recent File");
-        }
+        final String lastOpenedFile = PropertyManager.getProperty(PropertyFields.LAST_OPENED);
+        if (lastOpenedFile != null) recentFileNames.loadFromProperties(lastOpenedFile);
     }
 
     public RecentItems getRecentFileNames() {

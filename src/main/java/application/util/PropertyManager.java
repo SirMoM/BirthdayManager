@@ -17,7 +17,7 @@ import java.util.Properties;
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
 public class PropertyManager {
-    private static final String PROPERTIES_FILE_NAME = "BirthdayManager.properties";
+    private static final String PROPERTIES_FILE_NAME = ".gbm/BirthdayManager.properties";
     private static final Logger LOG = LogManager.getLogger(PropertyManager.class.getName());
     private static PropertyManager propertyManagerSingleton = null;
     private final Properties properties;
@@ -68,6 +68,14 @@ public class PropertyManager {
             LogManager.getLogger(PropertyManager.class.getName()).warn("Could not get property {}", key);
         }
         return null;
+    }
+
+    /**
+     * @param key For the property
+     * @return a property as String
+     */
+    public static String getProperty(final String key, final String defaultValue) {
+        return getProperty(key) == null ? defaultValue : getProperty(key);
     }
 
     /**

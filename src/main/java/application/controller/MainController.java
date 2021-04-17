@@ -473,10 +473,6 @@ public class MainController {
                     LOG.debug("Should have opened a file upon start but no file to open was found!");
                 } else if (filePathString.isEmpty()) {
                     LOG.debug("Empty file path can't open!");
-                    // If it is not an csv file remove from auto start!
-                } else if (filePathString.endsWith(".csv")) {
-                    this.openFile(new File(filePathString));
-                    LOG.debug("Opening File {}", filePathString);
                 } else {
                     PropertyManager.getInstance().getProperties().setProperty(PropertyFields.FILE_ON_START, "");
                     LOG.warn("Should have opened a file upon start but file to open was wasn't a csv file!");

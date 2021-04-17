@@ -23,7 +23,8 @@ public class LangResourceManager {
 
     /** The Basic Constructor */
     public LangResourceManager() {
-        final Locale locale = new Locale(PropertyManager.getProperty(PropertyFields.SAVED_LOCALE));
+        String savedLocal = PropertyManager.getProperty(PropertyFields.SAVED_LOCALE, "en_GB");
+        final Locale locale = new Locale(savedLocal);
         try {
             this.langResourceBundle = ResourceBundle.getBundle(LANG_BUNDLE_BASE_NAME, locale);
         } catch (final MissingResourceException missingResourceException) {
