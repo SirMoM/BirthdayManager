@@ -3,15 +3,14 @@ package application.controller;
 import application.model.Person;
 import application.model.PersonManager;
 import application.model.SessionInfos;
-import application.processes.CheckForUpdatesTask;
-import application.processes.ExportToCalenderTask;
-import application.processes.LoadPersonsTask;
-import application.processes.SaveBirthdaysToFileTask;
+import application.processes.*;
 import application.util.PropertyFields;
 import application.util.PropertyManager;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
 import javafx.application.Platform;
+import javafx.concurrent.ScheduledService;
+import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -30,6 +29,7 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -487,6 +487,19 @@ public class MainController {
         }
         getActiveController().placeFocus();
         checkVersionAndAlert();
+        ScheduledService<Boolean> scheduledService = new ScheduledService<Boolean>() {
+            @Override
+            protected Task<Boolean> createTask() {
+                UpdateSublistsPeriodically updateSublistsPeriodically = new UpdateSublistsPeriodically();
+                updateSublistsPeriodically.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, workerStateEvent -> {
+                    Boolean update = updateSublistsPeriodically.getValue();
+                    if (update) getSessionInfos().updateSubLists();
+                });
+                return updateSublistsPeriodically;
+            }
+        };
+        scheduledService.setDelay(new Duration(30000));
+        scheduledService.start();
     }
 
     private void checkVersionAndAlert() {
