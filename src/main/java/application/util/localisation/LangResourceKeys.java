@@ -34,7 +34,7 @@ public enum LangResourceKeys {
     identifyingPerson_label, name_Label, name_TextField, middleName_Label, surname_Label, surname_TextField, birthday_Label, birthday_DatePicker,
 
     // Preferences View
-    languageOptions_label, chooseLanguage_label, saveOptions_label, writeThru_CheckBox, autoSave_CheckBox, miscellaneous_label, openFileOnStart_Checkbox, chooseFile_button, cancel_button, save_button, firstHighlightingColor_label, secondHighlightingColor_label, appearanceOptions_label, countBirthdaysShown_Label, iCalNotification_checkBox,
+    languageOptions_label, chooseLanguage_label, saveOptions_label, writeThru_CheckBox, autoSave_CheckBox, miscellaneous_label, openFileOnStart_Checkbox, chooseFile_button, firstHighlightingColor_label, secondHighlightingColor_label, appearanceOptions_label, countBirthdaysShown_Label, iCalNotification_checkBox, darkMode_button, reminder_CheckBox,
 
     // Search View
     search, enableFuzzy_RadioButton, enableRegEx_RadioButton, advancedSettings_TitledPane,
@@ -47,4 +47,6 @@ public enum LangResourceKeys {
 
     // Miscellaneous
     yes, no, csv_file, txt_file, all_files, missedBirthdays, missedBirthdaysMsg,
+    cancel_button, save_button, delete_button,
+    calendar_file, export_msg, export, exportMenuItem, close_Button;
 }

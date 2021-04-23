@@ -141,7 +141,7 @@ public class PreferencesViewController extends Controller {
         properties.setProperty(PropertyFields.EXPORT_WITH_ALARM, PreferencesViewController.this.iCalNotification_CheckBox.selectedProperty().getValue().toString());
         try {
             if (!PreferencesViewController.this.startupFile_textField.getText().endsWith(".csv")) {
-                LOG.debug("1");
+                // TODO Localisation
                 new Alert(AlertType.WARNING).setContentText("Tried to set the file to be opened automatically so that it is not CSV!");
             } else {
                 properties.setProperty(PropertyFields.FILE_ON_START, PreferencesViewController.this.startupFile_textField.getText());
@@ -329,6 +329,10 @@ public class PreferencesViewController extends Controller {
         this.appearanceOptions_Label.setText(resourceManager.getLocaleString(LangResourceKeys.appearanceOptions_label));
         this.countBirthdaysShown_Label.setText(resourceManager.getLocaleString(LangResourceKeys.countBirthdaysShown_Label));
         this.iCalNotification_CheckBox.setText(resourceManager.getLocaleString(LangResourceKeys.iCalNotification_checkBox));
+        this.darkMode_ToggleButton.setText(resourceManager.getLocaleString(LangResourceKeys.darkMode_button));
+        this.save_button.setText(resourceManager.getLocaleString(LangResourceKeys.save_button));
+        this.cancel_button.setText(resourceManager.getLocaleString(LangResourceKeys.cancel_button));
+        this.reminder_CheckBox.setText(resourceManager.getLocaleString(LangResourceKeys.reminder_CheckBox));
     }
 
     @Override

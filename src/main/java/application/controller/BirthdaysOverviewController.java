@@ -510,6 +510,7 @@ public class BirthdaysOverviewController extends Controller {
         this.friday_column2.setText(resourceManager.getLocaleString(LangResourceKeys.friday_column2));
         this.saturday_column2.setText(resourceManager.getLocaleString(LangResourceKeys.saturday_column2));
         this.sunday_column2.setText(resourceManager.getLocaleString(LangResourceKeys.sunday_column2));
+        this.exportToCalendar_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.exportMenuItem));
     }
 
     @Override

@@ -220,6 +220,8 @@ public class NewBirthdayViewController extends Controller {
             LOG.catching(Level.INFO, nullPointerException);
             LOG.info("No recent File opened ?");
         }
+        this.save_Button.setText(resourceManager.getLocaleString(LangResourceKeys.save_button));
+        this.cancel_Button.setText(resourceManager.getLocaleString(LangResourceKeys.cancel_button));
     }
 
     @Override

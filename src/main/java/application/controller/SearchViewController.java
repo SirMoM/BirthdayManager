@@ -234,6 +234,8 @@ public class SearchViewController extends Controller {
         this.dateSearch_Button.setText(lrm.getLocaleString(LangResourceKeys.search));
         this.openBirthday_MenuItem.setText(lrm.getLocaleString(LangResourceKeys.openBirthday_MenuItem));
         this.advancedSettings_TitledPane.setText(lrm.getLocaleString(LangResourceKeys.advancedSettings_TitledPane));
+        this.openBirthday_Button.setText(lrm.getLocaleString(LangResourceKeys.openBirthday_MenuItem));
+        this.closeSearch_Button.setText(lrm.getLocaleString(LangResourceKeys.close_Button));
     }
 
     @Override

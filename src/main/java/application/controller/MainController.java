@@ -57,16 +57,16 @@ public class MainController {
     private final Stage stage;
     final EventHandler<ActionEvent> exportToFileHandler = event -> {
         final FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
+        LangResourceManager lrm = new LangResourceManager();
+        fileChooser.setTitle(lrm.getLocaleString(LangResourceKeys.fileChooserCaption));
 
         try {
             fileChooser.setInitialDirectory(new File(PropertyManager.getProperty(PropertyFields.LAST_OPENED)).getParentFile());
         } catch (final NullPointerException nullPointerException) {
             fileChooser.setInitialDirectory(new File(System.getProperty(USER_HOME)));
         }
-        // TODO Extension Filters with internationalisation
-        fileChooser.setInitialFileName("Birthdays");
-        fileChooser.getExtensionFilters().addAll(new ExtensionFilter("CSV Files", CSV_FILE_EXTENSION), new ExtensionFilter("All Files", "*.*"));
+        fileChooser.setInitialFileName(lrm.getLocaleString(LangResourceKeys.birthday_Label));
+        fileChooser.getExtensionFilters().addAll(new ExtensionFilter(lrm.getLocaleString(LangResourceKeys.csv_file), CSV_FILE_EXTENSION), new ExtensionFilter(lrm.getLocaleString(LangResourceKeys.all_files), "*.*"));
 
         final File saveFile = fileChooser.showSaveDialog(MainController.this.getStage().getScene().getWindow());
 
@@ -210,11 +210,13 @@ public class MainController {
     private Controller activeController = null;
     final EventHandler<ActionEvent> exportToCalendarHandler = event -> {
         final FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
+
+        LangResourceManager lrm = new LangResourceManager();
+        fileChooser.setTitle(lrm.getLocaleString(LangResourceKeys.fileChooserCaption));
 
         fileChooser.setInitialDirectory(new File(System.getProperty(USER_HOME)));
-        fileChooser.setInitialFileName("birthdays.ics");
-        fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Calendars", "*.ics"));
+        fileChooser.setInitialFileName(lrm.getLocaleString(LangResourceKeys.birthday_Label) +".ics");
+        fileChooser.getExtensionFilters().addAll(new ExtensionFilter(lrm.getLocaleString(LangResourceKeys.calendar_file), "*.ics"));
 
         final File saveFile = fileChooser.showSaveDialog(MainController.this.getStage().getScene().getWindow());
         if (saveFile == null) {
@@ -223,11 +225,13 @@ public class MainController {
         ExportToCalenderTask exportToCalenderTask = null;
         try {
             exportToCalenderTask = new ExportToCalenderTask(saveFile);
+            // TODO Localisation
             exportToCalenderTask.setOnSucceeded(x -> {
                 LOG.debug("EXPORTED");
                 final Alert alert = new Alert(AlertType.INFORMATION);
-                alert.setTitle("Exported");
-                alert.setHeaderText("All birthdays have been exported to " + saveFile.getAbsolutePath() + "!");
+                alert.setTitle(lrm.getLocaleString(LangResourceKeys.export));
+                String msg = String.format(lrm.getLocaleString(LangResourceKeys.export_msg), saveFile.getAbsolutePath());
+                alert.setHeaderText(msg);
                 alert.showAndWait();
             });
             if (MainController.this.getActiveController() instanceof BirthdaysOverviewController) {

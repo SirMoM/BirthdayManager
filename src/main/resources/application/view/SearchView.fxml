@@ -86,7 +86,7 @@
         <HBox alignment="CENTER" prefHeight="50.0" prefWidth="600.0">
             <children>
                 <Button fx:id="openBirthday_Button" alignment="CENTER" defaultButton="true" mnemonicParsing="false"
-                        prefHeight="30.0" prefWidth="100.0" text="Open" textAlignment="CENTER">
+                        prefHeight="30.0" prefWidth="150.0" text="Open" textAlignment="CENTER">
                     <opaqueInsets>
                         <Insets/>
                     </opaqueInsets>

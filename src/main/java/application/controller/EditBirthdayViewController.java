@@ -40,7 +40,6 @@ public class EditBirthdayViewController extends Controller {
         PersonManager.getInstance().deletePerson(EditBirthdayViewController.this.personToEdit);
         EditBirthdayViewController.this.getMainController().goToLastScene();
     };
-    private MenuItem recentFiles_MenuItem;
     @FXML
     private ResourceBundle resources;
     @FXML
@@ -261,8 +260,10 @@ public class EditBirthdayViewController extends Controller {
         this.birthday_Label.setText(resourceManager.getLocaleString(LangResourceKeys.birthday_Label));
 
         this.openFile_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromFileChooserHandler);
-        this.recentFiles_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().openFromRecentHandler);
-        this.openRecent_MenuItem.getItems().add(this.recentFiles_MenuItem);
+
+        this.save_Button.setText(resourceManager.getLocaleString(LangResourceKeys.save_button));
+        this.cancel_Button.setText(resourceManager.getLocaleString(LangResourceKeys.cancel_button));
+        this.delete_Button.setText(resourceManager.getLocaleString(LangResourceKeys.delete_button));
     }
 
     @Override
