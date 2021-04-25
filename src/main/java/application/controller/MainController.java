@@ -541,6 +541,7 @@ public class MainController {
                         LOG.catching(e);
                     }
                 }
+                alert.showAndWait();
 
             }
         });
