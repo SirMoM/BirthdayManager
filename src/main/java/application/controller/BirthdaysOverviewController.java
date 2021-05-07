@@ -414,6 +414,8 @@ public class BirthdaysOverviewController extends Controller {
         getMainController().getSessionInfos().getRecentFileNames().addListener(listener -> {
             createRecentFilesMenuItems();
         });
+
+        debug.addEventHandler(ActionEvent.ANY, actionEvent -> getMainController().goToAboutView());
     }
 
     private void refreshBirthdayTableView() {

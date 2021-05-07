@@ -45,12 +45,14 @@ public class CheckForUpdatesTask extends Task<String> {
         return output.split("=")[1];
     }
 
-    private String getCurrentVersion() throws IOException {
-        String version = this.getClass().getPackage().getImplementationVersion();
+    public static String getCurrentVersion(){
+        String version = CheckForUpdatesTask.class.getPackage().getImplementationVersion();
         if (version == null) {
-            BufferedReader reader = new BufferedReader(new FileReader("gradle.properties"));
-            version = reader.readLine().split("=")[1];
-            reader.close();
+            try(BufferedReader reader = new BufferedReader(new FileReader("gradle.properties"))){
+                version = reader.readLine().split("=")[1];
+            } catch (IOException ioException) {
+                LOG.catching(ioException);
+            }
         }
         return version;
     }

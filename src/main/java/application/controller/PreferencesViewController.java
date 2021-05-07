@@ -141,8 +141,7 @@ public class PreferencesViewController extends Controller {
         properties.setProperty(PropertyFields.EXPORT_WITH_ALARM, PreferencesViewController.this.iCalNotification_CheckBox.selectedProperty().getValue().toString());
         try {
             if (!PreferencesViewController.this.startupFile_textField.getText().endsWith(".csv")) {
-                // TODO Localisation
-                new Alert(AlertType.WARNING).setContentText("Tried to set the file to be opened automatically so that it is not CSV!");
+                LOG.debug("Tried to set the file to be opened automatically so that it is not CSV!");
             } else {
                 properties.setProperty(PropertyFields.FILE_ON_START, PreferencesViewController.this.startupFile_textField.getText());
             }

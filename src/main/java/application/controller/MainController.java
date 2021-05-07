@@ -225,14 +225,13 @@ public class MainController {
         ExportToCalenderTask exportToCalenderTask = null;
         try {
             exportToCalenderTask = new ExportToCalenderTask(saveFile);
-            // TODO Localisation
             exportToCalenderTask.setOnSucceeded(x -> {
-                LOG.debug("EXPORTED");
                 final Alert alert = new Alert(AlertType.INFORMATION);
                 alert.setTitle(lrm.getLocaleString(LangResourceKeys.export));
                 String msg = String.format(lrm.getLocaleString(LangResourceKeys.export_msg), saveFile.getAbsolutePath());
                 alert.setHeaderText(msg);
                 alert.showAndWait();
+                LOG.debug("EXPORTED");
             });
             if (MainController.this.getActiveController() instanceof BirthdaysOverviewController) {
                 ((BirthdaysOverviewController) MainController.this.getActiveController()).getProgressbar().progressProperty().bind(exportToCalenderTask.workDoneProperty());
@@ -256,7 +255,7 @@ public class MainController {
         PersonManager.getInstance().setSessionInfos(sessionInfos);
 
         this.stage = stage;
-        this.stage.getIcons().add(new Image(this.getClass().getResourceAsStream("/img/icons8-birthday-50.png")));
+        this.stage.getIcons().add(new Image(this.getClass().getResourceAsStream("/img/gbm_icon.png")));
         stage.setOnCloseRequest(this.closeAppHandler);
     }
 
@@ -312,6 +311,29 @@ public class MainController {
             LOG.catching(Level.ERROR, exception);
         }
         getActiveController().placeFocus();
+    }
+
+    /**
+     * Switches scenes to the AboutView. Generates a new Controller.
+     *
+     * @see EditBirthdayViewController
+     */
+    public void goToAboutView() {
+
+        try {
+            final FXMLLoader fxmlLoader = new FXMLLoader();
+            fxmlLoader.setLocation(this.getClass().getResource("/application/view/AboutView.fxml"));
+            fxmlLoader.setController(new AboutViewController(this));
+            final Scene scene = new Scene(fxmlLoader.load());
+            final Stage aboutStage = new Stage();
+            aboutStage.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.about));
+            aboutStage.setScene(scene);
+            setStyle(scene);
+            aboutStage.show();
+        } catch (final IOException ioException) {
+            LOG.log(Level.ERROR, "Failed to create about window.", ioException);
+        }
+
     }
 
     /**
@@ -401,7 +423,7 @@ public class MainController {
             setStyle(scene);
             prefStage.show();
         } catch (final IOException ioException) {
-            LOG.log(Level.ERROR, "Failed to create new Window.", ioException);
+            LOG.log(Level.ERROR, "Failed to create preferences window.", ioException);
         }
     }
 
@@ -502,7 +524,7 @@ public class MainController {
         scheduledService.start();
     }
 
-    private void checkVersionAndAlert() {
+    public void checkVersionAndAlert() {
         if (Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.NEW_VERSION_REMINDER))) {
             LOG.debug("Don't check for new version!");
             return;

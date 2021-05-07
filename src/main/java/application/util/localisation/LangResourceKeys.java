@@ -48,5 +48,8 @@ public enum LangResourceKeys {
     // Miscellaneous
     yes, no, csv_file, txt_file, all_files, missedBirthdays, missedBirthdaysMsg,
     cancel_button, save_button, delete_button,
-    calendar_file, export_msg, export, exportMenuItem, close_Button;
+    calendar_file, export_msg, export, exportMenuItem, close_Button,
+
+    // About page
+    about, appName_Label, version_Label, createdBy_Label, visitWebsite, visitGithub, checkForUpdates;
 }
