@@ -8,9 +8,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Properties;
 
 public class ApplicationSetup {
@@ -56,8 +54,9 @@ public class ApplicationSetup {
         String onStartFile = PropertyManager.getProperty(PropertyFields.FILE_ON_START);
         if (onStartFile == null) return;
         File file = new File(onStartFile);
-        if (!(file.exists() && file.isFile() && !onStartFile.endsWith(".csv"))) {
+        if (!file.exists() || !file.isFile() || !onStartFile.endsWith(".csv")) {
             LOG.info("On start file is not valid {} and will be cleansed", onStartFile);
+            PropertyManager.getInstance().getProperties().setProperty(PropertyFields.FILE_ON_START, "");
         }
     }
 

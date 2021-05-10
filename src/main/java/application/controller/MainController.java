@@ -500,8 +500,7 @@ public class MainController {
                 } else if (filePathString.isEmpty()) {
                     LOG.debug("Empty file path can't open!");
                 } else {
-                    PropertyManager.getInstance().getProperties().setProperty(PropertyFields.FILE_ON_START, "");
-                    LOG.warn("Should have opened a file upon start but file to open was wasn't a csv file!");
+                    openFile(new File(filePathString));
                 }
             }
         } catch (final Exception exception) {
@@ -509,6 +508,8 @@ public class MainController {
         }
         getActiveController().placeFocus();
         checkVersionAndAlert();
+
+        // Continuous operation Task
         ScheduledService<Boolean> scheduledService = new ScheduledService<Boolean>() {
             @Override
             protected Task<Boolean> createTask() {
