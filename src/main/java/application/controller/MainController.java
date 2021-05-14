@@ -516,12 +516,15 @@ public class MainController {
                 UpdateSublistsPeriodically updateSublistsPeriodically = new UpdateSublistsPeriodically();
                 updateSublistsPeriodically.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, workerStateEvent -> {
                     Boolean update = updateSublistsPeriodically.getValue();
-                    if (update) getSessionInfos().updateSubLists();
+                    if (update){
+                        getSessionInfos().updateSubLists();
+                        LOG.info("Update sublist!");
+                    }
                 });
                 return updateSublistsPeriodically;
             }
         };
-        scheduledService.setDelay(new Duration(30000));
+        scheduledService.setPeriod(new Duration(1000*60));
         scheduledService.start();
     }
 
