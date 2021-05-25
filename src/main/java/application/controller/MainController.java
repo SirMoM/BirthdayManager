@@ -13,6 +13,7 @@ import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -25,6 +26,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -54,6 +58,27 @@ public class MainController {
         LOG.trace("Open Preferences");
         MainController.this.openPreferences();
     };
+
+    final EventHandler<Event> birthdayDoubleClickHandler = event -> {
+        Integer selectedPersonIndex = -1;
+        if (event.getSource() instanceof ListView) {
+            ListView listView = (ListView<Person>) event.getSource();
+            if (!listView.getSelectionModel().getSelectedIndices().isEmpty()) {
+                selectedPersonIndex = (Integer) listView.getSelectionModel().getSelectedIndices().get(0);
+            } else {
+                LOG.info("No person selected!");
+                return;
+            }
+        }
+        if (event.getEventType().equals(MouseEvent.MOUSE_CLICKED)) {
+            if (((MouseEvent) event).getClickCount() >= 2) {
+                goToEditBirthdayView(selectedPersonIndex);
+            }
+        } else if (event.getEventType().equals(KeyEvent.KEY_PRESSED) && ((KeyEvent) event).getCode() == KeyCode.ENTER) {
+            goToEditBirthdayView(selectedPersonIndex);
+        }
+    };
+
     private final Stage stage;
     final EventHandler<ActionEvent> exportToFileHandler = event -> {
         final FileChooser fileChooser = new FileChooser();

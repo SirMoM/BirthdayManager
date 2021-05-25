@@ -180,19 +180,6 @@ public class BirthdaysOverviewController extends Controller {
         BirthdaysOverviewController.this.nextBdaysList.setCellFactory(BirthdaysOverviewController.this.colorCellFactory);
         BirthdaysOverviewController.this.nextBdaysList.refresh();
     };
-    private final EventHandler<Event> birthdayDoubleClickHandler = event -> {
-        if (event.getEventType().equals(MouseEvent.MOUSE_CLICKED)) {
-            if (((MouseEvent) event).getClickCount() >= 2) {
-                final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
-                final int indexOf = PersonManager.getInstance().getPersons().indexOf(selectedItems.get(0));
-                BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(indexOf);
-            }
-        } else if (event.getEventType().equals(KeyEvent.KEY_PRESSED) && ((KeyEvent) event).getCode() == KeyCode.ENTER) {
-            final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
-            final int indexOf = PersonManager.getInstance().getPersons().indexOf(selectedItems.get(0));
-            BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(indexOf);
-        }
-    };
     private final EventHandler<ActionEvent> deletePersonHandler = event -> {
         final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
         if (!selectedItems.isEmpty()) {
@@ -356,8 +343,8 @@ public class BirthdaysOverviewController extends Controller {
         this.nextBdaysList.setItems(this.getMainController().getSessionInfos().getNextBirthdays());
         this.nextBdaysList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         this.nextBdaysList.setCellFactory(this.colorCellFactory);
-        this.nextBdaysList.addEventHandler(MouseEvent.MOUSE_CLICKED, this.birthdayDoubleClickHandler);
-        this.nextBdaysList.addEventHandler(KeyEvent.KEY_PRESSED, this.birthdayDoubleClickHandler);
+        this.nextBdaysList.addEventHandler(MouseEvent.MOUSE_CLICKED, getMainController().birthdayDoubleClickHandler);
+        this.nextBdaysList.addEventHandler(KeyEvent.KEY_PRESSED, getMainController().birthdayDoubleClickHandler);
         this.nextBdaysList.getItems().addListener((ListChangeListener<Person>) change -> {
             this.nextBdaysList.setCellFactory(null);
             this.nextBdaysList.refresh();

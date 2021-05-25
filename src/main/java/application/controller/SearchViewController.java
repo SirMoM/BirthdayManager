@@ -22,6 +22,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -221,6 +222,9 @@ public class SearchViewController extends Controller {
         this.dateSearch_Button.addEventHandler(ActionEvent.ANY, this.searchDateEventHandler);
         this.openBirthday_Button.addEventHandler(ActionEvent.ANY, this.openBirthday);
         this.closeSearch_Button.addEventHandler(ActionEvent.ANY, this.returnToPreviousView);
+        this.searchResults_ListView.addEventHandler(MouseEvent.MOUSE_CLICKED, getMainController().birthdayDoubleClickHandler);
+        this.searchResults_ListView.addEventHandler(KeyEvent.KEY_PRESSED, getMainController().birthdayDoubleClickHandler);
+
     }
 
     @Override
