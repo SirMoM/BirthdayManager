@@ -206,17 +206,17 @@ public class SessionInfos {
                     } catch (NullPointerException nullPointerException) {
                         LOG.catching(Level.WARN, nullPointerException);
                         LOG.warn("Could not generate Missing-Text for {} based on {} and {}", person, days, age);
-                        stringBuilder.append("\n");
                     }
+                    stringBuilder.append("\n");
 
                     final TextArea textArea = new TextArea(stringBuilder.toString());
                     textArea.setEditable(false);
-                    textArea.setWrapText(false);
+                    textArea.setWrapText(true);
 
                     alert.getDialogPane().setContent(textArea);
-                    alert.showAndWait();
                     LOG.debug(endMessage, workerStateEvent.getSource().getClass().getName());
                 }
+                    alert.showAndWait();
             }
         });
         new Thread(missedBirthdays).start();
