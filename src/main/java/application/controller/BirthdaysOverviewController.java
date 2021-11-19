@@ -150,6 +150,8 @@ public class BirthdaysOverviewController extends Controller {
     @FXML
     private MenuItem refresh_MenuItem;
     @FXML
+    private MenuItem about;
+    @FXML
     private MenuItem openFileExternal_Button;
     @FXML
     private Button expandRightSide_Button;
@@ -262,6 +264,7 @@ public class BirthdaysOverviewController extends Controller {
      * All assertions for the controller. Checks if all FXML-Components have been loaded properly.
      */
     private void assertion() {
+        assert about != null : "fx:id=\"about\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
         assert file_menu != null : "fx:id=\"file_menu\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
         assert openFile_MenuItem != null : "fx:id=\"openFile_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
         assert openRecent_MenuItem != null : "fx:id=\"openRecent_MenuItem\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
@@ -402,7 +405,7 @@ public class BirthdaysOverviewController extends Controller {
             createRecentFilesMenuItems();
         });
 
-        debug.addEventHandler(ActionEvent.ANY, actionEvent -> getMainController().goToAboutView());
+        about.addEventHandler(ActionEvent.ANY, actionEvent -> getMainController().goToAboutView());
     }
 
     private void refreshBirthdayTableView() {
