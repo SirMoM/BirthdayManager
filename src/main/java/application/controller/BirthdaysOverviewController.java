@@ -483,7 +483,7 @@ public class BirthdaysOverviewController extends Controller {
         this.deleteBirthdays_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.deleteBirthdays_MenuItem));
 
         this.help_menu.setText(resourceManager.getLocaleString(LangResourceKeys.help_menu));
-
+        this.about.setText(resourceManager.getLocaleString(LangResourceKeys.about));
         // List menu
         this.openBirthday_MenuItem.setText(resourceManager.getLocaleString(LangResourceKeys.openBirthday_MenuItem));
 
