@@ -451,6 +451,8 @@ public class BirthdaysOverviewController extends Controller {
         this.updateLocalisation();
 
         this.bindComponents();
+
+        this.refreshBirthdayTableView();
     }
 
     /*
