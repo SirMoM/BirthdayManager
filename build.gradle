@@ -7,46 +7,59 @@ plugins {
 
     // Publish
     id 'maven-publish'
-    id 'maven'
-    id 'net.researchgate.release' version '2.8.1'
+    id 'net.researchgate.release' version '3.1.0'
 
     // Code quality
     id 'com.github.sherter.google-java-format' version '0.9'
+
+    // JavaFX
+    id 'org.openjfx.javafxplugin' version '0.1.0'
+    // Shadow JAR
+    id 'com.gradleup.shadow' version '9.4.0'
 }
 
 // Variables
-def main_class = 'application.AppStart'
+def main_class = 'application.Launcher'
 
 static def getDate() { return new Date().format('dd.MM.yyyy HH:mm:ss') }
 
 verifyGoogleJavaFormat.enabled = false
 commitNewVersion.enabled = false
 repositories {
-    // Use JCenter for resolving dependencies.
-    jcenter()
+    mavenCentral()
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+javafx {
+    version = '21'
+    modules = ['javafx.controls', 'javafx.fxml', 'javafx.graphics', 'javafx.swing']
 }
 
 dependencies {
     // Gradle dependencies
     // This dependency is used by the application.
-    implementation 'com.google.guava:guava:29.0-jre'
+    implementation 'com.google.guava:guava:33.0.0-jre'
 
     // Exporting to iCal
     // https://github.com/mangstadt/biweekly
-    compile 'net.sf.biweekly:biweekly:0.6.6'
+    implementation 'net.sf.biweekly:biweekly:0.6.7'
 
     // JSON parsing
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.12.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.0'
 
     //Log4J
-    compile 'org.apache.logging.log4j:log4j-api:2.14.0'
-    compile 'org.apache.logging.log4j:log4j-core:2.14.0'
+    implementation 'org.apache.logging.log4j:log4j-api:2.23.1'
+    implementation 'org.apache.logging.log4j:log4j-core:2.23.1'
 
     // Test dependencies
     // Use JUnit test framework.
-    // testImplementation 'junit:junit:4.13'
-    implementation 'org.junit.jupiter:junit-jupiter:5.4.2'
-    testImplementation 'org.assertj:assertj-core:3.19.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testImplementation 'org.assertj:assertj-core:3.25.3'
 }
 
 test {
@@ -61,12 +74,12 @@ application {
 jar {
     manifest {
         attributes 'Implementation-Title': rootProject.name,
-                'Implementation-Version': getArchiveVersion(),
+                'Implementation-Version': archiveVersion.get(),
                 'Main-Class': main_class,
                 'Build-Time-ISO-8601': getDate(),
                 'Multi-Release': 'true'
     }
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 // Debug infos when building
@@ -96,9 +109,9 @@ publishing {
     }
     publications {
         gpr(MavenPublication) {
-            groupId 'sirmom'
-            artifactId getArchivesBaseName().toString().toLowerCase()
-            version getVersion()
+            groupId = 'sirmom'
+            artifactId = project.name.toLowerCase()
+            version = getVersion()
 
             from components.java
         }
@@ -125,16 +138,16 @@ release {
     versionPatterns = [
             /(\d+)([^\d]*$)/: { Matcher m, Project p -> m.replaceAll("${(m[0][1] as int) + 1}${m[0][2]}") }
     ]
-    pushReleaseVersionBranch = false
+    pushReleaseVersionBranch = 'false'
     scmAdapters = [
             net.researchgate.release.GitAdapter
     ]
 
     git {
-        requireBranch = 'master'
-        pushToRemote = 'origin'
-        pushToBranchPrefix = 'releases/'
-        commitVersionFileOnly = false
-        signTag = false
+        requireBranch.set('master')
+        pushToRemote.set('origin')
+        pushToBranchPrefix.set('releases/')
+        commitVersionFileOnly.set(false)
+        signTag.set(false)
     }
 }
