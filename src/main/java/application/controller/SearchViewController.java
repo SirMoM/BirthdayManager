@@ -172,9 +172,9 @@ public class SearchViewController extends Controller {
 
     protected boolean contains(final Person person, final String searchText) {
         String searchString = searchText.toUpperCase();
-        boolean surname = person.getSurname() != null && searchString.contains(person.getSurname().toUpperCase());
-        boolean name = person.getName() != null && searchString.contains(person.getName().toUpperCase());
-        boolean misc = person.getMisc() != null && searchString.contains(person.getMisc().toUpperCase());
+        boolean surname = person.getSurname() != null && person.getSurname().toUpperCase().contains(searchString);
+        boolean name = person.getName() != null && person.getName().toUpperCase().contains(searchString);
+        boolean misc = person.getMisc() != null && person.getMisc().toUpperCase().contains(searchString);
 
         return surname || name || misc;
     }
