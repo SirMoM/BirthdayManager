@@ -1,5 +1,7 @@
 package application.model;
 
+import application.util.BirthdayUtils;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +60,8 @@ public class PersonsInAWeek {
         final ArrayList<PersonsInAWeek> personsInAWeekList = new ArrayList<>();
         for (int i = 0; i < personsToParse.size(); i++) {
             final LocalDate birthday = personsToParse.get(i).getBirthday();
-            final LocalDate thisYearsBirthday = birthday.withYear(LocalDate.now().getYear());
+            final LocalDate thisYearsBirthday = BirthdayUtils.getBirthdayInYear(
+                    birthday, LocalDate.now().getYear());
 
             switch (thisYearsBirthday.getDayOfWeek()) {
                 case MONDAY:

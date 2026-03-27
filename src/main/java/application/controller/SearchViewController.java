@@ -6,6 +6,7 @@ package application.controller;
 import application.model.Person;
 import application.model.PersonManager;
 import application.util.BirthdayComparator;
+import application.util.BirthdayUtils;
 import application.util.LevenshteinDistance;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
@@ -60,8 +61,9 @@ public class SearchViewController extends Controller {
         getSearchResults().clear();
 
         for (Person person : PersonManager.getInstance().getPersons()) {
-            boolean start = person.getBirthday().withYear(year).isAfter(SearchViewController.this.dateSearch_DatePicker.getValue().minusDays(6));
-            boolean end = person.getBirthday().withYear(year).isBefore(SearchViewController.this.dateSearch_DatePicker.getValue().plusDays(6));
+            LocalDate birthdayThisYear = BirthdayUtils.getBirthdayInYear(person.getBirthday(), year);
+            boolean start = birthdayThisYear.isAfter(SearchViewController.this.dateSearch_DatePicker.getValue().minusDays(6));
+            boolean end = birthdayThisYear.isBefore(SearchViewController.this.dateSearch_DatePicker.getValue().plusDays(6));
 
             if (start && end) {
                 SearchViewController.this.searchResults.add(person);

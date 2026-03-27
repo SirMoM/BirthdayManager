@@ -1,5 +1,6 @@
 package application.model;
 
+import application.util.BirthdayUtils;
 import org.junit.jupiter.api.Test;
 
 import java.time.DayOfWeek;
@@ -41,6 +42,7 @@ class PersonsInAWeekTest {
     }
 
     private DayOfWeek getDayOfWeek(Person person) {
-        return person.getBirthday().withYear(LocalDate.now().getYear()).getDayOfWeek();
+        return BirthdayUtils.getBirthdayInYear(person.getBirthday(), LocalDate.now().getYear())
+                .getDayOfWeek();
     }
 }

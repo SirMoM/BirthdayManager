@@ -5,6 +5,7 @@ package application.processes;
 
 import application.model.Person;
 import application.model.PersonManager;
+import application.util.BirthdayUtils;
 import application.util.PropertyFields;
 import application.util.PropertyManager;
 import biweekly.ICalVersion;
@@ -73,7 +74,9 @@ public class ExportToCalenderTask extends PersonTasks<Boolean> {
             VEvent event = new VEvent();
             Summary summary = event.setSummary(person.namesToString());
             summary.setLanguage("de-DE");
-            Date start = Date.from(person.getBirthday().withYear(LocalDate.now().getYear()).atStartOfDay(ZoneId.systemDefault()).toInstant());
+            Date start = Date.from(BirthdayUtils.getBirthdayInYear(
+                    person.getBirthday(), LocalDate.now().getYear())
+                    .atStartOfDay(ZoneId.systemDefault()).toInstant());
             event.setDateStart(start, false);
             event.setClassification(Classification.PUBLIC);
             if (Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.EXPORT_WITH_ALARM))) {

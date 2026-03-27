@@ -7,6 +7,7 @@ import application.processes.UpdateNextBirthdaysTask;
 import application.processes.UpdateRecentBirthdaysTask;
 import application.util.PropertyFields;
 import application.util.PropertyManager;
+import application.util.BirthdayUtils;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
 import javafx.beans.property.SimpleStringProperty;
@@ -194,7 +195,10 @@ public class SessionInfos {
 
                 for (Person person : value) {
                     int age = (LocalDate.now().getYear() - person.getBirthday().getYear());
-                    long days = ChronoUnit.DAYS.between(person.getBirthday().withYear(LocalDate.now().getYear()), LocalDate.now());
+                    long days = ChronoUnit.DAYS.between(
+                            BirthdayUtils.getBirthdayInYear(
+                                    person.getBirthday(), LocalDate.now().getYear()),
+                            LocalDate.now());
                     stringBuilder.append(person.namesToString() + " ");
 
                     try {

@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class UpdateNextBirthdaysTaskTest {
@@ -32,5 +33,16 @@ class UpdateNextBirthdaysTaskTest {
         assertThat(personList.get(0)).isEqualTo(persons.get(2));
         assertThat(personList.get(1)).isEqualTo(persons.get(3));
         assertThat(personList).size().isEqualTo(2);
+    }
+
+    @Test
+    void call_DoesNotFailForLeapDayBirthdaysInNonLeapYears() {
+        persons.add(new Person("Leap", "Year", "", LocalDate.of(2000, 2, 29)));
+        persons.add(new Person("Future", "Birthday", "", LocalDate.now().plusDays(1)));
+        PersonManager.getInstance().setPersonDB(persons);
+        PropertyManager.getInstance().getProperties().setProperty(PropertyFields.SHOW_BIRTHDAYS_COUNT, "1");
+        classToTest = new UpdateNextBirthdaysTask();
+
+        assertThatCode(() -> classToTest.call()).doesNotThrowAnyException();
     }
 }

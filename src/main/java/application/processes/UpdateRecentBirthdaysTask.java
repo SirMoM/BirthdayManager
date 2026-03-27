@@ -5,6 +5,7 @@ package application.processes;
 
 import application.model.Person;
 import application.util.BirthdayComparator;
+import application.util.BirthdayUtils;
 import application.util.PropertyFields;
 import application.util.PropertyManager;
 import org.apache.logging.log4j.LogManager;
@@ -52,7 +53,8 @@ public class UpdateRecentBirthdaysTask extends PersonTasks<List<Person>> {
         // Fill upcoming and after based on today
         for (int i = 0; i < personDB.size(); i++) {
             final Person person = personDB.get(i);
-            int dayOfYear = person.getBirthday().withYear(LocalDate.now().getYear()).getDayOfYear();
+            int dayOfYear = BirthdayUtils.getBirthdayInYear(
+                    person.getBirthday(), LocalDate.now().getYear()).getDayOfYear();
             if (dayOfYear >= LocalDate.now().getDayOfYear()) {
                 upcoming.add(person);
             } else {

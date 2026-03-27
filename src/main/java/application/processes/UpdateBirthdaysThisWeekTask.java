@@ -6,6 +6,7 @@ package application.processes;
 import application.model.Person;
 import application.model.PersonsInAWeek;
 import application.util.BirthdayComparator;
+import application.util.BirthdayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -47,7 +48,8 @@ public class UpdateBirthdaysThisWeekTask extends PersonTasks<List<PersonsInAWeek
         personDB.sort(new BirthdayComparator(true));
 
         for (final Person person : personDB) {
-            final LocalDate birthday = person.getBirthday().withYear(LocalDate.now().getYear());
+            final LocalDate birthday = BirthdayUtils.getBirthdayInYear(
+                    person.getBirthday(), LocalDate.now().getYear());
             if (birthday.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) == this.week) {
                 birthdaysThisWeek.add(person);
             }

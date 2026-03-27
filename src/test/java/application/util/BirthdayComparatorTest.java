@@ -28,4 +28,13 @@ class BirthdayComparatorTest {
         assertThat(classToTest.compare(person1, person2)).isEqualTo(-1);
         assertThat(classToTest.compare(person1, person3)).isEqualTo(1);
     }
+
+    @Test
+    void compare_SortsLeapDayBeforeMarchFirst() {
+        BirthdayComparator classToTest = new BirthdayComparator(false);
+        Person leapDay = new Person("Leap", "Year", "", LocalDate.of(2000, 2, 29));
+        Person marchFirst = new Person("March", "First", "", LocalDate.of(2001, 3, 1));
+
+        assertThat(classToTest.compare(leapDay, marchFirst)).isNegative();
+    }
 }

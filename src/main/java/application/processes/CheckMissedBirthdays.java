@@ -1,6 +1,7 @@
 package application.processes;
 
 import application.model.Person;
+import application.util.BirthdayUtils;
 import application.util.PropertyFields;
 import application.util.PropertyManager;
 import org.apache.logging.log4j.LogManager;
@@ -48,7 +49,8 @@ public class CheckMissedBirthdays extends PersonTasks<List<Person>> {
     private List<Person> getBirthdaysSince(LocalDate lastVisit, LocalDate now) {
         List<Person> skippedBirthdays = new ArrayList<>();
         for (Person person : personDB) {
-            if (person.getBirthday().withYear(now.getYear()).isAfter(lastVisit) && person.getBirthday().withYear(now.getYear()).isBefore(now)) {
+            LocalDate birthdayThisYear = BirthdayUtils.getBirthdayInYear(person.getBirthday(), now.getYear());
+            if (birthdayThisYear.isAfter(lastVisit) && birthdayThisYear.isBefore(now)) {
                 LOG.debug("{} missed!", person.toExtendedString());
                 skippedBirthdays.add(person);
             }

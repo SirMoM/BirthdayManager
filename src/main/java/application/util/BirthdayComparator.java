@@ -24,9 +24,16 @@ public class BirthdayComparator implements Comparator<Person> {
     @Override
     public int compare(final Person person1, final Person person2) {
         if (this.compareToToday) {
-            return Integer.compare(person2.getBirthday().getDayOfYear(), this.today.getDayOfYear());
+            return Integer.compare(getCurrentYearDayOfYear(person2), this.today.getDayOfYear());
         } else {
-            return Integer.compare(person1.getBirthday().getDayOfYear(), person2.getBirthday().getDayOfYear());
+            return Integer.compare(
+                    getCurrentYearDayOfYear(person1),
+                    getCurrentYearDayOfYear(person2));
         }
+    }
+
+    private int getCurrentYearDayOfYear(final Person person) {
+        return BirthdayUtils.getBirthdayInYear(person.getBirthday(), this.today.getYear())
+                .getDayOfYear();
     }
 }

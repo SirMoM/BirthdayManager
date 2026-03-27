@@ -6,6 +6,7 @@ import application.model.PersonsInAWeek;
 import application.model.RecentItems;
 import application.processes.LoadPersonsTask;
 import application.processes.SaveBirthdaysToFileTask;
+import application.util.BirthdayUtils;
 import application.util.PropertyFields;
 import application.util.PropertyManager;
 import application.util.WeekTableCallback;
@@ -93,9 +94,13 @@ public class BirthdaysOverviewController extends Controller {
                     super.updateItem(item, empty);
                     this.styleProperty().bind(new SimpleStringProperty(""));
                     if (!empty && item != null) {
-                        if (item.getBirthday().isEqual(LocalDate.now().withYear(item.getBirthday().getYear()))) {
+                        final LocalDate today = LocalDate.now();
+                        final LocalDate birthdayThisYear =
+                                BirthdayUtils.getBirthdayInYear(item.getBirthday(), today.getYear());
+
+                        if (birthdayThisYear.isEqual(today)) {
                             this.styleProperty().bind(Bindings.when(this.selectedProperty()).then(new SimpleStringProperty("-fx-background-color: -fx-selection-bar;")).otherwise(new SimpleStringProperty("-fx-background-color: " + firstColorString)));
-                        } else if (LocalDate.now().withYear(item.getBirthday().getYear()).isBefore(item.getBirthday()) && item.getBirthday().isBefore(LocalDate.now().withYear(item.getBirthday().getYear()).plusDays(7))) {
+                        } else if (today.isBefore(birthdayThisYear) && birthdayThisYear.isBefore(today.plusDays(7))) {
 
                             this.styleProperty().bind(Bindings.when(this.selectedProperty()).then(new SimpleStringProperty("-fx-background-color: -fx-selection-bar;")).otherwise(new SimpleStringProperty("-fx-background-color: " + secondColorString)));
                         }
