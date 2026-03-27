@@ -24,7 +24,7 @@ public class LangResourceManager {
     /** The Basic Constructor */
     public LangResourceManager() {
         String savedLocal = PropertyManager.getProperty(PropertyFields.SAVED_LOCALE, "en_GB");
-        final Locale locale = new Locale(savedLocal);
+        final Locale locale = resolveLocale(savedLocal);
         try {
             this.langResourceBundle = ResourceBundle.getBundle(LANG_BUNDLE_BASE_NAME, locale);
         } catch (final MissingResourceException missingResourceException) {
@@ -53,5 +53,18 @@ public class LangResourceManager {
      */
     public String getLocaleString(final LangResourceKeys langResourceKeys) {
         return this.langResourceBundle.getString(langResourceKeys.name());
+    }
+
+    public static Locale resolveLocale(final String localeValue) {
+        if (localeValue == null || localeValue.isBlank()) {
+            return Locale.UK;
+        }
+
+        final Locale locale = Locale.forLanguageTag(localeValue.trim().replace('_', '-'));
+        return switch (locale.getLanguage()) {
+            case "de" -> Locale.GERMANY;
+            case "en" -> Locale.UK;
+            default -> Locale.UK;
+        };
     }
 }

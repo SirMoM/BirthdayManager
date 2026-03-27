@@ -215,7 +215,7 @@ public class PreferencesViewController extends Controller {
 
             @Override
             public Locale fromString(final String string) {
-                return new Locale(string);
+                return LangResourceManager.resolveLocale(string);
             }
 
             @Override
@@ -268,9 +268,9 @@ public class PreferencesViewController extends Controller {
     /** Loads the preferences of this application- */
     private void loadPreferences() {
         this.fillComboBoxLanguages();
-        final String displayLanguage = new Locale(PropertyManager.getProperty(PropertyFields.SAVED_LOCALE)).getDisplayLanguage();
-        LOG.info(new Locale(displayLanguage).getDisplayLanguage());
-        this.language_CompoBox.getSelectionModel().select(new Locale(displayLanguage));
+        final Locale savedLocale = LangResourceManager.resolveLocale(PropertyManager.getProperty(PropertyFields.SAVED_LOCALE));
+        LOG.info(savedLocale.getDisplayLanguage());
+        this.language_CompoBox.getSelectionModel().select(savedLocale);
         this.writeThru_CheckBox.selectedProperty().set(Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.WRITE_THRU)));
         this.autoSave_CheckBox.selectedProperty().set(Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.AUTOSAVE)));
 

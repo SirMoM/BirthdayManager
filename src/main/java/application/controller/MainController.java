@@ -29,10 +29,12 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.InputEvent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -59,22 +61,21 @@ public class MainController {
         MainController.this.openPreferences();
     };
 
-    final EventHandler<Event> birthdayDoubleClickHandler = event -> {
+    final EventHandler<InputEvent> birthdayDoubleClickHandler = event -> {
         Integer selectedPersonIndex = -1;
-        if (event.getSource() instanceof ListView) {
-            ListView listView = (ListView<Person>) event.getSource();
-            if (!listView.getSelectionModel().getSelectedIndices().isEmpty()) {
-                selectedPersonIndex = (Integer) listView.getSelectionModel().getSelectedIndices().get(0);
+        if (event.getSource() instanceof ListView<?> listView) {
+            if (!listView.getSelectionModel().isEmpty()) {
+                selectedPersonIndex = listView.getSelectionModel().getSelectedIndex();
             } else {
                 LOG.info("No person selected!");
                 return;
             }
         }
-        if (event.getEventType().equals(MouseEvent.MOUSE_CLICKED)) {
-            if (((MouseEvent) event).getClickCount() >= 2) {
+        if (event instanceof MouseEvent mouseEvent) {
+            if (mouseEvent.getClickCount() >= 2) {
                 goToEditBirthdayView(selectedPersonIndex);
             }
-        } else if (event.getEventType().equals(KeyEvent.KEY_PRESSED) && ((KeyEvent) event).getCode() == KeyCode.ENTER) {
+        } else if (event instanceof KeyEvent keyEvent && keyEvent.getCode() == KeyCode.ENTER) {
             goToEditBirthdayView(selectedPersonIndex);
         }
     };
@@ -98,7 +99,10 @@ public class MainController {
         new Thread(new SaveBirthdaysToFileTask(saveFile)).start();
     };
     private final SessionInfos sessionInfos;
-    final EventHandler closeAppHandler = event -> {
+    final EventHandler<ActionEvent> closeAppHandler = event -> MainController.this.closeApp();
+    final EventHandler<WindowEvent> closeAppWindowHandler = event -> MainController.this.closeApp();
+
+    private void closeApp() {
         final boolean autosave = Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.AUTOSAVE));
 
         if (PersonManager.getInstance().getPersons().isEmpty()) {
@@ -156,7 +160,7 @@ public class MainController {
                 }
             });
         }
-    };
+    }
     final EventHandler<ActionEvent> closeFileHandler = event -> MainController.this.sessionInfos.resetSubLists();
     final EventHandler<ActionEvent> saveToFileHandler = event -> {
         if (MainController.this.getSessionInfos().getSaveFile() == null) {
@@ -281,7 +285,7 @@ public class MainController {
 
         this.stage = stage;
         this.stage.getIcons().add(new Image(this.getClass().getResourceAsStream("/img/gbm_icon.png")));
-        stage.setOnCloseRequest(this.closeAppHandler);
+        stage.setOnCloseRequest(this.closeAppWindowHandler);
     }
 
     public Controller getActiveController() {

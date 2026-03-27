@@ -541,15 +541,15 @@ public class BirthdaysOverviewController extends Controller {
         alert.showAndWait();
     }
 
-    private class RecentFileEventHandler implements EventHandler {
-        File fileToOpen;
+    private class RecentFileEventHandler implements EventHandler<ActionEvent> {
+        private final File fileToOpen;
 
         public RecentFileEventHandler(File file) {
             this.fileToOpen = file;
         }
 
         @Override
-        public void handle(Event event) {
+        public void handle(ActionEvent event) {
             try {
                 BirthdaysOverviewController.this.getMainController().openFile(fileToOpen);
             } catch (IOException ioException) {

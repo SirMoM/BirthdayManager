@@ -9,6 +9,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 
 public class CheckForUpdatesTask extends Task<String> {
@@ -32,7 +33,7 @@ public class CheckForUpdatesTask extends Task<String> {
 
     private String getLatestVersion() throws IOException {
         // Sending get request
-        URL url = new URL(URL);
+        URL url = URI.create(URL).toURL();
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
 
