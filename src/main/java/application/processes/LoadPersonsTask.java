@@ -8,8 +8,10 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,8 +33,18 @@ public class LoadPersonsTask extends Task<LoadPersonsTask.Result> {
      */
     public LoadPersonsTask(final File file, final boolean csvFile) throws IOException {
         super();
-        this.reader = new BufferedReader(new FileReader(file));
+        this.reader = openReader(file);
         this.csvFile = csvFile;
+    }
+
+    private static BufferedReader openReader(final File file) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
+        bufferedReader.mark(1);
+        int firstChar = bufferedReader.read();
+        if (firstChar != '\uFEFF' && firstChar != -1) {
+            bufferedReader.reset();
+        }
+        return bufferedReader;
     }
 
     @Override
