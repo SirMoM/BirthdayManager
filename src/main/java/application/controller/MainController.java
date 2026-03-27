@@ -102,6 +102,19 @@ public class MainController {
     final EventHandler<ActionEvent> closeAppHandler = event -> MainController.this.closeApp();
     final EventHandler<WindowEvent> closeAppWindowHandler = event -> MainController.this.closeApp();
 
+    enum CloseAction {
+        SAVE_TO_EXISTING_FILE,
+        ASK_FOR_SAVE_FILE,
+        EXIT_WITHOUT_SAVING
+    }
+
+    static CloseAction determineCloseAction(final boolean hasSaveFile, final ButtonBar.ButtonData buttonData) {
+        if (buttonData == ButtonBar.ButtonData.YES) {
+            return hasSaveFile ? CloseAction.SAVE_TO_EXISTING_FILE : CloseAction.ASK_FOR_SAVE_FILE;
+        }
+        return CloseAction.EXIT_WITHOUT_SAVING;
+    }
+
     private void closeApp() {
         final boolean autosave = Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.AUTOSAVE));
 
@@ -129,33 +142,49 @@ public class MainController {
             alert.getButtonTypes().setAll(okButton, noButton);
 
             alert.showAndWait().ifPresent(type -> {
-                if (type.getButtonData() == ButtonType.YES.getButtonData() && MainController.this.getSessionInfos().getSaveFile() == null) {
-
-                    final FileChooser fileChooser = new FileChooser();
-                    fileChooser.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
-                    fileChooser.getExtensionFilters().add(new ExtensionFilter(new LangResourceManager().getLocaleString(LangResourceKeys.csv_file), CSV_FILE_EXTENSION));
-
-                    try {
-                        fileChooser.setInitialDirectory(new File(PropertyManager.getProperty(PropertyFields.LAST_OPENED)).getParentFile());
-                    } catch (final NullPointerException nullPointerException) {
-                        fileChooser.setInitialDirectory(new File(System.getProperty(USER_HOME)));
-                    }
-
-                    // if the chooser is "x'ed" the file is null
-                    final File selectedFile = fileChooser.showSaveDialog(MainController.this.getStage().getScene().getWindow());
-
-                    if (selectedFile == null) {
-                        final Alert error = new Alert(AlertType.ERROR);
-                        error.showAndWait();
-                        return;
-                    } else {
-                        MainController.this.getSessionInfos().setSaveFile(selectedFile);
-                        SaveBirthdaysToFileTask saveBirthdaysToFileTask = new SaveBirthdaysToFileTask(MainController.this.getSessionInfos().getSaveFile());
+                switch (determineCloseAction(
+                        MainController.this.getSessionInfos().getSaveFile() != null,
+                        type.getButtonData())) {
+                    case SAVE_TO_EXISTING_FILE -> {
+                        SaveBirthdaysToFileTask saveBirthdaysToFileTask =
+                                new SaveBirthdaysToFileTask(MainController.this.getSessionInfos().getSaveFile());
                         saveBirthdaysToFileTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, workerStateEvent -> {
                             Platform.exit();
                             System.exit(0);
                         });
                         new Thread(saveBirthdaysToFileTask).start();
+                    }
+                    case ASK_FOR_SAVE_FILE -> {
+                        final FileChooser fileChooser = new FileChooser();
+                        fileChooser.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
+                        fileChooser.getExtensionFilters().add(new ExtensionFilter(new LangResourceManager().getLocaleString(LangResourceKeys.csv_file), CSV_FILE_EXTENSION));
+
+                        try {
+                            fileChooser.setInitialDirectory(new File(PropertyManager.getProperty(PropertyFields.LAST_OPENED)).getParentFile());
+                        } catch (final NullPointerException nullPointerException) {
+                            fileChooser.setInitialDirectory(new File(System.getProperty(USER_HOME)));
+                        }
+
+                        final File selectedFile = fileChooser.showSaveDialog(MainController.this.getStage().getScene().getWindow());
+
+                        if (selectedFile == null) {
+                            final Alert error = new Alert(AlertType.ERROR);
+                            error.showAndWait();
+                            return;
+                        }
+
+                        MainController.this.getSessionInfos().setSaveFile(selectedFile);
+                        SaveBirthdaysToFileTask saveBirthdaysToFileTask =
+                                new SaveBirthdaysToFileTask(MainController.this.getSessionInfos().getSaveFile());
+                        saveBirthdaysToFileTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, workerStateEvent -> {
+                            Platform.exit();
+                            System.exit(0);
+                        });
+                        new Thread(saveBirthdaysToFileTask).start();
+                    }
+                    case EXIT_WITHOUT_SAVING -> {
+                        Platform.exit();
+                        System.exit(0);
                     }
                 }
             });
