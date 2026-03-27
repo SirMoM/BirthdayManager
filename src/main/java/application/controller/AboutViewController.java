@@ -113,7 +113,8 @@ public class AboutViewController extends Controller {
                 gridPane.setAlignment(Pos.CENTER);
                 alert.getDialogPane().setContent(gridPane);
                 alert.setHeaderText(msg);
-                if (checkBox.isSelected()) {
+                alert.showAndWait();
+                if (MainController.shouldPersistUpdateReminder(checkBox.isSelected())) {
                     PropertyManager.getInstance().getProperties().setProperty(PropertyFields.NEW_VERSION_REMINDER, String.valueOf(checkBox.isSelected()));
                     try {
                         PropertyManager.getInstance().storeProperties("");
@@ -121,7 +122,6 @@ public class AboutViewController extends Controller {
                         LOG.catching(e);
                     }
                 }
-                alert.showAndWait();
 
             } else {
                 final Alert alert = new Alert(Alert.AlertType.INFORMATION);

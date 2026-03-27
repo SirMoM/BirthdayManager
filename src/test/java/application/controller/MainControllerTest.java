@@ -24,4 +24,10 @@ class MainControllerTest {
         assertThat(MainController.determineCloseAction(true, ButtonBar.ButtonData.NO))
                 .isEqualTo(MainController.CloseAction.EXIT_WITHOUT_SAVING);
     }
+
+    @Test
+    void shouldPersistUpdateReminder_UsesTheFinalCheckboxState() {
+        assertThat(MainController.shouldPersistUpdateReminder(true)).isTrue();
+        assertThat(MainController.shouldPersistUpdateReminder(false)).isFalse();
+    }
 }

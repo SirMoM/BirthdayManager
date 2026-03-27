@@ -115,6 +115,10 @@ public class MainController {
         return CloseAction.EXIT_WITHOUT_SAVING;
     }
 
+    static boolean shouldPersistUpdateReminder(final boolean isSelected) {
+        return isSelected;
+    }
+
     private void closeApp() {
         final boolean autosave = Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.AUTOSAVE));
 
@@ -617,7 +621,8 @@ public class MainController {
                 gridPane.setAlignment(Pos.CENTER);
                 alert.getDialogPane().setContent(gridPane);
                 alert.setHeaderText(msg);
-                if (checkBox.isSelected()) {
+                alert.showAndWait();
+                if (shouldPersistUpdateReminder(checkBox.isSelected())) {
                     PropertyManager.getInstance().getProperties().setProperty(PropertyFields.NEW_VERSION_REMINDER, String.valueOf(checkBox.isSelected()));
                     try {
                         PropertyManager.getInstance().storeProperties("");
@@ -625,7 +630,6 @@ public class MainController {
                         LOG.catching(e);
                     }
                 }
-                alert.showAndWait();
 
             }
         });
