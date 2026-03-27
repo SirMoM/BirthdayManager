@@ -59,6 +59,7 @@ dependencies {
     // Test dependencies
     // Use JUnit test framework.
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'org.assertj:assertj-core:3.25.3'
 }
 
@@ -85,6 +86,7 @@ jar {
 // Debug infos when building
 tasks.withType(JavaCompile) {
     options.compilerArgs += "-Xlint:unchecked"
+    options.compilerArgs += "-Xlint:deprecation"
 }
 
 
