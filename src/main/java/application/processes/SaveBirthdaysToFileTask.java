@@ -26,8 +26,12 @@ public class SaveBirthdaysToFileTask extends Task<Boolean> {
      * @param file the File
      */
     public SaveBirthdaysToFileTask(final File file) {
-        LOG.info("Save to {}", file.getAbsolutePath());
         this.saveFile = file;
+        if (file == null) {
+            LOG.warn("No file selected for saving birthdays");
+        } else {
+            LOG.info("Save to {}", file.getAbsolutePath());
+        }
     }
 
     /*
@@ -38,6 +42,10 @@ public class SaveBirthdaysToFileTask extends Task<Boolean> {
     @Override
     protected Boolean call() {
         LOG.debug("Started {}", this.getClass().getName());
+
+        if (this.saveFile == null) {
+            return false;
+        }
 
         List<Person> persons = PersonManager.getInstance().getPersons();
 
