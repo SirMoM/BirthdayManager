@@ -107,7 +107,8 @@ public class PreferencesViewController extends Controller {
 
         final File saveFile = fileChooser.showOpenDialog(PreferencesViewController.this.getMainController().getStage().getScene().getWindow());
 
-        PreferencesViewController.this.startupFile_textField.setText(saveFile.getAbsolutePath());
+        PreferencesViewController.this.startupFile_textField.setText(
+                resolveStartupFilePath(saveFile, PreferencesViewController.this.startupFile_textField.getText()));
         ((Stage) PreferencesViewController.this.cancel_button.getParent().getScene().getWindow()).toFront();
     };
     @FXML
@@ -170,6 +171,13 @@ public class PreferencesViewController extends Controller {
 
     public PreferencesViewController(final MainController mainController) {
         super(mainController);
+    }
+
+    static String resolveStartupFilePath(final File selectedFile, final String currentValue) {
+        if (selectedFile == null) {
+            return currentValue;
+        }
+        return selectedFile.getAbsolutePath();
     }
 
     /** All assertions for the controller. Checks if all FXML-Components have been loaded properly. */
