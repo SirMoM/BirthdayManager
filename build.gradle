@@ -124,7 +124,7 @@ publishing {
             artifactId = project.name.toLowerCase()
             version = getVersion()
 
-            from components.java
+            artifact tasks.shadowJar
         }
     }
 }
