@@ -14,6 +14,21 @@ gradle googleJavaFormat
 gradle shadowJar
 ```
 
+`gradle run` starts the app for local development.
+`gradle shadowJar` builds the standalone executable JAR in `build/jar/`.
+Run it with `java -jar build/jar/BirthdayManager-<version>-all.jar`.
+The shaded JAR bundles JavaFX for macOS, Linux, and Windows,
+so it only requires a compatible Java 21+ JVM.
+
+#### Executable JAR Constraints
+
+- The standalone JAR targets Java 21+.
+- No separate JavaFX installation is required.
+- The currently verified native coverage is Windows x64, Linux x64, and macOS arm64.
+- Intel macOS and Windows ARM are not covered by the current shaded artifact.
+- The JAR embeds JavaFX on the classpath, so JavaFX may still report an unnamed-module configuration warning at startup.
+- The manifest includes `Enable-Native-Access: ALL-UNNAMED` for newer JDKs that warn about native access.
+
 ### Features:
 * Light mode / Dark mode
 * Localisation for English and German

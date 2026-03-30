@@ -42,6 +42,7 @@ Cover model parsing, task behavior, and any controller-adjacent logic that can b
 
 ## Commit & Pull Request Guidelines
 Recent history favors short, descriptive commit subjects such as `Adds localization for the about button` and release commits like `Version 0.4.5`.
+Before proposing a commit message, inspect recent `git log --oneline` entries and mirror the existing repository style.
 Keep commits single-purpose and write the subject as a concise summary of the visible change.
 Do not use semantic or conventional commit prefixes such as `feat:`, `fix:`, or `chore:`.
 Match the existing repository style with plain descriptive subjects instead.

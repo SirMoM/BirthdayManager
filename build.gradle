@@ -15,11 +15,21 @@ plugins {
     // JavaFX
     id 'org.openjfx.javafxplugin' version '0.1.0'
     // Shadow JAR
-    id 'com.gradleup.shadow' version '9.4.0'
+    id 'com.gradleup.shadow' version '9.4.1'
 }
 
 // Variables
 def main_class = 'application.Launcher'
+def javafx_version = '21'
+def javafx_cross_platforms = ['win', 'linux', 'linux-aarch64', 'mac', 'mac-aarch64']
+def common_manifest_attributes = [
+        'Implementation-Title': rootProject.name,
+        'Implementation-Version': project.version,
+        'Main-Class': main_class,
+        'Enable-Native-Access': 'ALL-UNNAMED',
+        'Build-Time-ISO-8601': getDate(),
+        'Multi-Release': 'true'
+]
 
 static def getDate() { return new Date().format('dd.MM.yyyy HH:mm:ss') }
 
@@ -36,31 +46,28 @@ java {
 }
 
 javafx {
-    version = '21'
+    version = javafx_version
     modules = ['javafx.controls', 'javafx.fxml', 'javafx.graphics', 'javafx.swing']
 }
 
 dependencies {
-    // Gradle dependencies
-    // This dependency is used by the application.
-    implementation 'com.google.guava:guava:33.0.0-jre'
-
     // Exporting to iCal
     // https://github.com/mangstadt/biweekly
-    implementation 'net.sf.biweekly:biweekly:0.6.7'
-
-    // JSON parsing
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.0'
+    implementation 'net.sf.biweekly:biweekly:0.6.8'
 
     //Log4J
-    implementation 'org.apache.logging.log4j:log4j-api:2.23.1'
-    implementation 'org.apache.logging.log4j:log4j-core:2.23.1'
+    implementation 'org.apache.logging.log4j:log4j-api:2.25.4'
+    implementation 'org.apache.logging.log4j:log4j-core:2.25.4'
+
+    javafx_cross_platforms.each { platform ->
+        runtimeOnly "org.openjfx:javafx-graphics:${javafx_version}:${platform}"
+    }
 
     // Test dependencies
     // Use JUnit test framework.
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testImplementation 'org.assertj:assertj-core:3.25.3'
+    testImplementation 'org.junit.jupiter:junit-jupiter:6.0.3'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:6.0.3'
+    testImplementation 'org.assertj:assertj-core:3.27.7'
 }
 
 test {
@@ -74,13 +81,15 @@ application {
 
 jar {
     manifest {
-        attributes 'Implementation-Title': rootProject.name,
-                'Implementation-Version': archiveVersion.get(),
-                'Main-Class': main_class,
-                'Build-Time-ISO-8601': getDate(),
-                'Multi-Release': 'true'
+        attributes(common_manifest_attributes)
     }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+shadowJar {
+    manifest {
+        attributes(common_manifest_attributes)
+    }
 }
 
 // Debug infos when building
