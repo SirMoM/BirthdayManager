@@ -15,6 +15,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -50,6 +51,7 @@ public class SessionInfos {
     private final ObservableList<PersonsInAMonthWeek> personsInAMonthList = FXCollections.observableArrayList();
 
     private final RecentItems recentFileNames = new RecentItems(5);
+    private boolean missedBirthdaysCheckStarted;
     private Locale appLocale;
     private File saveFile;
 
@@ -168,7 +170,7 @@ public class SessionInfos {
             LOG.debug(endMessage, workerStateEvent.getSource().getClass().getName());
             SessionInfos.this.getNextBirthdays().setAll(updateNextBirthdaysTask.getValue());
         });
-        new Thread(updateNextBirthdaysTask).start();
+        startTask(updateNextBirthdaysTask);
 
         // Worker for the recent Birthdays
         final UpdateRecentBirthdaysTask updateRecentBirthdaysTask = new UpdateRecentBirthdaysTask();
@@ -176,7 +178,7 @@ public class SessionInfos {
             SessionInfos.this.recentBirthdays.setAll(updateRecentBirthdaysTask.getValue());
             LOG.debug(endMessage, workerStateEvent.getSource().getClass().getName());
         });
-        new Thread(updateRecentBirthdaysTask).start();
+        startTask(updateRecentBirthdaysTask);
 
         // Worker for the Birthdays this Week
         final UpdateBirthdaysThisWeekTask updateBirthdaysThisWeekTask = new UpdateBirthdaysThisWeekTask();
@@ -184,18 +186,28 @@ public class SessionInfos {
             SessionInfos.this.personsInAWeekList.setAll(updateBirthdaysThisWeekTask.getValue());
             LOG.debug(endMessage, workerStateEvent.getSource().getClass().getName());
         });
-        new Thread(updateBirthdaysThisWeekTask).start();
+        startTask(updateBirthdaysThisWeekTask);
 
         final UpdateBirthdaysThisMonthTask updateBirthdaysThisMonthTask = new UpdateBirthdaysThisMonthTask();
         updateBirthdaysThisMonthTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, workerStateEvent -> {
             SessionInfos.this.personsInAMonthList.setAll(updateBirthdaysThisMonthTask.getValue());
             LOG.debug(endMessage, workerStateEvent.getSource().getClass().getName());
         });
-        new Thread(updateBirthdaysThisMonthTask).start();
+        startTask(updateBirthdaysThisMonthTask);
+        startMissedBirthdaysCheckIfNeeded(endMessage);
+    }
 
+    void startTask(final Task<?> task) {
+        new Thread(task).start();
+    }
 
-        // FIXME: This should not be executed everytime we rebuild the sublists!
-        CheckMissedBirthdays missedBirthdays = new CheckMissedBirthdays();
+    private void startMissedBirthdaysCheckIfNeeded(final String endMessage) {
+        if (missedBirthdaysCheckStarted) {
+            return;
+        }
+        missedBirthdaysCheckStarted = true;
+
+        final CheckMissedBirthdays missedBirthdays = new CheckMissedBirthdays();
         missedBirthdays.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, workerStateEvent -> {
             List<Person> value = missedBirthdays.getValue();
             LangResourceManager lRM = new LangResourceManager();
@@ -215,7 +227,7 @@ public class SessionInfos {
                             BirthdayUtils.getBirthdayInYear(
                                     person.getBirthday(), LocalDate.now().getYear()),
                             LocalDate.now());
-                    stringBuilder.append(person.namesToString() + " ");
+                    stringBuilder.append(person.namesToString()).append(" ");
 
                     try {
                         String missedBirthdaysMessage = String.format(lRM.getLocaleString(LangResourceKeys.missedBirthdaysMsg), days, age);
@@ -236,10 +248,10 @@ public class SessionInfos {
                     alert.getDialogPane().setContent(textArea);
                     LOG.debug(endMessage, workerStateEvent.getSource().getClass().getName());
                 }
-                    alert.showAndWait();
+                alert.showAndWait();
             }
         });
-        new Thread(missedBirthdays).start();
+        startTask(missedBirthdays);
     }
 
     public File getSaveFile() {
