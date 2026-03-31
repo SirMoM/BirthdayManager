@@ -1,4 +1,5 @@
 import java.util.regex.Matcher
+import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
@@ -37,6 +38,50 @@ verifyGoogleJavaFormat.enabled = false
 commitNewVersion.enabled = false
 repositories {
     mavenCentral()
+}
+
+def copyJavadocsToWebsite = { Project project, File sourceDir ->
+    File targetDir = project.file("$rootDir/../BirthdayManagerWebsite/javaDocs")
+    if (!targetDir.exists()) {
+        project.logger.lifecycle("Skipping website JavaDocs sync because target directory does not exist: ${targetDir}")
+        return
+    }
+
+    File rsyncExecutable = ['/usr/bin/rsync', '/bin/rsync']
+            .collect { new File(it) }
+            .find { it.canExecute() }
+
+    if (Os.isFamily(Os.FAMILY_UNIX) && rsyncExecutable != null) {
+        try {
+            Process rsyncProcess = new ProcessBuilder(
+                    rsyncExecutable.absolutePath,
+                    '-a',
+                    '--delete',
+                    "${sourceDir}/",
+                    "${targetDir}/"
+            ).redirectErrorStream(true).start()
+            int rsyncExitValue = rsyncProcess.waitFor()
+            String rsyncOutput = rsyncProcess.inputStream.getText('UTF-8').trim()
+
+            if (rsyncExitValue == 0) {
+                project.logger.lifecycle("Synced website JavaDocs to ${targetDir} with rsync.")
+                return
+            }
+            project.logger.lifecycle("Falling back to Gradle copy because rsync failed with exit code ${rsyncExitValue}: ${rsyncOutput}")
+        } catch (InterruptedException ignored) {
+            Thread.currentThread().interrupt()
+            project.logger.lifecycle("Falling back to Gradle copy because rsync execution was interrupted.")
+        } catch (Exception ignored) {
+            project.logger.lifecycle("Falling back to Gradle copy because rsync execution failed: ${ignored.class.simpleName}: ${ignored.message}")
+        }
+    }
+
+    project.delete(project.fileTree(targetDir))
+    project.copy {
+        from sourceDir
+        into targetDir
+    }
+    project.logger.lifecycle("Synced website JavaDocs to ${targetDir} with Gradle copy.")
 }
 
 java {
@@ -119,6 +164,18 @@ tasks.withType(Javadoc) {
                     .join('\n') + '\n'
         }
     }
+}
+
+tasks.register('syncWebsiteJavadocs') {
+    dependsOn tasks.named('javadoc')
+    outputs.upToDateWhen { false }
+    doLast {
+        copyJavadocsToWebsite(project, tasks.named('javadoc', Javadoc).get().destinationDir)
+    }
+}
+
+tasks.named('javadoc') {
+    finalizedBy(tasks.named('syncWebsiteJavadocs'))
 }
 
 publishing {
