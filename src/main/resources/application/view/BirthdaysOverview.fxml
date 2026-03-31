@@ -100,13 +100,13 @@
                                     <children>
                                         <TableView fx:id="week_tableView" layoutY="4.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
                                             <columns>
-                                                <TableColumn fx:id="monday_column1" editable="false" prefWidth="75.0" text="Montag" />
-                                                <TableColumn fx:id="tuesday_column1" editable="false" prefWidth="75.0" text="Dienstag" />
-                                                <TableColumn fx:id="wednesday_column1" editable="false" prefWidth="75.0" text="Mitwoch" />
-                                                <TableColumn fx:id="thursday_column1" editable="false" prefWidth="75.0" text="Donnerstag" />
+                                                <TableColumn fx:id="monday_column1" editable="false" prefWidth="75.0" sortable="false" text="Montag" />
+                                                <TableColumn fx:id="tuesday_column1" editable="false" prefWidth="75.0" sortable="false" text="Dienstag" />
+                                                <TableColumn fx:id="wednesday_column1" editable="false" prefWidth="75.0" sortable="false" text="Mitwoch" />
+                                                <TableColumn fx:id="thursday_column1" editable="false" prefWidth="75.0" sortable="false" text="Donnerstag" />
                                                 <TableColumn fx:id="friday_column1" editable="false" minWidth="-1.0" prefWidth="-1.0" sortable="false" text="Freitag" />
-                                                <TableColumn fx:id="saturday_column1" editable="false" prefWidth="75.0" text="Sammstag" />
-                                                <TableColumn fx:id="sunday_column1" editable="false" prefWidth="75.0" text="Sonntag" />
+                                                <TableColumn fx:id="saturday_column1" editable="false" prefWidth="75.0" sortable="false" text="Sammstag" />
+                                                <TableColumn fx:id="sunday_column1" editable="false" prefWidth="75.0" sortable="false" text="Sonntag" />
                                             </columns>
                                             <contextMenu>
                                                 <ContextMenu>
@@ -123,19 +123,19 @@
                                 </AnchorPane>
                             </content>
                         </Tab>
-                        <Tab fx:id="month_tap" disable="true" text="Monat">
+                        <Tab fx:id="month_tap" text="Monat">
                             <content>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" visible="false">
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                     <children>
-                                        <TableView maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
+                                        <TableView fx:id="month_tableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
                                             <columns>
-                                                <TableColumn fx:id="monday_column2" prefWidth="75.0" text="Montag" />
-                                                <TableColumn fx:id="tuesday_column2" prefWidth="75.0" text="Dienstag" />
-                                                <TableColumn fx:id="wednesday_column2" prefWidth="75.0" text="Mitwoch" />
-                                                <TableColumn fx:id="thursday_column2" prefWidth="75.0" text="Donnerstag" />
-                                                <TableColumn fx:id="friday_column2" prefWidth="75.0" text="Freitag" />
-                                                <TableColumn fx:id="saturday_column2" prefWidth="75.0" text="Sammstag" />
-                                                <TableColumn fx:id="sunday_column2" prefWidth="75.0" text="Sonntag" />
+                                                <TableColumn fx:id="monday_column2" editable="false" prefWidth="75.0" sortable="false" text="Montag" />
+                                                <TableColumn fx:id="tuesday_column2" editable="false" prefWidth="75.0" sortable="false" text="Dienstag" />
+                                                <TableColumn fx:id="wednesday_column2" editable="false" prefWidth="75.0" sortable="false" text="Mitwoch" />
+                                                <TableColumn fx:id="thursday_column2" editable="false" prefWidth="75.0" sortable="false" text="Donnerstag" />
+                                                <TableColumn fx:id="friday_column2" editable="false" prefWidth="75.0" sortable="false" text="Freitag" />
+                                                <TableColumn fx:id="saturday_column2" editable="false" prefWidth="75.0" sortable="false" text="Sammstag" />
+                                                <TableColumn fx:id="sunday_column2" editable="false" prefWidth="75.0" sortable="false" text="Sonntag" />
                                             </columns>
                                             <contextMenu>
                                                 <ContextMenu>

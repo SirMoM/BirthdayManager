@@ -2,6 +2,7 @@ package application.model;
 
 import application.controller.MainController;
 import application.processes.CheckMissedBirthdays;
+import application.processes.UpdateBirthdaysThisMonthTask;
 import application.processes.UpdateBirthdaysThisWeekTask;
 import application.processes.UpdateNextBirthdaysTask;
 import application.processes.UpdateRecentBirthdaysTask;
@@ -46,6 +47,7 @@ public class SessionInfos {
     private final ObservableList<Person> recentBirthdays = FXCollections.observableArrayList();
     private final ObservableList<Person> nextBirthdays = FXCollections.observableArrayList();
     private final ObservableList<PersonsInAWeek> personsInAWeekList = FXCollections.observableArrayList();
+    private final ObservableList<PersonsInAMonthWeek> personsInAMonthList = FXCollections.observableArrayList();
 
     private final RecentItems recentFileNames = new RecentItems(5);
     private Locale appLocale;
@@ -114,6 +116,10 @@ public class SessionInfos {
         return this.personsInAWeekList;
     }
 
+    public ObservableList<PersonsInAMonthWeek> getPersonsInAMonthList() {
+        return this.personsInAMonthList;
+    }
+
     /**
      * @return the recentBirthdays
      */
@@ -128,6 +134,7 @@ public class SessionInfos {
         this.nextBirthdays.clear();
         this.recentBirthdays.clear();
         this.personsInAWeekList.clear();
+        this.personsInAMonthList.clear();
     }
 
     /**
@@ -139,6 +146,7 @@ public class SessionInfos {
      *   <li>{@link #nextBirthdays}
      *   <li>{@link #recentBirthdays}
      *   <li>{@link #birthdaysThisWeek}
+     *   <li>{@link #personsInAMonthList}
      * </ul>
      *
      * <b>Used Tasks</b>
@@ -147,6 +155,7 @@ public class SessionInfos {
      *   <li>{@link UpdateNextBirthdaysTask}
      *   <li>{@link UpdateRecentBirthdaysTask}
      *   <li>{@link UpdateBirthdaysThisWeekTask}
+     *   <li>{@link UpdateBirthdaysThisMonthTask}
      * </ul>
      */
     public void updateSubLists() {
@@ -176,6 +185,13 @@ public class SessionInfos {
             LOG.debug(endMessage, workerStateEvent.getSource().getClass().getName());
         });
         new Thread(updateBirthdaysThisWeekTask).start();
+
+        final UpdateBirthdaysThisMonthTask updateBirthdaysThisMonthTask = new UpdateBirthdaysThisMonthTask();
+        updateBirthdaysThisMonthTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, workerStateEvent -> {
+            SessionInfos.this.personsInAMonthList.setAll(updateBirthdaysThisMonthTask.getValue());
+            LOG.debug(endMessage, workerStateEvent.getSource().getClass().getName());
+        });
+        new Thread(updateBirthdaysThisMonthTask).start();
 
 
         // FIXME: This should not be executed everytime we rebuild the sublists!

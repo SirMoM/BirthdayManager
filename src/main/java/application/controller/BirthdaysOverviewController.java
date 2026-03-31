@@ -2,11 +2,14 @@ package application.controller;
 
 import application.model.Person;
 import application.model.PersonManager;
+import application.model.PersonsInAMonthWeek;
 import application.model.PersonsInAWeek;
 import application.model.RecentItems;
 import application.processes.LoadPersonsTask;
 import application.processes.SaveBirthdaysToFileTask;
 import application.util.BirthdayUtils;
+import application.util.MonthTableCellFactory;
+import application.util.MonthTableCallback;
 import application.util.PropertyFields;
 import application.util.PropertyManager;
 import application.util.WeekTableCallback;
@@ -237,19 +240,21 @@ public class BirthdaysOverviewController extends Controller {
     @FXML
     private Tab month_tap;
     @FXML
-    private TableColumn<PersonsInAWeek, String> monday_column2;
+    private TableView<PersonsInAMonthWeek> month_tableView;
     @FXML
-    private TableColumn<PersonsInAWeek, String> tuesday_column2;
+    private TableColumn<PersonsInAMonthWeek, String> monday_column2;
     @FXML
-    private TableColumn<PersonsInAWeek, String> wednesday_column2;
+    private TableColumn<PersonsInAMonthWeek, String> tuesday_column2;
     @FXML
-    private TableColumn<PersonsInAWeek, String> thursday_column2;
+    private TableColumn<PersonsInAMonthWeek, String> wednesday_column2;
     @FXML
-    private TableColumn<PersonsInAWeek, String> friday_column2;
+    private TableColumn<PersonsInAMonthWeek, String> thursday_column2;
     @FXML
-    private TableColumn<PersonsInAWeek, String> saturday_column2;
+    private TableColumn<PersonsInAMonthWeek, String> friday_column2;
     @FXML
-    private TableColumn<PersonsInAWeek, String> sunday_column2;
+    private TableColumn<PersonsInAMonthWeek, String> saturday_column2;
+    @FXML
+    private TableColumn<PersonsInAMonthWeek, String> sunday_column2;
     @FXML
     private Label openedFile_label;
     @FXML
@@ -305,6 +310,7 @@ public class BirthdaysOverviewController extends Controller {
         assert saturday_column1 != null : "fx:id=\"saturday_column1\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
         assert sunday_column1 != null : "fx:id=\"sunday_column1\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
         assert month_tap != null : "fx:id=\"month_tap\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
+        assert month_tableView != null : "fx:id=\"month_tableView\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
         assert monday_column2 != null : "fx:id=\"monday_column2\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
         assert tuesday_column2 != null : "fx:id=\"tuesday_column2\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
         assert wednesday_column2 != null : "fx:id=\"wednesday_column2\" was not injected: check your FXML file 'BirthdaysOverview.fxml'.";
@@ -380,6 +386,22 @@ public class BirthdaysOverviewController extends Controller {
         this.saturday_column1.setCellValueFactory(new WeekTableCallback(DayOfWeek.SATURDAY));
         this.sunday_column1.setCellValueFactory(new WeekTableCallback(DayOfWeek.SUNDAY));
 
+        this.month_tableView.setItems(this.getMainController().getSessionInfos().getPersonsInAMonthList());
+        this.monday_column2.setCellValueFactory(new MonthTableCallback(DayOfWeek.MONDAY));
+        this.monday_column2.setCellFactory(new MonthTableCellFactory(DayOfWeek.MONDAY));
+        this.tuesday_column2.setCellValueFactory(new MonthTableCallback(DayOfWeek.TUESDAY));
+        this.tuesday_column2.setCellFactory(new MonthTableCellFactory(DayOfWeek.TUESDAY));
+        this.wednesday_column2.setCellValueFactory(new MonthTableCallback(DayOfWeek.WEDNESDAY));
+        this.wednesday_column2.setCellFactory(new MonthTableCellFactory(DayOfWeek.WEDNESDAY));
+        this.thursday_column2.setCellValueFactory(new MonthTableCallback(DayOfWeek.THURSDAY));
+        this.thursday_column2.setCellFactory(new MonthTableCellFactory(DayOfWeek.THURSDAY));
+        this.friday_column2.setCellValueFactory(new MonthTableCallback(DayOfWeek.FRIDAY));
+        this.friday_column2.setCellFactory(new MonthTableCellFactory(DayOfWeek.FRIDAY));
+        this.saturday_column2.setCellValueFactory(new MonthTableCallback(DayOfWeek.SATURDAY));
+        this.saturday_column2.setCellFactory(new MonthTableCellFactory(DayOfWeek.SATURDAY));
+        this.sunday_column2.setCellValueFactory(new MonthTableCallback(DayOfWeek.SUNDAY));
+        this.sunday_column2.setCellFactory(new MonthTableCellFactory(DayOfWeek.SUNDAY));
+
         this.refresh_MenuItem.setOnAction(actionEvent -> this.refreshBirthdayTableView());
 
         this.searchBirthdayMenuItem.setOnAction(actionEvent -> this.getMainController().goToSearchView());
@@ -416,6 +438,7 @@ public class BirthdaysOverviewController extends Controller {
     private void refreshBirthdayTableView() {
         this.getMainController().getSessionInfos().updateSubLists();
         this.week_tableView.refresh();
+        this.month_tableView.refresh();
         this.nextBdaysList.setCellFactory(null);
         this.nextBdaysList.refresh();
         this.nextBdaysList.setCellFactory(this.colorCellFactory);
