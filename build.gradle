@@ -104,6 +104,21 @@ tasks.withType(Jar) {
 }
 tasks.withType(Javadoc) {
     destinationDir = file("$rootDir/build/doc")
+    doLast {
+        File stylesheet = file("$rootDir/build/doc/stylesheet.css")
+        if (stylesheet.exists()) {
+            stylesheet.text = stylesheet.text.replace("@import url('resources/fonts/dejavu.css');\n\n", '')
+        }
+
+        fileTree("$rootDir/build/doc").matching {
+            include '**/*.html', '**/*.css', '**/*.js', '**/*.md', '**/element-list'
+        }.each { File generatedFile ->
+            generatedFile.text = generatedFile.text
+                    .readLines()
+                    .collect { it.replaceAll(/[ \t]+$/, '') }
+                    .join('\n') + '\n'
+        }
+    }
 }
 
 publishing {

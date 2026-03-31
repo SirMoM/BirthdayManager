@@ -119,6 +119,12 @@ public class MainController {
         return isSelected;
     }
 
+    static void applyLoadedPersons(final SessionInfos sessionInfos, final LoadPersonsTask.Result result) {
+        PersonManager.getInstance().getPersons().clear();
+        PersonManager.getInstance().getPersons().addAll(result.getPersons());
+        sessionInfos.updateSubLists();
+    }
+
     private void closeApp() {
         final boolean autosave = Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.AUTOSAVE));
 
@@ -441,10 +447,8 @@ public class MainController {
 
         final LoadPersonsTask loadPersonsTask = new LoadPersonsTask(selectedFile, selectedFile.getAbsolutePath().endsWith(".csv"));
         loadPersonsTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, event -> {
-            PersonManager.getInstance().getPersons().clear();
-            sessionInfos.updateSubLists();
             LoadPersonsTask.Result result = loadPersonsTask.getValue();
-            PersonManager.getInstance().getPersons().addAll(result.getPersons());
+            applyLoadedPersons(sessionInfos, result);
             for (Person.PersonCouldNotBeParsedException error : result.getErrors()) {
                 logAndAlertParsingError(error);
             }
