@@ -34,7 +34,7 @@
                   <Font size="24.0" />
                </font>
             </Label>
-            <Label fx:id="version_Label" text="Version 0.5.0">
+            <Label fx:id="version_Label" text="Version 0.6.0">
                <font>
                   <Font size="18.0" />
                </font>
