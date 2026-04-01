@@ -15,6 +15,7 @@ import application.util.PropertyManager;
 import application.util.WeekTableCallback;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ListChangeListener;
@@ -388,7 +389,7 @@ public class BirthdaysOverviewController extends Controller {
         this.sunday_column1.setCellValueFactory(new WeekTableCallback(DayOfWeek.SUNDAY));
 
         this.month_tableView.setItems(this.getMainController().getSessionInfos().getPersonsInAMonthList());
-        this.month_tableView.getItems().addListener((ListChangeListener<PersonsInAMonthWeek>) change -> this.selectCurrentMonthWeek());
+        this.month_tableView.getItems().addListener((ListChangeListener<PersonsInAMonthWeek>) change -> this.selectCurrentMonthWeekLater());
         this.monday_column2.setCellValueFactory(new MonthTableCallback(DayOfWeek.MONDAY));
         this.monday_column2.setCellFactory(new MonthTableCellFactory(DayOfWeek.MONDAY));
         this.tuesday_column2.setCellValueFactory(new MonthTableCallback(DayOfWeek.TUESDAY));
@@ -405,7 +406,7 @@ public class BirthdaysOverviewController extends Controller {
         this.sunday_column2.setCellFactory(new MonthTableCellFactory(DayOfWeek.SUNDAY));
         this.month_tap.selectedProperty().addListener((observable, wasSelected, isSelected) -> {
             if (isSelected) {
-                this.selectCurrentMonthWeek();
+                this.selectCurrentMonthWeekLater();
             }
         });
 
@@ -419,7 +420,7 @@ public class BirthdaysOverviewController extends Controller {
                 this.rightSide_TapView.visibleProperty().set(true);
                 this.getMainController().getStage().setWidth(1200);
                 if (this.month_tap.isSelected()) {
-                    this.selectCurrentMonthWeek();
+                    this.selectCurrentMonthWeekLater();
                 }
             } else {
                 this.expandRightSide_Button.setText(">");
@@ -449,7 +450,7 @@ public class BirthdaysOverviewController extends Controller {
         this.getMainController().getSessionInfos().updateSubLists();
         this.week_tableView.refresh();
         this.month_tableView.refresh();
-        this.selectCurrentMonthWeek();
+        this.selectCurrentMonthWeekLater();
         this.nextBdaysList.setCellFactory(null);
         this.nextBdaysList.refresh();
         this.nextBdaysList.setCellFactory(this.colorCellFactory);
@@ -468,6 +469,10 @@ public class BirthdaysOverviewController extends Controller {
         return -1;
     }
 
+    private void selectCurrentMonthWeekLater() {
+        Platform.runLater(this::selectCurrentMonthWeek);
+    }
+
     private void selectCurrentMonthWeek() {
         final int currentWeekIndex = findMonthWeekIndexForDate(this.month_tableView.getItems(), LocalDate.now());
         if (currentWeekIndex < 0) {
@@ -478,6 +483,7 @@ public class BirthdaysOverviewController extends Controller {
         this.month_tableView.getSelectionModel().clearAndSelect(currentWeekIndex);
         this.month_tableView.getFocusModel().focus(currentWeekIndex);
         if (this.month_tap.isSelected()) {
+            this.month_tableView.requestFocus();
             this.month_tableView.scrollTo(currentWeekIndex);
         }
     }
