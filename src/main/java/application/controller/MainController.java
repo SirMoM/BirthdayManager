@@ -62,21 +62,21 @@ public class MainController {
     };
 
     final EventHandler<InputEvent> birthdayDoubleClickHandler = event -> {
-        Integer selectedPersonIndex = -1;
+        Person selectedPerson = null;
         if (event.getSource() instanceof ListView<?> listView) {
-            if (!listView.getSelectionModel().isEmpty()) {
-                selectedPersonIndex = listView.getSelectionModel().getSelectedIndex();
-            } else {
+            Object selectedItem = listView.getSelectionModel().getSelectedItem();
+            if (!(selectedItem instanceof Person person)) {
                 LOG.info("No person selected!");
                 return;
             }
+            selectedPerson = person;
         }
         if (event instanceof MouseEvent mouseEvent) {
             if (mouseEvent.getClickCount() >= 2) {
-                goToEditBirthdayView(selectedPersonIndex);
+                goToEditBirthdayView(selectedPerson);
             }
         } else if (event instanceof KeyEvent keyEvent && keyEvent.getCode() == KeyCode.ENTER) {
-            goToEditBirthdayView(selectedPersonIndex);
+            goToEditBirthdayView(selectedPerson);
         }
     };
 
@@ -404,14 +404,8 @@ public class MainController {
 
     }
 
-    /**
-     * Switches scenes to the BirthdayOverview. Generates a new Controller.
-     *
-     * @param indexPerson The index of the person to edit.
-     * @see EditBirthdayViewController
-     */
-    public void goToEditBirthdayView(final int indexPerson) {
-        this.setActiveController(new EditBirthdayViewController(this, indexPerson));
+    public void goToEditBirthdayView(final Person person) {
+        this.setActiveController(new EditBirthdayViewController(this, person));
         try {
             this.replaceSceneContent("/application/view/EditBirthdayView.fxml", this.getActiveController());
 

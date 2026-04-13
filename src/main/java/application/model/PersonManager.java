@@ -61,10 +61,6 @@ public class PersonManager {
         updateSessionInfosIfPossible();
     }
 
-    public Person getPersonFromIndex(final int indexPerson) {
-        return this.personDB.get(indexPerson);
-    }
-
     /** @return the personDB == the {@link ArrayList} which contains the Persons */
     public List<Person> getPersons() {
         return this.personDB;
@@ -76,16 +72,12 @@ public class PersonManager {
         updateSessionInfosIfPossible();
     }
 
-    /**
-     * @param indexPerson the index of the person which will be updated
-     * @param updatedPerson the person which was updated
-     */
-    public void updatePerson(final int indexPerson, final Person updatedPerson) {
-        LOG.debug("Update person from {} new person {}", this.personDB.get(indexPerson).toExtendedString(), updatedPerson.toExtendedString());
-        this.personDB.get(indexPerson).setBirthday(updatedPerson.getBirthday());
-        this.personDB.get(indexPerson).setName(updatedPerson.getName());
-        this.personDB.get(indexPerson).setSurname(updatedPerson.getSurname());
-        this.personDB.get(indexPerson).setMisc(updatedPerson.getMisc());
+    public void updatePerson(final Person personToUpdate, final Person updatedPerson) {
+        LOG.debug("Update person from {} new person {}", personToUpdate.toExtendedString(), updatedPerson.toExtendedString());
+        personToUpdate.setBirthday(updatedPerson.getBirthday());
+        personToUpdate.setName(updatedPerson.getName());
+        personToUpdate.setSurname(updatedPerson.getSurname());
+        personToUpdate.setMisc(updatedPerson.getMisc());
         updateSessionInfosIfPossible();
     }
 }

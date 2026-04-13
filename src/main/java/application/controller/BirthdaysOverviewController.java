@@ -174,8 +174,7 @@ public class BirthdaysOverviewController extends Controller {
     final EventHandler<ActionEvent> openBirthday = event -> {
         final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
         if (!selectedItems.isEmpty()) {
-            final int indexOf = PersonManager.getInstance().getPersons().indexOf(selectedItems.get(0));
-            BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(indexOf);
+            BirthdaysOverviewController.this.getMainController().goToEditBirthdayView(selectedItems.get(0));
         }
     };
     final EventHandler<ActionEvent> showRecentBirthdaysHandler = eventHandler -> {
@@ -195,8 +194,7 @@ public class BirthdaysOverviewController extends Controller {
     private final EventHandler<ActionEvent> deletePersonHandler = event -> {
         final ObservableList<Person> selectedItems = BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
         if (!selectedItems.isEmpty()) {
-            final int indexOf = PersonManager.getInstance().getPersons().indexOf(selectedItems.get(0));
-            PersonManager.getInstance().deletePerson(PersonManager.getInstance().getPersonFromIndex(indexOf));
+            deleteSelectedPerson(selectedItems);
             BirthdaysOverviewController.this.getMainController().getSessionInfos().updateSubLists();
 
             if (Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.WRITE_THRU))) {
@@ -467,6 +465,12 @@ public class BirthdaysOverviewController extends Controller {
             }
         }
         return -1;
+    }
+
+    static void deleteSelectedPerson(final ObservableList<Person> selectedItems) {
+        if (!selectedItems.isEmpty()) {
+            PersonManager.getInstance().deletePerson(selectedItems.get(0));
+        }
     }
 
     private void selectCurrentMonthWeekLater() {

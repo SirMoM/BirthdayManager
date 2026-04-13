@@ -25,6 +25,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**
@@ -106,36 +107,14 @@ public class EditBirthdayViewController extends Controller {
     private Color x4;
     @FXML
     private Label date_label;
-    private int indexPerson = -1;
-
     private final EventHandler<ActionEvent> savePersonHandler = actionEvent -> {
-        boolean anyChangeAtAll = false;
         final String nameFromTextField = EditBirthdayViewController.this.name_TextField.getText();
         final String middleNameFromTextField = EditBirthdayViewController.this.middleName_TextField.getText();
         final String surnameFromTextfield = EditBirthdayViewController.this.surname_TextField.getText();
         final LocalDate birthdayFromDatePicker = EditBirthdayViewController.this.birthday_DatePicker.getValue();
+        final Person updatedPerson = new Person(surnameFromTextfield, nameFromTextField, middleNameFromTextField, birthdayFromDatePicker);
 
-        try {
-            if (!nameFromTextField.matches(EditBirthdayViewController.this.personToEdit.getName())) {
-                anyChangeAtAll = true;
-            }
-            if (!middleNameFromTextField.matches(EditBirthdayViewController.this.personToEdit.getMisc())) {
-                anyChangeAtAll = true;
-            }
-            if (!surnameFromTextfield.matches(EditBirthdayViewController.this.personToEdit.getSurname())) {
-                anyChangeAtAll = true;
-            }
-            if (EditBirthdayViewController.this.birthday_DatePicker.getValue() != EditBirthdayViewController.this.personToEdit.getBirthday()) {
-                anyChangeAtAll = true;
-            }
-        } catch (final NullPointerException exception) {
-            LOG.catching(Level.INFO, exception);
-            if (EditBirthdayViewController.this.personToEdit != null) {
-                LOG.info(EditBirthdayViewController.this.personToEdit.toExtendedString());
-            }
-            anyChangeAtAll = true;
-        }
-        if (anyChangeAtAll) {
+        if (hasChanges(EditBirthdayViewController.this.personToEdit, updatedPerson)) {
             if (birthdayFromDatePicker == null || surnameFromTextfield.isEmpty() || nameFromTextField.isEmpty()) {
                 final LangResourceManager langResourceManager = new LangResourceManager();
                 final Alert alert = new Alert(AlertType.WARNING);
@@ -144,8 +123,7 @@ public class EditBirthdayViewController extends Controller {
                 alert.showAndWait();
                 return;
             }
-            final Person updatedPerson = new Person(surnameFromTextfield, nameFromTextField, middleNameFromTextField, birthdayFromDatePicker);
-            PersonManager.getInstance().updatePerson(EditBirthdayViewController.this.indexPerson, updatedPerson);
+            PersonManager.getInstance().updatePerson(EditBirthdayViewController.this.personToEdit, updatedPerson);
             EditBirthdayViewController.this.getMainController().goToLastScene();
 
         }
@@ -162,13 +140,19 @@ public class EditBirthdayViewController extends Controller {
 
     /**
      * @param mainController The "MainController" of this application.
-     * @param indexPerson the index of Person to edit.
+     * @param personToEdit the person to edit.
      * @see application.controller.Controller#Controller(MainController)
      */
-    public EditBirthdayViewController(final MainController mainController, final int indexPerson) {
+    public EditBirthdayViewController(final MainController mainController, final Person personToEdit) {
         super(mainController);
-        this.personToEdit = PersonManager.getInstance().getPersonFromIndex(indexPerson);
-        this.indexPerson = indexPerson;
+        this.personToEdit = personToEdit;
+    }
+
+    static boolean hasChanges(final Person originalPerson, final Person updatedPerson) {
+        return !Objects.equals(originalPerson.getName(), updatedPerson.getName())
+                || !Objects.equals(originalPerson.getMisc(), updatedPerson.getMisc())
+                || !Objects.equals(originalPerson.getSurname(), updatedPerson.getSurname())
+                || !Objects.equals(originalPerson.getBirthday(), updatedPerson.getBirthday());
     }
 
     /** All assertions for the controller. Checks if all FXML-Components have been loaded properly. */

@@ -148,8 +148,7 @@ public class SearchViewController extends Controller {
     final EventHandler<ActionEvent> openBirthday = event -> {
         final ObservableList<Person> selectedItems = SearchViewController.this.searchResults_ListView.getSelectionModel().getSelectedItems();
         if (!selectedItems.isEmpty()) {
-            final int indexOf = PersonManager.getInstance().getPersons().indexOf(selectedItems.get(0));
-            SearchViewController.this.getMainController().goToEditBirthdayView(indexOf);
+            SearchViewController.this.getMainController().goToEditBirthdayView(selectedItems.get(0));
         }
     };
     @FXML
