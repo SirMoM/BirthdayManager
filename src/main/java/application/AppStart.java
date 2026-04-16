@@ -1,8 +1,8 @@
 package application;
 
 import application.controller.MainController;
-import application.model.PersonManager;
 import application.util.ApplicationSetup;
+import application.util.ThrowableFormatter;
 import javafx.application.Application;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -12,7 +12,6 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,27 +28,22 @@ public class AppStart extends Application {
     @Override
     public void init() throws Exception {
         Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
-            LogManager.getLogger(PersonManager.class).catching(Level.FATAL, throwable);
-            LogManager.getLogger(PersonManager.class).catching(Level.FATAL, throwable.getCause());
+            LOG.fatal("Uncaught exception on thread {}", thread.getName(), throwable);
 
             final Alert alert = new Alert(AlertType.ERROR);
             alert.setTitle("ERROR");
             alert.setHeaderText("Something went wrong! \n Consider sending me the log.");
 
-            final StringBuilder stringBuilder = new StringBuilder("Stacktrace: \n");
-            for (int i = 0; i < throwable.getStackTrace().length; i++) {
-                stringBuilder.append(throwable.getStackTrace()[i]);
-                stringBuilder.append(System.getProperty("line.separator"));
-            }
+            final String stackTrace = ThrowableFormatter.toStackTrace(throwable);
 
-            final TextArea textArea = new TextArea(stringBuilder.toString());
+            final TextArea textArea = new TextArea(stackTrace);
             textArea.setEditable(false);
             textArea.setWrapText(true);
             final Button copyButton = new Button("Copy");
             copyButton.setOnAction(event -> {
                 final Clipboard clipboard = Clipboard.getSystemClipboard();
                 final ClipboardContent content = new ClipboardContent();
-                content.putString(stringBuilder.toString());
+                content.putString(stackTrace);
                 clipboard.setContent(content);
             });
 

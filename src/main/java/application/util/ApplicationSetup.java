@@ -45,7 +45,7 @@ public class ApplicationSetup {
             try {
                 Files.deleteIfExists(propertiesFile.toPath());
             } catch (IOException ioException) {
-                ioException.printStackTrace();
+                LOG.warn("Could not delete legacy properties file {}", propertiesFile.getAbsolutePath(), ioException);
             }
         }
     }

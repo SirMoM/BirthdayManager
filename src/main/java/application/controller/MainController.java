@@ -238,7 +238,7 @@ public class MainController {
             try {
                 desktop.edit(file);
             } catch (final IOException ioException) {
-                ioException.printStackTrace();
+                LOG.error("Could not open file {} in the system editor.", file.getAbsolutePath(), ioException);
             }
         }
     };

@@ -6,11 +6,14 @@ import application.util.PropertyManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.List;
 
 public class RecentItems {
+    private static final Logger LOG = LogManager.getLogger(RecentItems.class.getName());
     private final int maxSize;
 
     ObservableList<String> items = FXCollections.observableArrayList();
@@ -43,7 +46,7 @@ public class RecentItems {
         try {
             PropertyManager.getInstance().storeProperties("Persist last opened");
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.warn("Could not persist recent items.", e);
         }
     }
 
@@ -77,4 +80,3 @@ public class RecentItems {
         return items.size();
     }
 }
-
