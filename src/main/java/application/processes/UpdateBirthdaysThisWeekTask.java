@@ -1,19 +1,16 @@
-/**
- *
- */
+/** */
 package application.processes;
 
 import application.model.Person;
 import application.model.PersonsInAWeek;
 import application.util.BirthdayComparator;
 import application.util.BirthdayUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.time.LocalDate;
 import java.time.temporal.IsoFields;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author Admin
@@ -21,41 +18,41 @@ import java.util.List;
  */
 public class UpdateBirthdaysThisWeekTask extends PersonTasks<List<PersonsInAWeek>> {
 
+  private static final Logger LOG =
+      LogManager.getLogger(UpdateBirthdaysThisWeekTask.class.getName());
+  private final int week;
+  private int timeInWaiting;
 
-    private static final Logger LOG = LogManager.getLogger(UpdateBirthdaysThisWeekTask.class.getName());
-    private final int week;
-    private int timeInWaiting;
+  /** */
+  public UpdateBirthdaysThisWeekTask() {
+    this.week = LocalDate.now().get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+    LOG.info("Gathering the Birthdays for this week: {}", this.week);
+  }
 
-    /** */
-    public UpdateBirthdaysThisWeekTask() {
-        this.week = LocalDate.now().get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
-        LOG.info("Gathering the Birthdays for this week: {}", this.week);
+  /**
+   * Fills the BirthdaysThisWeek
+   *
+   * @see javafx.concurrent.Task#call()
+   */
+  @Override
+  protected List<PersonsInAWeek> call() throws Exception {
+    LOG.debug("Started {}", this.getClass().getName());
+
+    List<Person> personDB = getPersons();
+
+    final List<Person> birthdaysThisWeek = new ArrayList<>();
+
+    personDB.sort(new BirthdayComparator(true));
+
+    for (final Person person : personDB) {
+      final LocalDate birthday =
+          BirthdayUtils.getBirthdayInYear(person.getBirthday(), LocalDate.now().getYear());
+      if (birthday.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) == this.week) {
+        birthdaysThisWeek.add(person);
+      }
     }
 
-    /**
-     * Fills the BirthdaysThisWeek
-     *
-     * @see javafx.concurrent.Task#call()
-     */
-    @Override
-    protected List<PersonsInAWeek> call() throws Exception {
-        LOG.debug("Started {}", this.getClass().getName());
-
-        List<Person> personDB = getPersons();
-
-        final List<Person> birthdaysThisWeek = new ArrayList<>();
-
-        personDB.sort(new BirthdayComparator(true));
-
-        for (final Person person : personDB) {
-            final LocalDate birthday = BirthdayUtils.getBirthdayInYear(
-                    person.getBirthday(), LocalDate.now().getYear());
-            if (birthday.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) == this.week) {
-                birthdaysThisWeek.add(person);
-            }
-        }
-
-        LOG.debug("Gathered all Persons this week({})! Count: {}", this.week, birthdaysThisWeek.size());
-        return PersonsInAWeek.parseAList(birthdaysThisWeek);
-    }
+    LOG.debug("Gathered all Persons this week({})! Count: {}", this.week, birthdaysThisWeek.size());
+    return PersonsInAWeek.parseAList(birthdaysThisWeek);
+  }
 }

@@ -10,7 +10,7 @@ or an environment explicitly requires it.
 gradle run
 gradle test
 gradle build
-gradle googleJavaFormat
+gradle spotlessApply
 gradle shadowJar
 ```
 

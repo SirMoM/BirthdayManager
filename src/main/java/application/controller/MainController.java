@@ -8,12 +8,17 @@ import application.util.PropertyFields;
 import application.util.PropertyManager;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Stack;
 import javafx.application.Platform;
 import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -22,14 +27,14 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
+import javafx.scene.input.InputEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.InputEvent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -40,615 +45,704 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Stack;
-
 /**
  * @author Noah Ruben
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
 public class MainController {
-    private static final String CSV_FILE_EXTENSION = "*.csv";
-    private static final String USER_HOME = "user.home";
-    private static final Logger LOG = LogManager.getLogger(MainController.class.getName());
+  private static final String CSV_FILE_EXTENSION = "*.csv";
+  private static final String USER_HOME = "user.home";
+  private static final Logger LOG = LogManager.getLogger(MainController.class.getName());
 
-    final EventHandler<ActionEvent> openPreferencesHandler = event -> {
+  final EventHandler<ActionEvent> openPreferencesHandler =
+      event -> {
         LOG.trace("Open Preferences");
         MainController.this.openPreferences();
-    };
+      };
 
-    final EventHandler<InputEvent> birthdayDoubleClickHandler = event -> {
+  final EventHandler<InputEvent> birthdayDoubleClickHandler =
+      event -> {
         Person selectedPerson = null;
         if (event.getSource() instanceof ListView<?> listView) {
-            Object selectedItem = listView.getSelectionModel().getSelectedItem();
-            if (!(selectedItem instanceof Person person)) {
-                LOG.info("No person selected!");
-                return;
-            }
-            selectedPerson = person;
+          Object selectedItem = listView.getSelectionModel().getSelectedItem();
+          if (!(selectedItem instanceof Person person)) {
+            LOG.info("No person selected!");
+            return;
+          }
+          selectedPerson = person;
         }
         if (event instanceof MouseEvent mouseEvent) {
-            if (mouseEvent.getClickCount() >= 2) {
-                goToEditBirthdayView(selectedPerson);
-            }
-        } else if (event instanceof KeyEvent keyEvent && keyEvent.getCode() == KeyCode.ENTER) {
+          if (mouseEvent.getClickCount() >= 2) {
             goToEditBirthdayView(selectedPerson);
+          }
+        } else if (event instanceof KeyEvent keyEvent && keyEvent.getCode() == KeyCode.ENTER) {
+          goToEditBirthdayView(selectedPerson);
         }
-    };
+      };
 
-    private final Stage stage;
-    final EventHandler<ActionEvent> exportToFileHandler = event -> {
+  private final Stage stage;
+  final EventHandler<ActionEvent> exportToFileHandler =
+      event -> {
         final FileChooser fileChooser = new FileChooser();
         LangResourceManager lrm = new LangResourceManager();
         fileChooser.setTitle(lrm.getLocaleString(LangResourceKeys.fileChooserCaption));
 
         try {
-            fileChooser.setInitialDirectory(new File(PropertyManager.getProperty(PropertyFields.LAST_OPENED)).getParentFile());
+          fileChooser.setInitialDirectory(
+              new File(PropertyManager.getProperty(PropertyFields.LAST_OPENED)).getParentFile());
         } catch (final NullPointerException nullPointerException) {
-            fileChooser.setInitialDirectory(new File(System.getProperty(USER_HOME)));
+          fileChooser.setInitialDirectory(new File(System.getProperty(USER_HOME)));
         }
         fileChooser.setInitialFileName(lrm.getLocaleString(LangResourceKeys.birthday_Label));
-        fileChooser.getExtensionFilters().addAll(new ExtensionFilter(lrm.getLocaleString(LangResourceKeys.csv_file), CSV_FILE_EXTENSION), new ExtensionFilter(lrm.getLocaleString(LangResourceKeys.all_files), "*.*"));
+        fileChooser
+            .getExtensionFilters()
+            .addAll(
+                new ExtensionFilter(
+                    lrm.getLocaleString(LangResourceKeys.csv_file), CSV_FILE_EXTENSION),
+                new ExtensionFilter(lrm.getLocaleString(LangResourceKeys.all_files), "*.*"));
 
-        final File saveFile = fileChooser.showSaveDialog(MainController.this.getStage().getScene().getWindow());
+        final File saveFile =
+            fileChooser.showSaveDialog(MainController.this.getStage().getScene().getWindow());
 
         new Thread(new SaveBirthdaysToFileTask(saveFile)).start();
-    };
-    private final SessionInfos sessionInfos;
-    final EventHandler<ActionEvent> closeAppHandler = event -> MainController.this.closeApp();
-    final EventHandler<WindowEvent> closeAppWindowHandler = event -> MainController.this.closeApp();
+      };
+  private final SessionInfos sessionInfos;
+  final EventHandler<ActionEvent> closeAppHandler = event -> MainController.this.closeApp();
+  final EventHandler<WindowEvent> closeAppWindowHandler = event -> MainController.this.closeApp();
 
-    enum CloseAction {
-        SAVE_TO_EXISTING_FILE,
-        ASK_FOR_SAVE_FILE,
-        EXIT_WITHOUT_SAVING
+  enum CloseAction {
+    SAVE_TO_EXISTING_FILE,
+    ASK_FOR_SAVE_FILE,
+    EXIT_WITHOUT_SAVING
+  }
+
+  static CloseAction determineCloseAction(
+      final boolean hasSaveFile, final ButtonBar.ButtonData buttonData) {
+    if (buttonData == ButtonBar.ButtonData.YES) {
+      return hasSaveFile ? CloseAction.SAVE_TO_EXISTING_FILE : CloseAction.ASK_FOR_SAVE_FILE;
+    }
+    return CloseAction.EXIT_WITHOUT_SAVING;
+  }
+
+  static boolean shouldPersistUpdateReminder(final boolean isSelected) {
+    return isSelected;
+  }
+
+  static void applyLoadedPersons(
+      final SessionInfos sessionInfos, final LoadPersonsTask.Result result) {
+    PersonManager.getInstance().getPersons().clear();
+    PersonManager.getInstance().getPersons().addAll(result.getPersons());
+    sessionInfos.updateSubLists();
+  }
+
+  private void closeApp() {
+    final boolean autosave =
+        Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.AUTOSAVE));
+
+    if (PersonManager.getInstance().getPersons().isEmpty()) {
+      Platform.exit();
+      System.exit(0);
     }
 
-    static CloseAction determineCloseAction(final boolean hasSaveFile, final ButtonBar.ButtonData buttonData) {
-        if (buttonData == ButtonBar.ButtonData.YES) {
-            return hasSaveFile ? CloseAction.SAVE_TO_EXISTING_FILE : CloseAction.ASK_FOR_SAVE_FILE;
-        }
-        return CloseAction.EXIT_WITHOUT_SAVING;
-    }
-
-    static boolean shouldPersistUpdateReminder(final boolean isSelected) {
-        return isSelected;
-    }
-
-    static void applyLoadedPersons(final SessionInfos sessionInfos, final LoadPersonsTask.Result result) {
-        PersonManager.getInstance().getPersons().clear();
-        PersonManager.getInstance().getPersons().addAll(result.getPersons());
-        sessionInfos.updateSubLists();
-    }
-
-    private void closeApp() {
-        final boolean autosave = Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.AUTOSAVE));
-
-        if (PersonManager.getInstance().getPersons().isEmpty()) {
+    if (autosave && MainController.this.getSessionInfos().getSaveFile() != null) {
+      SaveBirthdaysToFileTask saveBirthdaysToFileTask =
+          new SaveBirthdaysToFileTask(MainController.this.getSessionInfos().getSaveFile());
+      saveBirthdaysToFileTask.addEventHandler(
+          WorkerStateEvent.WORKER_STATE_SUCCEEDED,
+          workerStateEvent -> {
             Platform.exit();
             System.exit(0);
-        }
+          });
+      new Thread(saveBirthdaysToFileTask).start();
+    } else {
+      LOG.debug(MainController.this.getSessionInfos().getSaveFile());
+      final LangResourceManager lRM = new LangResourceManager();
+      final Alert alert = new Alert(AlertType.CONFIRMATION);
+      alert.setTitle(lRM.getLocaleString(LangResourceKeys.save_before_exit));
+      alert.setContentText(lRM.getLocaleString(LangResourceKeys.save_before_exit_question));
 
-        if (autosave && MainController.this.getSessionInfos().getSaveFile() != null) {
-            SaveBirthdaysToFileTask saveBirthdaysToFileTask = new SaveBirthdaysToFileTask(MainController.this.getSessionInfos().getSaveFile());
-            saveBirthdaysToFileTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, workerStateEvent -> {
-                Platform.exit();
-                System.exit(0);
-            });
-            new Thread(saveBirthdaysToFileTask).start();
-        } else {
-            LOG.debug(MainController.this.getSessionInfos().getSaveFile());
-            final LangResourceManager lRM = new LangResourceManager();
-            final Alert alert = new Alert(AlertType.CONFIRMATION);
-            alert.setTitle(lRM.getLocaleString(LangResourceKeys.save_before_exit));
-            alert.setContentText(lRM.getLocaleString(LangResourceKeys.save_before_exit_question));
+      final ButtonType okButton =
+          new ButtonType(lRM.getLocaleString(LangResourceKeys.yes), ButtonBar.ButtonData.YES);
+      final ButtonType noButton =
+          new ButtonType(lRM.getLocaleString(LangResourceKeys.no), ButtonBar.ButtonData.NO);
+      alert.getButtonTypes().setAll(okButton, noButton);
 
-            final ButtonType okButton = new ButtonType(lRM.getLocaleString(LangResourceKeys.yes), ButtonBar.ButtonData.YES);
-            final ButtonType noButton = new ButtonType(lRM.getLocaleString(LangResourceKeys.no), ButtonBar.ButtonData.NO);
-            alert.getButtonTypes().setAll(okButton, noButton);
-
-            alert.showAndWait().ifPresent(type -> {
+      alert
+          .showAndWait()
+          .ifPresent(
+              type -> {
                 switch (determineCloseAction(
-                        MainController.this.getSessionInfos().getSaveFile() != null,
-                        type.getButtonData())) {
-                    case SAVE_TO_EXISTING_FILE -> {
-                        SaveBirthdaysToFileTask saveBirthdaysToFileTask =
-                                new SaveBirthdaysToFileTask(MainController.this.getSessionInfos().getSaveFile());
-                        saveBirthdaysToFileTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, workerStateEvent -> {
-                            Platform.exit();
-                            System.exit(0);
+                    MainController.this.getSessionInfos().getSaveFile() != null,
+                    type.getButtonData())) {
+                  case SAVE_TO_EXISTING_FILE -> {
+                    SaveBirthdaysToFileTask saveBirthdaysToFileTask =
+                        new SaveBirthdaysToFileTask(
+                            MainController.this.getSessionInfos().getSaveFile());
+                    saveBirthdaysToFileTask.addEventHandler(
+                        WorkerStateEvent.WORKER_STATE_SUCCEEDED,
+                        workerStateEvent -> {
+                          Platform.exit();
+                          System.exit(0);
                         });
-                        new Thread(saveBirthdaysToFileTask).start();
+                    new Thread(saveBirthdaysToFileTask).start();
+                  }
+                  case ASK_FOR_SAVE_FILE -> {
+                    final FileChooser fileChooser = new FileChooser();
+                    fileChooser.setTitle(
+                        new LangResourceManager()
+                            .getLocaleString(LangResourceKeys.fileChooserCaption));
+                    fileChooser
+                        .getExtensionFilters()
+                        .add(
+                            new ExtensionFilter(
+                                new LangResourceManager()
+                                    .getLocaleString(LangResourceKeys.csv_file),
+                                CSV_FILE_EXTENSION));
+
+                    try {
+                      fileChooser.setInitialDirectory(
+                          new File(PropertyManager.getProperty(PropertyFields.LAST_OPENED))
+                              .getParentFile());
+                    } catch (final NullPointerException nullPointerException) {
+                      fileChooser.setInitialDirectory(new File(System.getProperty(USER_HOME)));
                     }
-                    case ASK_FOR_SAVE_FILE -> {
-                        final FileChooser fileChooser = new FileChooser();
-                        fileChooser.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
-                        fileChooser.getExtensionFilters().add(new ExtensionFilter(new LangResourceManager().getLocaleString(LangResourceKeys.csv_file), CSV_FILE_EXTENSION));
 
-                        try {
-                            fileChooser.setInitialDirectory(new File(PropertyManager.getProperty(PropertyFields.LAST_OPENED)).getParentFile());
-                        } catch (final NullPointerException nullPointerException) {
-                            fileChooser.setInitialDirectory(new File(System.getProperty(USER_HOME)));
-                        }
+                    final File selectedFile =
+                        fileChooser.showSaveDialog(
+                            MainController.this.getStage().getScene().getWindow());
 
-                        final File selectedFile = fileChooser.showSaveDialog(MainController.this.getStage().getScene().getWindow());
+                    if (selectedFile == null) {
+                      final Alert error = new Alert(AlertType.ERROR);
+                      error.showAndWait();
+                      return;
+                    }
 
-                        if (selectedFile == null) {
-                            final Alert error = new Alert(AlertType.ERROR);
-                            error.showAndWait();
-                            return;
-                        }
-
-                        MainController.this.getSessionInfos().setSaveFile(selectedFile);
-                        SaveBirthdaysToFileTask saveBirthdaysToFileTask =
-                                new SaveBirthdaysToFileTask(MainController.this.getSessionInfos().getSaveFile());
-                        saveBirthdaysToFileTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, workerStateEvent -> {
-                            Platform.exit();
-                            System.exit(0);
+                    MainController.this.getSessionInfos().setSaveFile(selectedFile);
+                    SaveBirthdaysToFileTask saveBirthdaysToFileTask =
+                        new SaveBirthdaysToFileTask(
+                            MainController.this.getSessionInfos().getSaveFile());
+                    saveBirthdaysToFileTask.addEventHandler(
+                        WorkerStateEvent.WORKER_STATE_SUCCEEDED,
+                        workerStateEvent -> {
+                          Platform.exit();
+                          System.exit(0);
                         });
-                        new Thread(saveBirthdaysToFileTask).start();
-                    }
-                    case EXIT_WITHOUT_SAVING -> {
-                        Platform.exit();
-                        System.exit(0);
-                    }
+                    new Thread(saveBirthdaysToFileTask).start();
+                  }
+                  case EXIT_WITHOUT_SAVING -> {
+                    Platform.exit();
+                    System.exit(0);
+                  }
                 }
-            });
-        }
+              });
     }
-    final EventHandler<ActionEvent> closeFileHandler = event -> MainController.this.sessionInfos.resetSubLists();
-    final EventHandler<ActionEvent> saveToFileHandler = event -> {
-        if (MainController.this.getSessionInfos().getSaveFile() == null) {
-            final FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
-            fileChooser.getExtensionFilters().add(new ExtensionFilter(new LangResourceManager().getLocaleString(LangResourceKeys.csv_file), CSV_FILE_EXTENSION));
-            try {
-                fileChooser.setInitialDirectory(new File(PropertyManager.getProperty(PropertyFields.LAST_OPENED)).getParentFile());
-            } catch (final NullPointerException nullPointerException) {
-                fileChooser.setInitialDirectory(new File(System.getProperty(USER_HOME)));
-            }
+  }
 
-            // if the chooser is "x'ed" the file is null
-            final File selectedFile = fileChooser.showSaveDialog(MainController.this.getStage().getScene().getWindow());
-            MainController.this.getSessionInfos().setSaveFile(selectedFile);
+  final EventHandler<ActionEvent> closeFileHandler =
+      event -> MainController.this.sessionInfos.resetSubLists();
+  final EventHandler<ActionEvent> saveToFileHandler =
+      event -> {
+        if (MainController.this.getSessionInfos().getSaveFile() == null) {
+          final FileChooser fileChooser = new FileChooser();
+          fileChooser.setTitle(
+              new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
+          fileChooser
+              .getExtensionFilters()
+              .add(
+                  new ExtensionFilter(
+                      new LangResourceManager().getLocaleString(LangResourceKeys.csv_file),
+                      CSV_FILE_EXTENSION));
+          try {
+            fileChooser.setInitialDirectory(
+                new File(PropertyManager.getProperty(PropertyFields.LAST_OPENED)).getParentFile());
+          } catch (final NullPointerException nullPointerException) {
+            fileChooser.setInitialDirectory(new File(System.getProperty(USER_HOME)));
+          }
+
+          // if the chooser is "x'ed" the file is null
+          final File selectedFile =
+              fileChooser.showSaveDialog(MainController.this.getStage().getScene().getWindow());
+          MainController.this.getSessionInfos().setSaveFile(selectedFile);
         }
         if (MainController.this.getSessionInfos().getSaveFile() == null) {
-            final Alert error = new Alert(AlertType.ERROR);
-            error.showAndWait();
-            return;
+          final Alert error = new Alert(AlertType.ERROR);
+          error.showAndWait();
+          return;
         } else {
-            new Thread(new SaveBirthdaysToFileTask(MainController.this.getSessionInfos().getSaveFile())).start();
+          new Thread(
+                  new SaveBirthdaysToFileTask(MainController.this.getSessionInfos().getSaveFile()))
+              .start();
         }
-    };
-    public final EventHandler<ActionEvent> openFileExternal = event -> {
+      };
+  public final EventHandler<ActionEvent> openFileExternal =
+      event -> {
         // first check if Desktop is supported by Platform or not
         if (!Desktop.isDesktopSupported()) {
-            LOG.debug("Desktop is not supported");
-            return;
+          LOG.debug("Desktop is not supported");
+          return;
         }
 
         final File file = getSessionInfos().getSaveFile();
 
         final Desktop desktop = Desktop.getDesktop();
         if (desktop.isSupported(Desktop.Action.EDIT) && file != null) {
-            try {
-                desktop.edit(file);
-            } catch (final IOException ioException) {
-                LOG.error("Could not open file {} in the system editor.", file.getAbsolutePath(), ioException);
-            }
+          try {
+            desktop.edit(file);
+          } catch (final IOException ioException) {
+            LOG.error(
+                "Could not open file {} in the system editor.",
+                file.getAbsolutePath(),
+                ioException);
+          }
         }
-    };
-    final EventHandler<ActionEvent> openFromFileChooserHandler = event -> {
+      };
+  final EventHandler<ActionEvent> openFromFileChooserHandler =
+      event -> {
         final FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
-        fileChooser.getExtensionFilters().add(new ExtensionFilter(new LangResourceManager().getLocaleString(LangResourceKeys.csv_file), CSV_FILE_EXTENSION));
+        fileChooser.setTitle(
+            new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
+        fileChooser
+            .getExtensionFilters()
+            .add(
+                new ExtensionFilter(
+                    new LangResourceManager().getLocaleString(LangResourceKeys.csv_file),
+                    CSV_FILE_EXTENSION));
 
         try {
-            fileChooser.setInitialDirectory(new File(PropertyManager.getProperty(PropertyFields.LAST_OPENED)).getParentFile());
+          fileChooser.setInitialDirectory(
+              new File(PropertyManager.getProperty(PropertyFields.LAST_OPENED)).getParentFile());
         } catch (final NullPointerException nullPointerException) {
-            fileChooser.setInitialDirectory(new File(System.getProperty(USER_HOME)));
+          fileChooser.setInitialDirectory(new File(System.getProperty(USER_HOME)));
         }
 
         // if the chooser is "x'ed" the file is null
-        final File selectedFile = fileChooser.showOpenDialog(MainController.this.getStage().getScene().getWindow());
+        final File selectedFile =
+            fileChooser.showOpenDialog(MainController.this.getStage().getScene().getWindow());
         if (selectedFile == null) {
-            return;
+          return;
         }
         try {
-            MainController.this.openFile(selectedFile);
+          MainController.this.openFile(selectedFile);
         } catch (final IOException ioException) {
-            LOG.catching(ioException);
+          LOG.catching(ioException);
         }
-    };
-    final EventHandler<ActionEvent> openFromRecentHandler = event -> {
+      };
+  final EventHandler<ActionEvent> openFromRecentHandler =
+      event -> {
         final String lastUsedFilePath = PropertyManager.getProperty(PropertyFields.LAST_OPENED);
         final File birthdayFile = new File(lastUsedFilePath);
 
         try {
-            MainController.this.openFile(birthdayFile);
+          MainController.this.openFile(birthdayFile);
         } catch (final IOException ioException) {
-            LOG.catching(ioException);
+          LOG.catching(ioException);
         }
-    };
-    private final Stack<SceneAndController> lastScenes;
-    private Controller activeController = null;
-    final EventHandler<ActionEvent> exportToCalendarHandler = event -> {
+      };
+  private final Stack<SceneAndController> lastScenes;
+  private Controller activeController = null;
+  final EventHandler<ActionEvent> exportToCalendarHandler =
+      event -> {
         final FileChooser fileChooser = new FileChooser();
 
         LangResourceManager lrm = new LangResourceManager();
         fileChooser.setTitle(lrm.getLocaleString(LangResourceKeys.fileChooserCaption));
 
         fileChooser.setInitialDirectory(new File(System.getProperty(USER_HOME)));
-        fileChooser.setInitialFileName(lrm.getLocaleString(LangResourceKeys.birthday_Label) +".ics");
-        fileChooser.getExtensionFilters().addAll(new ExtensionFilter(lrm.getLocaleString(LangResourceKeys.calendar_file), "*.ics"));
+        fileChooser.setInitialFileName(
+            lrm.getLocaleString(LangResourceKeys.birthday_Label) + ".ics");
+        fileChooser
+            .getExtensionFilters()
+            .addAll(
+                new ExtensionFilter(lrm.getLocaleString(LangResourceKeys.calendar_file), "*.ics"));
 
-        final File saveFile = fileChooser.showSaveDialog(MainController.this.getStage().getScene().getWindow());
+        final File saveFile =
+            fileChooser.showSaveDialog(MainController.this.getStage().getScene().getWindow());
         if (saveFile == null) {
-            return;
+          return;
         }
         ExportToCalenderTask exportToCalenderTask = null;
         try {
-            exportToCalenderTask = new ExportToCalenderTask(saveFile);
-            exportToCalenderTask.setOnSucceeded(x -> {
+          exportToCalenderTask = new ExportToCalenderTask(saveFile);
+          exportToCalenderTask.setOnSucceeded(
+              x -> {
                 final Alert alert = new Alert(AlertType.INFORMATION);
                 alert.setTitle(lrm.getLocaleString(LangResourceKeys.export));
-                String msg = String.format(lrm.getLocaleString(LangResourceKeys.export_msg), saveFile.getAbsolutePath());
+                String msg =
+                    String.format(
+                        lrm.getLocaleString(LangResourceKeys.export_msg),
+                        saveFile.getAbsolutePath());
                 alert.setHeaderText(msg);
                 alert.showAndWait();
                 LOG.debug("EXPORTED");
-            });
-            if (MainController.this.getActiveController() instanceof BirthdaysOverviewController) {
-                ((BirthdaysOverviewController) MainController.this.getActiveController()).getProgressbar().progressProperty().bind(exportToCalenderTask.workDoneProperty());
-            }
+              });
+          if (MainController.this.getActiveController() instanceof BirthdaysOverviewController) {
+            ((BirthdaysOverviewController) MainController.this.getActiveController())
+                .getProgressbar()
+                .progressProperty()
+                .bind(exportToCalenderTask.workDoneProperty());
+          }
         } catch (final IOException ioException) {
-            LOG.catching(Level.ERROR, ioException);
+          LOG.catching(Level.ERROR, ioException);
         }
         if (exportToCalenderTask != null) {
-            new Thread(exportToCalenderTask).start();
+          new Thread(exportToCalenderTask).start();
         }
-    };
-    @FXML
-    private MenuItem changeLanguage_MenuItem;
+      };
+  @FXML private MenuItem changeLanguage_MenuItem;
 
-    /**
-     * @param stage the main stage for the application
-     */
-    public MainController(final Stage stage) {
-        lastScenes = new Stack<>();
-        this.sessionInfos = new SessionInfos(this);
-        PersonManager.getInstance().setSessionInfos(sessionInfos);
+  /**
+   * @param stage the main stage for the application
+   */
+  public MainController(final Stage stage) {
+    lastScenes = new Stack<>();
+    this.sessionInfos = new SessionInfos(this);
+    PersonManager.getInstance().setSessionInfos(sessionInfos);
 
-        this.stage = stage;
-        this.stage.getIcons().add(new Image(this.getClass().getResourceAsStream("/img/gbm_icon.png")));
-        stage.setOnCloseRequest(this.closeAppWindowHandler);
+    this.stage = stage;
+    this.stage.getIcons().add(new Image(this.getClass().getResourceAsStream("/img/gbm_icon.png")));
+    stage.setOnCloseRequest(this.closeAppWindowHandler);
+  }
+
+  public Controller getActiveController() {
+    return this.activeController;
+  }
+
+  private void setActiveController(final Controller activeController) {
+    this.activeController = activeController;
+  }
+
+  /**
+   * @return the session infos for the specific App-Instance
+   */
+  public SessionInfos getSessionInfos() {
+    return this.sessionInfos;
+  }
+
+  /**
+   * @return the main stage of this app
+   */
+  public Stage getStage() {
+    return this.stage;
+  }
+
+  /**
+   * Switches scenes to the BirthdayOverview. Generates a new Controller.
+   *
+   * @see BirthdaysOverviewController
+   */
+  public void goToBirthdaysOverview() {
+    this.setActiveController(new BirthdaysOverviewController(this));
+    try {
+      this.replaceSceneContent(
+          "/application/view/BirthdaysOverview.fxml", this.getActiveController());
+      this.stage.setTitle("Birthday Manager");
+    } catch (final Exception exception) {
+      LOG.catching(Level.ERROR, exception);
     }
+    getActiveController().placeFocus();
+  }
 
-    public Controller getActiveController() {
-        return this.activeController;
+  /**
+   * Switches scenes to the EditBirthdayView. Generates a new Controller.
+   *
+   * @see EditBirthdayViewController
+   */
+  public void goToEditBirthdayView() {
+    this.setActiveController(new NewBirthdayViewController(this));
+
+    try {
+      this.replaceSceneContent(
+          "/application/view/EditBirthdayView.fxml", this.getActiveController());
+    } catch (final Exception exception) {
+      LOG.catching(Level.ERROR, exception);
     }
+    getActiveController().placeFocus();
+  }
 
-    private void setActiveController(final Controller activeController) {
-        this.activeController = activeController;
+  /**
+   * Switches scenes to the AboutView. Generates a new Controller.
+   *
+   * @see EditBirthdayViewController
+   */
+  public void goToAboutView() {
+
+    try {
+      final FXMLLoader fxmlLoader = new FXMLLoader();
+      fxmlLoader.setLocation(this.getClass().getResource("/application/view/AboutView.fxml"));
+      fxmlLoader.setController(new AboutViewController(this));
+      final Scene scene = new Scene(fxmlLoader.load());
+      final Stage aboutStage = new Stage();
+      aboutStage.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.about));
+      aboutStage.setScene(scene);
+      setStyle(scene);
+      aboutStage.show();
+    } catch (final IOException ioException) {
+      LOG.log(Level.ERROR, "Failed to create about window.", ioException);
     }
+  }
 
-    /**
-     * @return the session infos for the specific App-Instance
-     */
-    public SessionInfos getSessionInfos() {
-        return this.sessionInfos;
+  public void goToEditBirthdayView(final Person person) {
+    this.setActiveController(new EditBirthdayViewController(this, person));
+    try {
+      this.replaceSceneContent(
+          "/application/view/EditBirthdayView.fxml", this.getActiveController());
+
+    } catch (final Exception exception) {
+      LOG.catching(Level.ERROR, exception);
     }
+    getActiveController().placeFocus();
+  }
 
-    /**
-     * @return the main stage of this app
-     */
-    public Stage getStage() {
-        return this.stage;
+  /**
+   * Switches scenes to the BirthdayOverview. Generates a new Controller.
+   *
+   * @see EditBirthdayViewController
+   */
+  public void goToSearchView() {
+    this.setActiveController(new SearchViewController(this));
+    try {
+      this.replaceSceneContent("/application/view/SearchView.fxml", this.getActiveController());
+    } catch (final Exception exception) {
+      LOG.catching(Level.ERROR, exception);
     }
+    getActiveController().placeFocus();
+  }
 
-    /**
-     * Switches scenes to the BirthdayOverview. Generates a new Controller.
-     *
-     * @see BirthdaysOverviewController
-     */
-    public void goToBirthdaysOverview() {
-        this.setActiveController(new BirthdaysOverviewController(this));
-        try {
-            this.replaceSceneContent("/application/view/BirthdaysOverview.fxml", this.getActiveController());
-            this.stage.setTitle("Birthday Manager");
-        } catch (final Exception exception) {
-            LOG.catching(Level.ERROR, exception);
-        }
-        getActiveController().placeFocus();
-    }
+  /**
+   * @param selectedFile used to fill the birthday list
+   * @throws IOException
+   */
+  void openFile(final File selectedFile) throws IOException {
+    LOG.debug("Open file: {}", selectedFile.getAbsolutePath());
 
-    /**
-     * Switches scenes to the EditBirthdayView. Generates a new Controller.
-     *
-     * @see EditBirthdayViewController
-     */
-    public void goToEditBirthdayView() {
-        this.setActiveController(new NewBirthdayViewController(this));
+    this.getSessionInfos().setSaveFile(selectedFile);
 
-        try {
-            this.replaceSceneContent("/application/view/EditBirthdayView.fxml", this.getActiveController());
-        } catch (final Exception exception) {
-            LOG.catching(Level.ERROR, exception);
-        }
-        getActiveController().placeFocus();
-    }
-
-    /**
-     * Switches scenes to the AboutView. Generates a new Controller.
-     *
-     * @see EditBirthdayViewController
-     */
-    public void goToAboutView() {
-
-        try {
-            final FXMLLoader fxmlLoader = new FXMLLoader();
-            fxmlLoader.setLocation(this.getClass().getResource("/application/view/AboutView.fxml"));
-            fxmlLoader.setController(new AboutViewController(this));
-            final Scene scene = new Scene(fxmlLoader.load());
-            final Stage aboutStage = new Stage();
-            aboutStage.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.about));
-            aboutStage.setScene(scene);
-            setStyle(scene);
-            aboutStage.show();
-        } catch (final IOException ioException) {
-            LOG.log(Level.ERROR, "Failed to create about window.", ioException);
-        }
-
-    }
-
-    public void goToEditBirthdayView(final Person person) {
-        this.setActiveController(new EditBirthdayViewController(this, person));
-        try {
-            this.replaceSceneContent("/application/view/EditBirthdayView.fxml", this.getActiveController());
-
-        } catch (final Exception exception) {
-            LOG.catching(Level.ERROR, exception);
-        }
-        getActiveController().placeFocus();
-    }
-
-    /**
-     * Switches scenes to the BirthdayOverview. Generates a new Controller.
-     *
-     * @see EditBirthdayViewController
-     */
-    public void goToSearchView() {
-        this.setActiveController(new SearchViewController(this));
-        try {
-            this.replaceSceneContent("/application/view/SearchView.fxml", this.getActiveController());
-        } catch (final Exception exception) {
-            LOG.catching(Level.ERROR, exception);
-        }
-        getActiveController().placeFocus();
-    }
-
-    /**
-     * @param selectedFile used to fill the birthday list
-     * @throws IOException
-     */
-    void openFile(final File selectedFile) throws IOException {
-        LOG.debug("Open file: {}", selectedFile.getAbsolutePath());
-
-        this.getSessionInfos().setSaveFile(selectedFile);
-
-        final LoadPersonsTask loadPersonsTask = new LoadPersonsTask(selectedFile, selectedFile.getAbsolutePath().endsWith(".csv"));
-        loadPersonsTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, event -> {
-            LoadPersonsTask.Result result = loadPersonsTask.getValue();
-            applyLoadedPersons(sessionInfos, result);
-            for (Person.PersonCouldNotBeParsedException error : result.getErrors()) {
-                logAndAlertParsingError(error);
-            }
-            LOG.debug("Loaded birthdays from File");
+    final LoadPersonsTask loadPersonsTask =
+        new LoadPersonsTask(selectedFile, selectedFile.getAbsolutePath().endsWith(".csv"));
+    loadPersonsTask.addEventHandler(
+        WorkerStateEvent.WORKER_STATE_SUCCEEDED,
+        event -> {
+          LoadPersonsTask.Result result = loadPersonsTask.getValue();
+          applyLoadedPersons(sessionInfos, result);
+          for (Person.PersonCouldNotBeParsedException error : result.getErrors()) {
+            logAndAlertParsingError(error);
+          }
+          LOG.debug("Loaded birthdays from File");
         });
-        new Thread(loadPersonsTask).start();
+    new Thread(loadPersonsTask).start();
 
+    MainController.this.sessionInfos.getRecentFileNames().push(selectedFile.getAbsolutePath());
+    MainController.this.sessionInfos.getFileToOpenName().set(selectedFile.getName());
 
-        MainController.this.sessionInfos.getRecentFileNames().push(selectedFile.getAbsolutePath());
-        MainController.this.sessionInfos.getFileToOpenName().set(selectedFile.getName());
+    PropertyManager.getInstance()
+        .getProperties()
+        .setProperty(PropertyFields.LAST_OPENED, getSessionInfos().getSaveFile().getAbsolutePath());
+    try {
+      PropertyManager.getInstance().storeProperties("Saved recent file.");
+    } catch (final IOException ioException) {
+      LOG.catching(Level.ERROR, ioException);
+    }
+  }
 
-        PropertyManager.getInstance().getProperties().setProperty(PropertyFields.LAST_OPENED, getSessionInfos().getSaveFile().getAbsolutePath());
-        try {
-            PropertyManager.getInstance().storeProperties("Saved recent file.");
-        } catch (final IOException ioException) {
-            LOG.catching(Level.ERROR, ioException);
+  /**
+   * Opens the preferences Window.
+   *
+   * <ul>
+   *   <li>Creates a new {@link Stage}
+   *   <li>Create a new {@link Scene}
+   *   <li>Create a new {@link PreferencesViewController}
+   * </ul>
+   */
+  public void openPreferences() {
+    try {
+      final FXMLLoader fxmlLoader = new FXMLLoader();
+      fxmlLoader.setLocation(this.getClass().getResource("/application/view/PreferencesView.fxml"));
+      fxmlLoader.setController(new PreferencesViewController(this));
+      final Scene scene = new Scene(fxmlLoader.load());
+      final Stage prefStage = new Stage();
+      prefStage.setTitle("Preferences");
+      prefStage.setScene(scene);
+      setStyle(scene);
+      prefStage.show();
+    } catch (final IOException ioException) {
+      LOG.log(Level.ERROR, "Failed to create preferences window.", ioException);
+    }
+  }
+
+  protected void setStyle(Scene scene) {
+    scene.getStylesheets().clear();
+    if (Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.DARK_MODE))) {
+      scene.getStylesheets().add("dark-mode.css");
+    }
+  }
+
+  protected void setStyle() {
+    Scene scene = this.getStage().getScene();
+    scene.getStylesheets().clear();
+    if (Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.DARK_MODE))) {
+      scene.getStylesheets().add("dark-mode.css");
+    }
+  }
+
+  /**
+   * @param fxmlPath the path of the FXML-File representing the view
+   * @param controller the associated Controller
+   * @throws IOException if the FXML-File could not be loaded
+   */
+  private void replaceSceneContent(final String fxmlPath, final Initializable controller)
+      throws IOException {
+    final FXMLLoader loader = new FXMLLoader();
+    loader.setLocation(this.getClass().getResource(fxmlPath));
+    loader.setController(controller);
+    final Parent root = loader.load();
+    final Scene scene = new Scene(root);
+    lastScenes.push(new SceneAndController((Controller) controller, scene));
+    this.stage.setScene(scene);
+    setStyle();
+
+    // Show the GUI
+    this.stage.show();
+  }
+
+  public void goToLastScene() {
+    SceneAndController currentSceneAndController = lastScenes.pop();
+    SceneAndController sceneAndController = lastScenes.peek();
+    LOG.info("Going back to {} view.", sceneAndController.scene);
+
+    this.stage.setScene(sceneAndController.scene);
+    this.setActiveController(sceneAndController.controller);
+    setStyle();
+
+    this.stage.show();
+
+    getActiveController().placeFocus();
+  }
+
+  public void settingsChanged() {
+    goToBirthdaysOverview();
+    this.getActiveController().updateLocalisation();
+  }
+
+  /** Starts the application with the BirthdaysOverview and possibly load a file */
+  public void start() {
+    this.setActiveController(new BirthdaysOverviewController(this));
+
+    boolean openFileOnStart =
+        Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.OPEN_FILE_ON_START));
+
+    try {
+      this.replaceSceneContent(
+          "/application/view/BirthdaysOverview.fxml", this.getActiveController());
+
+      if (openFileOnStart) {
+        LOG.info("Try to open file on start!");
+        String filePathString = PropertyManager.getProperty(PropertyFields.FILE_ON_START);
+
+        if (filePathString == null) {
+          LOG.debug("Should have opened a file upon start but no file to open was found!");
+        } else if (filePathString.isEmpty()) {
+          LOG.debug("Empty file path can't open!");
+        } else {
+          openFile(new File(filePathString));
         }
+      }
+    } catch (final Exception exception) {
+      LOG.catching(Level.ERROR, exception);
     }
+    getActiveController().placeFocus();
+    checkVersionAndAlert();
 
-    /**
-     * Opens the preferences Window.
-     *
-     * <ul>
-     *   <li>Creates a new {@link Stage}
-     *   <li>Create a new {@link Scene}
-     *   <li>Create a new {@link PreferencesViewController}
-     * </ul>
-     */
-    public void openPreferences() {
-        try {
-            final FXMLLoader fxmlLoader = new FXMLLoader();
-            fxmlLoader.setLocation(this.getClass().getResource("/application/view/PreferencesView.fxml"));
-            fxmlLoader.setController(new PreferencesViewController(this));
-            final Scene scene = new Scene(fxmlLoader.load());
-            final Stage prefStage = new Stage();
-            prefStage.setTitle("Preferences");
-            prefStage.setScene(scene);
-            setStyle(scene);
-            prefStage.show();
-        } catch (final IOException ioException) {
-            LOG.log(Level.ERROR, "Failed to create preferences window.", ioException);
-        }
-    }
-
-    protected void setStyle(Scene scene) {
-        scene.getStylesheets().clear();
-        if (Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.DARK_MODE))) {
-            scene.getStylesheets().add("dark-mode.css");
-        }
-    }
-
-    protected void setStyle() {
-        Scene scene = this.getStage().getScene();
-        scene.getStylesheets().clear();
-        if (Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.DARK_MODE))) {
-            scene.getStylesheets().add("dark-mode.css");
-        }
-    }
-
-    /**
-     * @param fxmlPath   the path of the FXML-File representing the view
-     * @param controller the associated Controller
-     * @throws IOException if the FXML-File could not be loaded
-     */
-    private void replaceSceneContent(final String fxmlPath, final Initializable controller) throws IOException {
-        final FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(this.getClass().getResource(fxmlPath));
-        loader.setController(controller);
-        final Parent root = loader.load();
-        final Scene scene = new Scene(root);
-        lastScenes.push(new SceneAndController((Controller) controller, scene));
-        this.stage.setScene(scene);
-        setStyle();
-
-        // Show the GUI
-        this.stage.show();
-    }
-
-    public void goToLastScene() {
-        SceneAndController currentSceneAndController = lastScenes.pop();
-        SceneAndController sceneAndController = lastScenes.peek();
-        LOG.info("Going back to {} view.", sceneAndController.scene);
-
-        this.stage.setScene(sceneAndController.scene);
-        this.setActiveController(sceneAndController.controller);
-        setStyle();
-
-        this.stage.show();
-
-        getActiveController().placeFocus();
-    }
-
-    public void settingsChanged() {
-        goToBirthdaysOverview();
-        this.getActiveController().updateLocalisation();
-    }
-
-    /**
-     * Starts the application with the BirthdaysOverview and possibly load a file
-     */
-    public void start() {
-        this.setActiveController(new BirthdaysOverviewController(this));
-
-        boolean openFileOnStart = Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.OPEN_FILE_ON_START));
-
-        try {
-            this.replaceSceneContent("/application/view/BirthdaysOverview.fxml", this.getActiveController());
-
-            if (openFileOnStart) {
-                LOG.info("Try to open file on start!");
-                String filePathString = PropertyManager.getProperty(PropertyFields.FILE_ON_START);
-
-                if (filePathString == null) {
-                    LOG.debug("Should have opened a file upon start but no file to open was found!");
-                } else if (filePathString.isEmpty()) {
-                    LOG.debug("Empty file path can't open!");
-                } else {
-                    openFile(new File(filePathString));
-                }
-            }
-        } catch (final Exception exception) {
-            LOG.catching(Level.ERROR, exception);
-        }
-        getActiveController().placeFocus();
-        checkVersionAndAlert();
-
-        // Continuous operation Task
-        ScheduledService<Boolean> scheduledService = new ScheduledService<Boolean>() {
-            @Override
-            protected Task<Boolean> createTask() {
-                UpdateSublistsPeriodically updateSublistsPeriodically = new UpdateSublistsPeriodically();
-                updateSublistsPeriodically.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, workerStateEvent -> {
-                    Boolean update = updateSublistsPeriodically.getValue();
-                    if (update){
-                        getSessionInfos().updateSubLists();
-                        LOG.info("Update sublist!");
-                    }
+    // Continuous operation Task
+    ScheduledService<Boolean> scheduledService =
+        new ScheduledService<Boolean>() {
+          @Override
+          protected Task<Boolean> createTask() {
+            UpdateSublistsPeriodically updateSublistsPeriodically =
+                new UpdateSublistsPeriodically();
+            updateSublistsPeriodically.addEventHandler(
+                WorkerStateEvent.WORKER_STATE_SUCCEEDED,
+                workerStateEvent -> {
+                  Boolean update = updateSublistsPeriodically.getValue();
+                  if (update) {
+                    getSessionInfos().updateSubLists();
+                    LOG.info("Update sublist!");
+                  }
                 });
-                return updateSublistsPeriodically;
-            }
+            return updateSublistsPeriodically;
+          }
         };
-        scheduledService.setPeriod(new Duration(1000*60));
-        scheduledService.start();
-    }
+    scheduledService.setPeriod(new Duration(1000 * 60));
+    scheduledService.start();
+  }
 
-    public void checkVersionAndAlert() {
-        if (Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.NEW_VERSION_REMINDER))) {
-            LOG.debug("Don't check for new version!");
-            return;
-        }
-        CheckForUpdatesTask checkForUpdatesTask = new CheckForUpdatesTask();
-        checkForUpdatesTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, event -> {
-            String msg = checkForUpdatesTask.getValue();
-            if (msg != null) {
-                final Alert alert = new Alert(AlertType.INFORMATION);
-                alert.setTitle("New version!");
-                Button button = new Button("Open Download page!");
-                button.setOnAction(actionEvent -> {
-                    String url = "https://github.com/SirMoM/BirthdayManager/packages";
-                    if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-                        try {
-                            Desktop.getDesktop().browse(new URI(url));
-                        } catch (IOException | URISyntaxException exception) {
-                            LOG.catching(Level.DEBUG, exception);
-                            LOG.debug("Could not open url {}", url);
-                        }
-                    }
-                });
-                CheckBox checkBox = new CheckBox("Don't remind me again");
-                GridPane gridPane = new GridPane();
-                gridPane.setMaxWidth(Double.MAX_VALUE);
-                gridPane.add(button, 1, 0);
-                gridPane.add(checkBox, 1, 1);
-                gridPane.setAlignment(Pos.CENTER);
-                alert.getDialogPane().setContent(gridPane);
-                alert.setHeaderText(msg);
-                alert.showAndWait();
-                if (shouldPersistUpdateReminder(checkBox.isSelected())) {
-                    PropertyManager.getInstance().getProperties().setProperty(PropertyFields.NEW_VERSION_REMINDER, String.valueOf(checkBox.isSelected()));
+  public void checkVersionAndAlert() {
+    if (Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.NEW_VERSION_REMINDER))) {
+      LOG.debug("Don't check for new version!");
+      return;
+    }
+    CheckForUpdatesTask checkForUpdatesTask = new CheckForUpdatesTask();
+    checkForUpdatesTask.addEventHandler(
+        WorkerStateEvent.WORKER_STATE_SUCCEEDED,
+        event -> {
+          String msg = checkForUpdatesTask.getValue();
+          if (msg != null) {
+            final Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("New version!");
+            Button button = new Button("Open Download page!");
+            button.setOnAction(
+                actionEvent -> {
+                  String url = "https://github.com/SirMoM/BirthdayManager/packages";
+                  if (Desktop.isDesktopSupported()
+                      && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
                     try {
-                        PropertyManager.getInstance().storeProperties("");
-                    } catch (IOException e) {
-                        LOG.catching(e);
+                      Desktop.getDesktop().browse(new URI(url));
+                    } catch (IOException | URISyntaxException exception) {
+                      LOG.catching(Level.DEBUG, exception);
+                      LOG.debug("Could not open url {}", url);
                     }
-                }
-
+                  }
+                });
+            CheckBox checkBox = new CheckBox("Don't remind me again");
+            GridPane gridPane = new GridPane();
+            gridPane.setMaxWidth(Double.MAX_VALUE);
+            gridPane.add(button, 1, 0);
+            gridPane.add(checkBox, 1, 1);
+            gridPane.setAlignment(Pos.CENTER);
+            alert.getDialogPane().setContent(gridPane);
+            alert.setHeaderText(msg);
+            alert.showAndWait();
+            if (shouldPersistUpdateReminder(checkBox.isSelected())) {
+              PropertyManager.getInstance()
+                  .getProperties()
+                  .setProperty(
+                      PropertyFields.NEW_VERSION_REMINDER, String.valueOf(checkBox.isSelected()));
+              try {
+                PropertyManager.getInstance().storeProperties("");
+              } catch (IOException e) {
+                LOG.catching(e);
+              }
             }
+          }
         });
-        new Thread(checkForUpdatesTask).start();
-    }
+    new Thread(checkForUpdatesTask).start();
+  }
 
-    private void logAndAlertParsingError(Person.PersonCouldNotBeParsedException personCouldNotBeParsedException) {
-        LOG.warn(personCouldNotBeParsedException);
-        final Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("ERROR: Parsing failed");
-        alert.setContentText(personCouldNotBeParsedException.getMessage());
-        alert.showAndWait();
-    }
+  private void logAndAlertParsingError(
+      Person.PersonCouldNotBeParsedException personCouldNotBeParsedException) {
+    LOG.warn(personCouldNotBeParsedException);
+    final Alert alert = new Alert(Alert.AlertType.WARNING);
+    alert.setTitle("ERROR: Parsing failed");
+    alert.setContentText(personCouldNotBeParsedException.getMessage());
+    alert.showAndWait();
+  }
 
-    private class SceneAndController {
-        final Controller controller;
-        final Scene scene;
+  private class SceneAndController {
+    final Controller controller;
+    final Scene scene;
 
-        public SceneAndController(Controller controller, Scene scene) {
-            this.scene = scene;
-            this.controller = controller;
-        }
+    public SceneAndController(Controller controller, Scene scene) {
+      this.scene = scene;
+      this.controller = controller;
     }
+  }
 }

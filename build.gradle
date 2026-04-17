@@ -11,7 +11,7 @@ plugins {
     id 'net.researchgate.release' version '3.1.0'
 
     // Code quality
-    id 'com.github.sherter.google-java-format' version '0.9'
+    id 'com.diffplug.spotless' version '8.4.0'
 
     // JavaFX
     id 'org.openjfx.javafxplugin' version '0.1.0'
@@ -34,10 +34,16 @@ def common_manifest_attributes = [
 
 static def getDate() { return new Date().format('dd.MM.yyyy HH:mm:ss') }
 
-verifyGoogleJavaFormat.enabled = false
 commitNewVersion.enabled = false
 repositories {
     mavenCentral()
+}
+
+spotless {
+    java {
+        target 'src/*/java/**/*.java'
+        googleJavaFormat('1.28.0')
+    }
 }
 
 def copyJavadocsToWebsite = { Project project, File sourceDir ->

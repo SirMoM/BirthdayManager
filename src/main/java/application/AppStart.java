@@ -3,6 +3,7 @@ package application;
 import application.controller.MainController;
 import application.util.ApplicationSetup;
 import application.util.ThrowableFormatter;
+import java.io.IOException;
 import javafx.application.Application;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -15,58 +16,58 @@ import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
-
 public class AppStart extends Application {
 
-    private static final Logger LOG = LogManager.getLogger(AppStart.class.getName());
+  private static final Logger LOG = LogManager.getLogger(AppStart.class.getName());
 
-    public static void main(final String[] args) {
-        launch(args);
-    }
+  public static void main(final String[] args) {
+    launch(args);
+  }
 
-    @Override
-    public void init() throws Exception {
-        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
-            LOG.fatal("Uncaught exception on thread {}", thread.getName(), throwable);
+  @Override
+  public void init() throws Exception {
+    Thread.setDefaultUncaughtExceptionHandler(
+        (thread, throwable) -> {
+          LOG.fatal("Uncaught exception on thread {}", thread.getName(), throwable);
 
-            final Alert alert = new Alert(AlertType.ERROR);
-            alert.setTitle("ERROR");
-            alert.setHeaderText("Something went wrong! \n Consider sending me the log.");
+          final Alert alert = new Alert(AlertType.ERROR);
+          alert.setTitle("ERROR");
+          alert.setHeaderText("Something went wrong! \n Consider sending me the log.");
 
-            final String stackTrace = ThrowableFormatter.toStackTrace(throwable);
+          final String stackTrace = ThrowableFormatter.toStackTrace(throwable);
 
-            final TextArea textArea = new TextArea(stackTrace);
-            textArea.setEditable(false);
-            textArea.setWrapText(true);
-            final Button copyButton = new Button("Copy");
-            copyButton.setOnAction(event -> {
+          final TextArea textArea = new TextArea(stackTrace);
+          textArea.setEditable(false);
+          textArea.setWrapText(true);
+          final Button copyButton = new Button("Copy");
+          copyButton.setOnAction(
+              event -> {
                 final Clipboard clipboard = Clipboard.getSystemClipboard();
                 final ClipboardContent content = new ClipboardContent();
                 content.putString(stackTrace);
                 clipboard.setContent(content);
-            });
+              });
 
-            final GridPane gridPane = new GridPane();
-            gridPane.setMaxWidth(Double.MAX_VALUE);
-            gridPane.add(textArea, 0, 0);
-            gridPane.add(copyButton, 0, 1);
-            alert.getDialogPane().setContent(gridPane);
-            alert.showAndWait();
+          final GridPane gridPane = new GridPane();
+          gridPane.setMaxWidth(Double.MAX_VALUE);
+          gridPane.add(textArea, 0, 0);
+          gridPane.add(copyButton, 0, 1);
+          alert.getDialogPane().setContent(gridPane);
+          alert.showAndWait();
         });
-        super.init();
-    }
+    super.init();
+  }
 
-    @Override
-    public void start(final Stage stage) throws IOException {
-        ApplicationSetup.setup();
+  @Override
+  public void start(final Stage stage) throws IOException {
+    ApplicationSetup.setup();
 
-        final MainController mainController = new MainController(stage);
-        mainController.start();
-    }
+    final MainController mainController = new MainController(stage);
+    mainController.start();
+  }
 
-    @Override
-    public void stop() {
-        LOG.debug("CLOSING!");
-    }
+  @Override
+  public void stop() {
+    LOG.debug("CLOSING!");
+  }
 }

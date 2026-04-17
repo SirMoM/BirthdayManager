@@ -6,11 +6,18 @@ import application.processes.UpdateBirthdaysThisMonthTask;
 import application.processes.UpdateBirthdaysThisWeekTask;
 import application.processes.UpdateNextBirthdaysTask;
 import application.processes.UpdateRecentBirthdaysTask;
+import application.util.BirthdayUtils;
 import application.util.PropertyFields;
 import application.util.PropertyManager;
-import application.util.BirthdayUtils;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
+import java.io.File;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.IllegalFormatException;
+import java.util.List;
+import java.util.Locale;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -24,14 +31,6 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.IllegalFormatException;
-import java.util.List;
-import java.util.Locale;
-
 /**
  * This holds a lot of information for the app.
  *
@@ -39,228 +38,243 @@ import java.util.Locale;
  * @see <a href="https://github.com/SirMoM/BirthdayManager">Github</a>
  */
 public class SessionInfos {
-    static final Logger LOG = LogManager.getLogger();
+  static final Logger LOG = LogManager.getLogger();
 
-    final MainController mainController;
+  final MainController mainController;
 
-    private final StringProperty fileToOpenName = new SimpleStringProperty();
-    private final List<Person> birthdaysThisWeek = new ArrayList<>();
-    private final ObservableList<Person> recentBirthdays = FXCollections.observableArrayList();
-    private final ObservableList<Person> nextBirthdays = FXCollections.observableArrayList();
-    private final ObservableList<PersonsInAWeek> personsInAWeekList = FXCollections.observableArrayList();
-    private final ObservableList<PersonsInAMonthWeek> personsInAMonthList = FXCollections.observableArrayList();
+  private final StringProperty fileToOpenName = new SimpleStringProperty();
+  private final List<Person> birthdaysThisWeek = new ArrayList<>();
+  private final ObservableList<Person> recentBirthdays = FXCollections.observableArrayList();
+  private final ObservableList<Person> nextBirthdays = FXCollections.observableArrayList();
+  private final ObservableList<PersonsInAWeek> personsInAWeekList =
+      FXCollections.observableArrayList();
+  private final ObservableList<PersonsInAMonthWeek> personsInAMonthList =
+      FXCollections.observableArrayList();
 
-    private final RecentItems recentFileNames = new RecentItems(5);
-    private boolean missedBirthdaysCheckStarted;
-    private Locale appLocale;
-    private File saveFile;
+  private final RecentItems recentFileNames = new RecentItems(5);
+  private boolean missedBirthdaysCheckStarted;
+  private Locale appLocale;
+  private File saveFile;
 
-    /**
-     * Loads the saved properties or gets the default values.
-     *
-     * @param mainController The {@link MainController} of the application.
-     */
-    public SessionInfos(MainController mainController) {
-        LOG.info("SessionInfos created");
+  /**
+   * Loads the saved properties or gets the default values.
+   *
+   * @param mainController The {@link MainController} of the application.
+   */
+  public SessionInfos(MainController mainController) {
+    LOG.info("SessionInfos created");
 
-        this.mainController = mainController;
-        final String localePropertyString = PropertyManager.getProperty(PropertyFields.SAVED_LOCALE);
+    this.mainController = mainController;
+    final String localePropertyString = PropertyManager.getProperty(PropertyFields.SAVED_LOCALE);
 
-        LOG.debug("Loaded locale property {}", localePropertyString);
+    LOG.debug("Loaded locale property {}", localePropertyString);
 
-        final String lastOpenedFile = PropertyManager.getProperty(PropertyFields.LAST_OPENED);
-        if (lastOpenedFile != null) recentFileNames.loadFromProperties(lastOpenedFile);
-    }
+    final String lastOpenedFile = PropertyManager.getProperty(PropertyFields.LAST_OPENED);
+    if (lastOpenedFile != null) recentFileNames.loadFromProperties(lastOpenedFile);
+  }
 
-    public RecentItems getRecentFileNames() {
-        return recentFileNames;
-    }
+  public RecentItems getRecentFileNames() {
+    return recentFileNames;
+  }
 
-    /**
-     * @return the appLocale
-     */
-    public Locale getAppLocale() {
-        return this.appLocale;
-    }
+  /**
+   * @return the appLocale
+   */
+  public Locale getAppLocale() {
+    return this.appLocale;
+  }
 
-    /**
-     * @param appLocale the appLocale to set
-     */
-    public void setAppLocale(final Locale appLocale) {
-        this.appLocale = appLocale;
-    }
+  /**
+   * @param appLocale the appLocale to set
+   */
+  public void setAppLocale(final Locale appLocale) {
+    this.appLocale = appLocale;
+  }
 
-    /**
-     * @return the birthdaysThisWeek
-     */
-    public List<Person> getBirthdaysThisWeek() {
-        return this.birthdaysThisWeek;
-    }
+  /**
+   * @return the birthdaysThisWeek
+   */
+  public List<Person> getBirthdaysThisWeek() {
+    return this.birthdaysThisWeek;
+  }
 
-    /**
-     * @return the fileToOpenName
-     */
-    public StringProperty getFileToOpenName() {
-        return this.fileToOpenName;
-    }
+  /**
+   * @return the fileToOpenName
+   */
+  public StringProperty getFileToOpenName() {
+    return this.fileToOpenName;
+  }
 
-    /**
-     * @return the nextBirthdays
-     */
-    public ObservableList<Person> getNextBirthdays() {
-        return this.nextBirthdays;
-    }
+  /**
+   * @return the nextBirthdays
+   */
+  public ObservableList<Person> getNextBirthdays() {
+    return this.nextBirthdays;
+  }
 
-    /**
-     * @return the personsInAWeekList
-     */
-    public ObservableList<PersonsInAWeek> getPersonsInAWeekList() {
-        return this.personsInAWeekList;
-    }
+  /**
+   * @return the personsInAWeekList
+   */
+  public ObservableList<PersonsInAWeek> getPersonsInAWeekList() {
+    return this.personsInAWeekList;
+  }
 
-    public ObservableList<PersonsInAMonthWeek> getPersonsInAMonthList() {
-        return this.personsInAMonthList;
-    }
+  public ObservableList<PersonsInAMonthWeek> getPersonsInAMonthList() {
+    return this.personsInAMonthList;
+  }
 
-    /**
-     * @return the recentBirthdays
-     */
-    public ObservableList<Person> getRecentBirthdays() {
-        return this.recentBirthdays;
-    }
+  /**
+   * @return the recentBirthdays
+   */
+  public ObservableList<Person> getRecentBirthdays() {
+    return this.recentBirthdays;
+  }
 
-    /**
-     * resets the nextBirthdays and recentBirthdays
-     */
-    public void resetSubLists() {
-        this.nextBirthdays.clear();
-        this.recentBirthdays.clear();
-        this.personsInAWeekList.clear();
-        this.personsInAMonthList.clear();
-    }
+  /** resets the nextBirthdays and recentBirthdays */
+  public void resetSubLists() {
+    this.nextBirthdays.clear();
+    this.recentBirthdays.clear();
+    this.personsInAWeekList.clear();
+    this.personsInAMonthList.clear();
+  }
 
-    /**
-     * Resets and updates all sublists
-     *
-     * <p><b>Sublists</b>
-     *
-     * <ul>
-     *   <li>{@link #nextBirthdays}
-     *   <li>{@link #recentBirthdays}
-     *   <li>{@link #birthdaysThisWeek}
-     *   <li>{@link #personsInAMonthList}
-     * </ul>
-     *
-     * <b>Used Tasks</b>
-     *
-     * <ul>
-     *   <li>{@link UpdateNextBirthdaysTask}
-     *   <li>{@link UpdateRecentBirthdaysTask}
-     *   <li>{@link UpdateBirthdaysThisWeekTask}
-     *   <li>{@link UpdateBirthdaysThisMonthTask}
-     * </ul>
-     */
-    public void updateSubLists() {
-        final String endMessage = "{} ENDED ";
-        this.resetSubLists();
+  /**
+   * Resets and updates all sublists
+   *
+   * <p><b>Sublists</b>
+   *
+   * <ul>
+   *   <li>{@link #nextBirthdays}
+   *   <li>{@link #recentBirthdays}
+   *   <li>{@link #birthdaysThisWeek}
+   *   <li>{@link #personsInAMonthList}
+   * </ul>
+   *
+   * <b>Used Tasks</b>
+   *
+   * <ul>
+   *   <li>{@link UpdateNextBirthdaysTask}
+   *   <li>{@link UpdateRecentBirthdaysTask}
+   *   <li>{@link UpdateBirthdaysThisWeekTask}
+   *   <li>{@link UpdateBirthdaysThisMonthTask}
+   * </ul>
+   */
+  public void updateSubLists() {
+    final String endMessage = "{} ENDED ";
+    this.resetSubLists();
 
-        // Worker for the next Birthdays
-        final UpdateNextBirthdaysTask updateNextBirthdaysTask = new UpdateNextBirthdaysTask();
-        updateNextBirthdaysTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, workerStateEvent -> {
-            LOG.debug(endMessage, workerStateEvent.getSource().getClass().getName());
-            SessionInfos.this.getNextBirthdays().setAll(updateNextBirthdaysTask.getValue());
+    // Worker for the next Birthdays
+    final UpdateNextBirthdaysTask updateNextBirthdaysTask = new UpdateNextBirthdaysTask();
+    updateNextBirthdaysTask.addEventHandler(
+        WorkerStateEvent.WORKER_STATE_SUCCEEDED,
+        workerStateEvent -> {
+          LOG.debug(endMessage, workerStateEvent.getSource().getClass().getName());
+          SessionInfos.this.getNextBirthdays().setAll(updateNextBirthdaysTask.getValue());
         });
-        startTask(updateNextBirthdaysTask);
+    startTask(updateNextBirthdaysTask);
 
-        // Worker for the recent Birthdays
-        final UpdateRecentBirthdaysTask updateRecentBirthdaysTask = new UpdateRecentBirthdaysTask();
-        updateRecentBirthdaysTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, workerStateEvent -> {
-            SessionInfos.this.recentBirthdays.setAll(updateRecentBirthdaysTask.getValue());
-            LOG.debug(endMessage, workerStateEvent.getSource().getClass().getName());
+    // Worker for the recent Birthdays
+    final UpdateRecentBirthdaysTask updateRecentBirthdaysTask = new UpdateRecentBirthdaysTask();
+    updateRecentBirthdaysTask.addEventHandler(
+        WorkerStateEvent.WORKER_STATE_SUCCEEDED,
+        workerStateEvent -> {
+          SessionInfos.this.recentBirthdays.setAll(updateRecentBirthdaysTask.getValue());
+          LOG.debug(endMessage, workerStateEvent.getSource().getClass().getName());
         });
-        startTask(updateRecentBirthdaysTask);
+    startTask(updateRecentBirthdaysTask);
 
-        // Worker for the Birthdays this Week
-        final UpdateBirthdaysThisWeekTask updateBirthdaysThisWeekTask = new UpdateBirthdaysThisWeekTask();
-        updateBirthdaysThisWeekTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, workerStateEvent -> {
-            SessionInfos.this.personsInAWeekList.setAll(updateBirthdaysThisWeekTask.getValue());
-            LOG.debug(endMessage, workerStateEvent.getSource().getClass().getName());
+    // Worker for the Birthdays this Week
+    final UpdateBirthdaysThisWeekTask updateBirthdaysThisWeekTask =
+        new UpdateBirthdaysThisWeekTask();
+    updateBirthdaysThisWeekTask.addEventHandler(
+        WorkerStateEvent.WORKER_STATE_SUCCEEDED,
+        workerStateEvent -> {
+          SessionInfos.this.personsInAWeekList.setAll(updateBirthdaysThisWeekTask.getValue());
+          LOG.debug(endMessage, workerStateEvent.getSource().getClass().getName());
         });
-        startTask(updateBirthdaysThisWeekTask);
+    startTask(updateBirthdaysThisWeekTask);
 
-        final UpdateBirthdaysThisMonthTask updateBirthdaysThisMonthTask = new UpdateBirthdaysThisMonthTask();
-        updateBirthdaysThisMonthTask.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, workerStateEvent -> {
-            SessionInfos.this.personsInAMonthList.setAll(updateBirthdaysThisMonthTask.getValue());
-            LOG.debug(endMessage, workerStateEvent.getSource().getClass().getName());
+    final UpdateBirthdaysThisMonthTask updateBirthdaysThisMonthTask =
+        new UpdateBirthdaysThisMonthTask();
+    updateBirthdaysThisMonthTask.addEventHandler(
+        WorkerStateEvent.WORKER_STATE_SUCCEEDED,
+        workerStateEvent -> {
+          SessionInfos.this.personsInAMonthList.setAll(updateBirthdaysThisMonthTask.getValue());
+          LOG.debug(endMessage, workerStateEvent.getSource().getClass().getName());
         });
-        startTask(updateBirthdaysThisMonthTask);
-        startMissedBirthdaysCheckIfNeeded(endMessage);
+    startTask(updateBirthdaysThisMonthTask);
+    startMissedBirthdaysCheckIfNeeded(endMessage);
+  }
+
+  void startTask(final Task<?> task) {
+    new Thread(task).start();
+  }
+
+  private void startMissedBirthdaysCheckIfNeeded(final String endMessage) {
+    if (missedBirthdaysCheckStarted) {
+      return;
     }
+    missedBirthdaysCheckStarted = true;
 
-    void startTask(final Task<?> task) {
-        new Thread(task).start();
-    }
+    final CheckMissedBirthdays missedBirthdays = new CheckMissedBirthdays();
+    missedBirthdays.addEventHandler(
+        WorkerStateEvent.WORKER_STATE_SUCCEEDED,
+        workerStateEvent -> {
+          List<Person> value = missedBirthdays.getValue();
+          LangResourceManager lRM = new LangResourceManager();
 
-    private void startMissedBirthdaysCheckIfNeeded(final String endMessage) {
-        if (missedBirthdaysCheckStarted) {
-            return;
-        }
-        missedBirthdaysCheckStarted = true;
+          if (value == null || value.isEmpty()) {
+            LOG.debug("No missed Birthdays!");
+          } else {
+            final Alert alert = new Alert(AlertType.WARNING);
+            alert.setTitle(lRM.getLocaleString(LangResourceKeys.missedBirthdays));
+            alert.setHeaderText(lRM.getLocaleString(LangResourceKeys.missedBirthdays));
 
-        final CheckMissedBirthdays missedBirthdays = new CheckMissedBirthdays();
-        missedBirthdays.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, workerStateEvent -> {
-            List<Person> value = missedBirthdays.getValue();
-            LangResourceManager lRM = new LangResourceManager();
+            StringBuilder stringBuilder = new StringBuilder();
 
-            if (value == null || value.isEmpty()) {
-                LOG.debug("No missed Birthdays!");
-            } else {
-                final Alert alert = new Alert(AlertType.WARNING);
-                alert.setTitle(lRM.getLocaleString(LangResourceKeys.missedBirthdays));
-                alert.setHeaderText(lRM.getLocaleString(LangResourceKeys.missedBirthdays));
+            for (Person person : value) {
+              int age = (LocalDate.now().getYear() - person.getBirthday().getYear());
+              long days =
+                  ChronoUnit.DAYS.between(
+                      BirthdayUtils.getBirthdayInYear(
+                          person.getBirthday(), LocalDate.now().getYear()),
+                      LocalDate.now());
+              stringBuilder.append(person.namesToString()).append(" ");
 
-                StringBuilder stringBuilder = new StringBuilder();
+              try {
+                String missedBirthdaysMessage =
+                    String.format(
+                        lRM.getLocaleString(LangResourceKeys.missedBirthdaysMsg), days, age);
+                stringBuilder.append(missedBirthdaysMessage);
+              } catch (IllegalFormatException illegalFormatException) {
+                LOG.catching(Level.WARN, illegalFormatException);
+                LOG.warn(
+                    "Could not generate Missing-Text for {} based on {} and {}", person, days, age);
+              } catch (NullPointerException nullPointerException) {
+                LOG.catching(Level.WARN, nullPointerException);
+                LOG.warn(
+                    "Could not generate Missing-Text for {} based on {} and {}", person, days, age);
+              }
+              stringBuilder.append("\n");
 
-                for (Person person : value) {
-                    int age = (LocalDate.now().getYear() - person.getBirthday().getYear());
-                    long days = ChronoUnit.DAYS.between(
-                            BirthdayUtils.getBirthdayInYear(
-                                    person.getBirthday(), LocalDate.now().getYear()),
-                            LocalDate.now());
-                    stringBuilder.append(person.namesToString()).append(" ");
+              final TextArea textArea = new TextArea(stringBuilder.toString());
+              textArea.setEditable(false);
+              textArea.setWrapText(true);
 
-                    try {
-                        String missedBirthdaysMessage = String.format(lRM.getLocaleString(LangResourceKeys.missedBirthdaysMsg), days, age);
-                        stringBuilder.append(missedBirthdaysMessage);
-                    } catch (IllegalFormatException illegalFormatException) {
-                        LOG.catching(Level.WARN, illegalFormatException);
-                        LOG.warn("Could not generate Missing-Text for {} based on {} and {}", person, days, age);
-                    } catch (NullPointerException nullPointerException) {
-                        LOG.catching(Level.WARN, nullPointerException);
-                        LOG.warn("Could not generate Missing-Text for {} based on {} and {}", person, days, age);
-                    }
-                    stringBuilder.append("\n");
-
-                    final TextArea textArea = new TextArea(stringBuilder.toString());
-                    textArea.setEditable(false);
-                    textArea.setWrapText(true);
-
-                    alert.getDialogPane().setContent(textArea);
-                    LOG.debug(endMessage, workerStateEvent.getSource().getClass().getName());
-                }
-                alert.showAndWait();
+              alert.getDialogPane().setContent(textArea);
+              LOG.debug(endMessage, workerStateEvent.getSource().getClass().getName());
             }
+            alert.showAndWait();
+          }
         });
-        startTask(missedBirthdays);
-    }
+    startTask(missedBirthdays);
+  }
 
-    public File getSaveFile() {
-        return saveFile;
-    }
+  public File getSaveFile() {
+    return saveFile;
+  }
 
-    public void setSaveFile(File saveFile) {
-        this.saveFile = saveFile;
-    }
-
-
+  public void setSaveFile(File saveFile) {
+    this.saveFile = saveFile;
+  }
 }

@@ -5,10 +5,9 @@ import java.time.MonthDay;
 
 public final class BirthdayUtils {
 
-    private BirthdayUtils() {
-    }
+  private BirthdayUtils() {}
 
-    public static LocalDate getBirthdayInYear(final LocalDate birthday, final int year) {
-        return MonthDay.from(birthday).atYear(year);
-    }
+  public static LocalDate getBirthdayInYear(final LocalDate birthday, final int year) {
+    return MonthDay.from(birthday).atYear(year);
+  }
 }
