@@ -84,7 +84,8 @@ public class AboutViewController extends Controller {
         actionEvent ->
             getMainController()
                 .showShortcutView(
-                    (Stage) showShortcuts_Button.getScene().getWindow(), ShortcutLaunchContext.ABOUT));
+                    (Stage) showShortcuts_Button.getScene().getWindow(),
+                    ShortcutLaunchContext.ABOUT));
   }
 
   private void loadChangelog() {

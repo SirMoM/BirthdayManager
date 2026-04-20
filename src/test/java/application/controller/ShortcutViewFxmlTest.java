@@ -17,9 +17,7 @@ class ShortcutViewFxmlTest {
 
       String fxml = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 
-      assertThat(fxml)
-          .contains("fx:id=\"shortcuts_Label\"")
-          .contains("mouseTransparent=\"true\"");
+      assertThat(fxml).contains("fx:id=\"shortcuts_Label\"").contains("mouseTransparent=\"true\"");
     }
   }
 }

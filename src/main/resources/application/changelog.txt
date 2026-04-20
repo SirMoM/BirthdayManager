@@ -1,6 +1,13 @@
 BirthdayManager Changelog
 =========================
 
+0.7.0
+- Add a shortcuts view that can be opened from About and Preferences.
+- Show the bundled changelog directly in the About window.
+- Keep popup windows from shrinking when switching to the shortcuts view.
+- Improve keyboard navigation through the birthday edit forms.
+- Skip duplicate birthdays while importing data.
+
 0.6.2
 - Fix edit and delete actions so they keep using the selected person.
 - Keep the current month-week selection stable while refreshing the overview.
