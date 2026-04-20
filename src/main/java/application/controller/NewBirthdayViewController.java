@@ -181,6 +181,14 @@ public class NewBirthdayViewController extends Controller {
     this.delete_Button.setVisible(false);
 
     this.quit_MenuItem.addEventHandler(ActionEvent.ANY, this.getMainController().closeAppHandler);
+    this.bindExplicitTabOrder(
+        this.name_TextField,
+        this.middleName_TextField,
+        this.surname_TextField,
+        this.birthday_DatePicker,
+        this.cancel_Button,
+        this.delete_Button,
+        this.save_Button);
   }
 
   /*
@@ -241,10 +249,6 @@ public class NewBirthdayViewController extends Controller {
 
   @Override
   public void placeFocus() {
-    this.name_TextField.setFocusTraversable(true);
-    this.middleName_TextField.setFocusTraversable(true);
-    this.surname_TextField.setFocusTraversable(true);
-
     name_TextField.requestFocus();
   }
 }
