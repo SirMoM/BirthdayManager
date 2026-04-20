@@ -58,7 +58,7 @@
                         <MenuItem fx:id="openFileExternal_Button" mnemonicParsing="false" text="Open file in Systemeditor" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem fx:id="refresh_MenuItem" mnemonicParsing="false" text="Refresh" />
-                        <MenuItem fx:id="debug" mnemonicParsing="false" text="Debug" />
+                        <MenuItem fx:id="debug" mnemonicParsing="false" text="Shortcuts" />
                     </items>
                 </Menu>
             </menus>

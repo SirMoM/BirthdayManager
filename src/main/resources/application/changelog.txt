@@ -1,0 +1,18 @@
+BirthdayManager Changelog
+=========================
+
+0.6.2
+- Fix edit and delete actions so they keep using the selected person.
+- Keep the current month-week selection stable while refreshing the overview.
+- Run the missed birthdays check only once per session.
+
+0.6.0
+- Add the month calendar view next to the existing week overview.
+- Refresh birthday sublists after loading a file.
+- Improve packaging and standalone JAR support on current Java releases.
+- Improve search, leap-year birthday handling, and update reminder persistence.
+
+Earlier highlights
+- Add the About view and improve its usability.
+- Allow double-clicking birthdays to open them.
+- Improve the missed birthdays prompt and general file handling.

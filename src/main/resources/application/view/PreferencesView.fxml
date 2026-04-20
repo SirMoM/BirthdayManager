@@ -58,10 +58,20 @@
                 <Separator layoutX="14.0" layoutY="559.0" maxHeight="1.7976931348623157E308"
                            maxWidth="1.7976931348623157E308" minWidth="0.0" prefWidth="600.0"
                            AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"/>
-                <Button fx:id="cancel_button" layoutX="189.0" layoutY="584.0" minWidth="100.0" mnemonicParsing="false"
-                        prefWidth="100.0" text="Cancel" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="150.0"/>
-                <Button fx:id="save_button" layoutX="379.0" layoutY="584.0" minWidth="100.0" mnemonicParsing="false"
-                        prefWidth="100.0" text="Save" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="150.0"/>
+                <HBox alignment="CENTER" spacing="24.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                    <children>
+                        <Button fx:id="showShortcuts_Button" minWidth="110.0" mnemonicParsing="false"
+                                prefWidth="110.0" text="Show shortcuts"/>
+                        <HBox alignment="CENTER" spacing="10.0">
+                            <children>
+                                <Button fx:id="cancel_button" minWidth="100.0" mnemonicParsing="false"
+                                        prefWidth="100.0" text="Cancel"/>
+                                <Button fx:id="save_button" minWidth="100.0" mnemonicParsing="false"
+                                        prefWidth="100.0" text="Save"/>
+                            </children>
+                        </HBox>
+                    </children>
+                </HBox>
                 <Separator layoutY="254.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
                            minWidth="0.0" prefWidth="600.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
                            AnchorPane.topAnchor="225.0"/>

@@ -7,11 +7,13 @@ import application.util.PropertyFields;
 import application.util.PropertyManager;
 import application.util.localisation.LangResourceKeys;
 import application.util.localisation.LangResourceManager;
-import java.awt.*;
+import java.awt.Desktop;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ResourceBundle;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
@@ -23,6 +25,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,6 +45,9 @@ public class AboutViewController extends Controller {
   @FXML private Hyperlink website_Hyperlink;
   @FXML private Hyperlink github_Hyperlink;
   @FXML private Button checkForUpdates_Button;
+  @FXML private Button showShortcuts_Button;
+  @FXML private Label changelog_Label;
+  @FXML private TextArea changelog_TextArea;
 
   public AboutViewController(MainController mainController) {
     super(mainController);
@@ -59,6 +65,8 @@ public class AboutViewController extends Controller {
     website_Hyperlink.setText(lrm.getLocaleString(LangResourceKeys.visitWebsite));
     github_Hyperlink.setText(lrm.getLocaleString(LangResourceKeys.visitGithub));
     checkForUpdates_Button.setText(lrm.getLocaleString(LangResourceKeys.checkForUpdates));
+    showShortcuts_Button.setText(lrm.getLocaleString(LangResourceKeys.showShortcuts_Button));
+    changelog_Label.setText(lrm.getLocaleString(LangResourceKeys.changelog_Label));
   }
 
   @Override
@@ -71,6 +79,31 @@ public class AboutViewController extends Controller {
     github_Hyperlink.addEventHandler(ActionEvent.ANY, actionEvent -> openWebsite(githubURL));
     website_Hyperlink.addEventHandler(ActionEvent.ANY, actionEvent -> openWebsite(websiteURL));
     checkForUpdates_Button.addEventHandler(ActionEvent.ANY, actionEvent -> checkVersionAndAlert());
+    showShortcuts_Button.addEventHandler(
+        ActionEvent.ANY,
+        actionEvent ->
+            getMainController()
+                .showShortcutView(
+                    (Stage) showShortcuts_Button.getScene().getWindow(), ShortcutLaunchContext.ABOUT));
+  }
+
+  private void loadChangelog() {
+    try (InputStream inputStream =
+        this.getClass().getResourceAsStream("/application/changelog.txt")) {
+      if (inputStream == null) {
+        LOG.error("Could not load bundled changelog resource.");
+        changelog_TextArea.clear();
+        return;
+      }
+      changelog_TextArea.setText(readBundledText(inputStream));
+    } catch (IOException ioException) {
+      LOG.log(Level.ERROR, "Could not read bundled changelog resource.", ioException);
+      changelog_TextArea.clear();
+    }
+  }
+
+  static String readBundledText(final InputStream inputStream) throws IOException {
+    return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
   }
 
   private void checkVersionAndAlert() {
@@ -157,6 +190,12 @@ public class AboutViewController extends Controller {
         : "fx:id=\"github_Hyperlink\" was not injected: check your FXML file 'AboutView.fxml'.";
     assert checkForUpdates_Button != null
         : "fx:id=\"checkForUpdates_Button\" was not injected: check your FXML file 'AboutView.fxml'.";
+    assert showShortcuts_Button != null
+        : "fx:id=\"showShortcuts_Button\" was not injected: check your FXML file 'AboutView.fxml'.";
+    assert changelog_Label != null
+        : "fx:id=\"changelog_Label\" was not injected: check your FXML file 'AboutView.fxml'.";
+    assert changelog_TextArea != null
+        : "fx:id=\"changelog_TextArea\" was not injected: check your FXML file 'AboutView.fxml'.";
   }
 
   @Override
@@ -164,6 +203,7 @@ public class AboutViewController extends Controller {
   public void initialize(URL url, ResourceBundle resourceBundle) {
     this.assertions();
     this.updateLocalisation();
+    this.loadChangelog();
     this.bindComponents();
   }
 }

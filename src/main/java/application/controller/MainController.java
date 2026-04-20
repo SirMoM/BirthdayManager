@@ -128,11 +128,16 @@ public class MainController {
     return isSelected;
   }
 
-  static void applyLoadedPersons(
-      final SessionInfos sessionInfos, final LoadPersonsTask.Result result) {
-    PersonManager.getInstance().getPersons().clear();
-    PersonManager.getInstance().getPersons().addAll(result.getPersons());
-    sessionInfos.updateSubLists();
+  static double retainPopupDimension(
+      final double previousDimension, final double preferredDimension) {
+    if (previousDimension <= 0) {
+      return preferredDimension;
+    }
+    return Math.max(previousDimension, preferredDimension);
+  }
+
+  static void applyLoadedPersons(final LoadPersonsTask.Result result) {
+    PersonManager.getInstance().setPersonDB(result.getPersons());
   }
 
   private void closeApp() {
@@ -465,20 +470,10 @@ public class MainController {
    * @see EditBirthdayViewController
    */
   public void goToAboutView() {
-
-    try {
-      final FXMLLoader fxmlLoader = new FXMLLoader();
-      fxmlLoader.setLocation(this.getClass().getResource("/application/view/AboutView.fxml"));
-      fxmlLoader.setController(new AboutViewController(this));
-      final Scene scene = new Scene(fxmlLoader.load());
-      final Stage aboutStage = new Stage();
-      aboutStage.setTitle(new LangResourceManager().getLocaleString(LangResourceKeys.about));
-      aboutStage.setScene(scene);
-      setStyle(scene);
-      aboutStage.show();
-    } catch (final IOException ioException) {
-      LOG.log(Level.ERROR, "Failed to create about window.", ioException);
-    }
+    this.openPopup(
+        ShortcutLaunchContext.ABOUT.getFxmlPath(),
+        new AboutViewController(this),
+        ShortcutLaunchContext.ABOUT.getTitleKey());
   }
 
   public void goToEditBirthdayView(final Person person) {
@@ -523,7 +518,7 @@ public class MainController {
         WorkerStateEvent.WORKER_STATE_SUCCEEDED,
         event -> {
           LoadPersonsTask.Result result = loadPersonsTask.getValue();
-          applyLoadedPersons(sessionInfos, result);
+          applyLoadedPersons(result);
           for (Person.PersonCouldNotBeParsedException error : result.getErrors()) {
             logAndAlertParsingError(error);
           }
@@ -554,19 +549,33 @@ public class MainController {
    * </ul>
    */
   public void openPreferences() {
-    try {
-      final FXMLLoader fxmlLoader = new FXMLLoader();
-      fxmlLoader.setLocation(this.getClass().getResource("/application/view/PreferencesView.fxml"));
-      fxmlLoader.setController(new PreferencesViewController(this));
-      final Scene scene = new Scene(fxmlLoader.load());
-      final Stage prefStage = new Stage();
-      prefStage.setTitle("Preferences");
-      prefStage.setScene(scene);
-      setStyle(scene);
-      prefStage.show();
-    } catch (final IOException ioException) {
-      LOG.log(Level.ERROR, "Failed to create preferences window.", ioException);
-    }
+    this.openPopup(
+        ShortcutLaunchContext.PREFERENCES.getFxmlPath(),
+        new PreferencesViewController(this),
+        ShortcutLaunchContext.PREFERENCES.getTitleKey());
+  }
+
+  public void showShortcutView(
+      final Stage popupStage, final ShortcutLaunchContext shortcutLaunchContext) {
+    this.replacePopupSceneContent(
+        popupStage,
+        "/application/view/ShortcutView.fxml",
+        new ShortcutViewController(this, shortcutLaunchContext),
+        LangResourceKeys.shortcuts);
+  }
+
+  public void restorePopupView(
+      final Stage popupStage, final ShortcutLaunchContext shortcutLaunchContext) {
+    final Controller controller =
+        switch (shortcutLaunchContext) {
+          case ABOUT -> new AboutViewController(this);
+          case PREFERENCES -> new PreferencesViewController(this);
+        };
+    this.replacePopupSceneContent(
+        popupStage,
+        shortcutLaunchContext.getFxmlPath(),
+        controller,
+        shortcutLaunchContext.getTitleKey());
   }
 
   protected void setStyle(Scene scene) {
@@ -581,6 +590,42 @@ public class MainController {
     scene.getStylesheets().clear();
     if (Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.DARK_MODE))) {
       scene.getStylesheets().add("dark-mode.css");
+    }
+  }
+
+  /**
+   * @param fxmlPath the path of the FXML-File representing the view
+   * @param controller the associated Controller
+   * @throws IOException if the FXML-File could not be loaded
+   */
+  private void openPopup(
+      final String fxmlPath, final Controller controller, final LangResourceKeys titleKey) {
+    this.replacePopupSceneContent(new Stage(), fxmlPath, controller, titleKey);
+  }
+
+  private void replacePopupSceneContent(
+      final Stage popupStage,
+      final String fxmlPath,
+      final Controller controller,
+      final LangResourceKeys titleKey) {
+    try {
+      final double previousWidth = popupStage.getWidth();
+      final double previousHeight = popupStage.getHeight();
+      final FXMLLoader fxmlLoader = new FXMLLoader();
+      fxmlLoader.setLocation(this.getClass().getResource(fxmlPath));
+      fxmlLoader.setController(controller);
+      final Scene scene = new Scene(fxmlLoader.load());
+      popupStage.setTitle(new LangResourceManager().getLocaleString(titleKey));
+      popupStage.setScene(scene);
+      setStyle(scene);
+      popupStage.sizeToScene();
+      popupStage.setWidth(retainPopupDimension(previousWidth, popupStage.getWidth()));
+      popupStage.setHeight(retainPopupDimension(previousHeight, popupStage.getHeight()));
+      popupStage.show();
+      popupStage.toFront();
+      Platform.runLater(controller::placeFocus);
+    } catch (final IOException ioException) {
+      LOG.log(Level.ERROR, "Failed to show popup view {}.", fxmlPath, ioException);
     }
   }
 

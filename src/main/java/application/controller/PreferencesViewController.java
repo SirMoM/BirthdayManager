@@ -116,6 +116,7 @@ public class PreferencesViewController extends Controller {
   @FXML private Label countBirthdaysShown_Label;
   @FXML private ToggleButton darkMode_ToggleButton;
   @FXML private CheckBox reminder_CheckBox;
+  @FXML private Button showShortcuts_Button;
   private final EventHandler<ActionEvent> savePropertiesHandler =
       event -> {
         Properties properties = PropertyManager.getInstance().getProperties();
@@ -260,6 +261,8 @@ public class PreferencesViewController extends Controller {
         : "fx:id=\"countBirthdaysShown_Label\" was not injected: check your FXML file 'PreferencesView.fxml'.";
     assert darkMode_ToggleButton != null
         : "fx:id=\"darkMode_ToggleButton\" was not injected: check your FXML file 'PreferencesView.fxml'.";
+    assert showShortcuts_Button != null
+        : "fx:id=\"showShortcuts_Button\" was not injected: check your FXML file 'PreferencesView.fxml'.";
   }
 
   /** Binds the JavaFX Components to their {@link EventHandler}. */
@@ -270,6 +273,13 @@ public class PreferencesViewController extends Controller {
         .addListener(this.openFileOnStartCheckboxChangeListener);
     this.save_button.addEventHandler(ActionEvent.ANY, this.savePropertiesHandler);
     this.cancel_button.addEventHandler(ActionEvent.ANY, this.exitHandler);
+    this.showShortcuts_Button.addEventHandler(
+        ActionEvent.ANY,
+        event ->
+            this.getMainController()
+                .showShortcutView(
+                    (Stage) this.showShortcuts_Button.getScene().getWindow(),
+                    ShortcutLaunchContext.PREFERENCES));
     this.countBirthdaysShown_Spinner.setValueFactory(new IntegerSpinnerValueFactory(5, 50, 10, 1));
   }
 
@@ -432,6 +442,8 @@ public class PreferencesViewController extends Controller {
     this.cancel_button.setText(resourceManager.getLocaleString(LangResourceKeys.cancel_button));
     this.reminder_CheckBox.setText(
         resourceManager.getLocaleString(LangResourceKeys.reminder_CheckBox));
+    this.showShortcuts_Button.setText(
+        resourceManager.getLocaleString(LangResourceKeys.showShortcuts_Button));
   }
 
   @Override

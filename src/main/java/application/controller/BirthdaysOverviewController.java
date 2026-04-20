@@ -392,16 +392,12 @@ public class BirthdaysOverviewController extends Controller {
     // File
     this.openFile_MenuItem.addEventHandler(
         ActionEvent.ANY, this.getMainController().openFromFileChooserHandler);
-    this.openFile_MenuItem.setAccelerator(
-        new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN));
     this.createRecentFilesMenuItems();
 
     this.closeFile_MenuItem.addEventHandler(
         ActionEvent.ANY, this.getMainController().closeFileHandler);
     this.saveFile_MenuItem.addEventHandler(
         ActionEvent.ANY, this.getMainController().saveToFileHandler);
-    this.saveFile_MenuItem.setAccelerator(
-        new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
     this.saveAsFile_MenuItem.addEventHandler(
         ActionEvent.ANY, this.getMainController().exportToFileHandler);
 
@@ -414,8 +410,6 @@ public class BirthdaysOverviewController extends Controller {
 
     this.openBirthday_MenuItem.addEventHandler(ActionEvent.ANY, this.openBirthday);
     this.newBirthday_MenuItem.addEventHandler(ActionEvent.ANY, this.newBirthdayHandler);
-    this.newBirthday_MenuItem.setAccelerator(
-        new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
     this.importBirthdays_MenuItem.addEventHandler(ActionEvent.ANY, this.importBirthdaysHandler);
 
     this.showNextBirthdays_MenuItem.addEventHandler(ActionEvent.ANY, this.showNextBirthdaysHandler);
@@ -448,8 +442,7 @@ public class BirthdaysOverviewController extends Controller {
         .bind(this.getMainController().getSessionInfos().getFileToOpenName());
 
     this.deleteBirthdays_MenuItem.addEventHandler(ActionEvent.ANY, this.deletePersonHandler);
-    this.deleteBirthdays_MenuItem.setAccelerator(
-        new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN));
+    this.applySharedShortcutAccelerators();
 
     this.openFileExternal_Button.addEventHandler(
         ActionEvent.ANY, this.getMainController().openFileExternal);
@@ -542,6 +535,20 @@ public class BirthdaysOverviewController extends Controller {
             });
 
     about.addEventHandler(ActionEvent.ANY, actionEvent -> getMainController().goToAboutView());
+  }
+
+  private void applySharedShortcutAccelerators() {
+    this.applyShortcutAccelerator(this.openFile_MenuItem, ShortcutDefinition.OPEN_FILE_ACTION);
+    this.applyShortcutAccelerator(this.saveFile_MenuItem, ShortcutDefinition.SAVE_FILE_ACTION);
+    this.applyShortcutAccelerator(
+        this.newBirthday_MenuItem, ShortcutDefinition.NEW_BIRTHDAY_ACTION);
+    this.applyShortcutAccelerator(
+        this.deleteBirthdays_MenuItem, ShortcutDefinition.DELETE_BIRTHDAY_ACTION);
+  }
+
+  private void applyShortcutAccelerator(final MenuItem menuItem, final String actionId) {
+    ShortcutDefinition.findByActionId(actionId)
+        .ifPresent(definition -> menuItem.setAccelerator(definition.getKeyCombination()));
   }
 
   private void refreshBirthdayTableView() {
@@ -676,6 +683,7 @@ public class BirthdaysOverviewController extends Controller {
 
     this.help_menu.setText(resourceManager.getLocaleString(LangResourceKeys.help_menu));
     this.about.setText(resourceManager.getLocaleString(LangResourceKeys.about));
+    this.debug.setText(resourceManager.getLocaleString(LangResourceKeys.shortcuts));
     // List menu
     this.openBirthday_MenuItem.setText(
         resourceManager.getLocaleString(LangResourceKeys.openBirthday_MenuItem));

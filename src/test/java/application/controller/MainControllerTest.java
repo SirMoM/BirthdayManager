@@ -27,6 +27,11 @@ class MainControllerTest {
       updateSubListsCalled = true;
       personsSeenDuringRefresh = new ArrayList<>(PersonManager.getInstance().getPersons());
     }
+
+    private void reset() {
+      updateSubListsCalled = false;
+      personsSeenDuringRefresh = List.of();
+    }
   }
 
   @Test
@@ -54,19 +59,60 @@ class MainControllerTest {
   }
 
   @Test
+  void retainPopupDimension_KeepsOldSizeWhenNewContentWouldShrink() {
+    assertThat(MainController.retainPopupDimension(640.0, 420.0)).isEqualTo(640.0);
+  }
+
+  @Test
+  void retainPopupDimension_AllowsGrowthWhenNewContentNeedsMoreSpace() {
+    assertThat(MainController.retainPopupDimension(420.0, 640.0)).isEqualTo(640.0);
+  }
+
+  @Test
+  void retainPopupDimension_UsesPreferredSizeForFreshPopup() {
+    assertThat(MainController.retainPopupDimension(0.0, 420.0)).isEqualTo(420.0);
+  }
+
+  @Test
   void applyLoadedPersons_RebuildsSublistsAfterReplacingLoadedPersons() {
     PersonManager personManager = PersonManager.getInstance();
     personManager.getPersons().clear();
-    personManager.getPersons().add(new Person("Old", "Entry", null, LocalDate.of(1990, 1, 1)));
 
     RecordingSessionInfos sessionInfos = new RecordingSessionInfos();
+    personManager.setSessionInfos(sessionInfos);
+    sessionInfos.reset();
+
+    personManager.getPersons().add(new Person("Old", "Entry", null, LocalDate.of(1990, 1, 1)));
     Person loadedPerson = new Person("New", "Entry", null, LocalDate.of(2000, 2, 2));
     LoadPersonsTask.Result result = new LoadPersonsTask.Result(List.of(loadedPerson), List.of());
 
-    MainController.applyLoadedPersons(sessionInfos, result);
+    MainController.applyLoadedPersons(result);
 
     assertThat(personManager.getPersons()).containsExactly(loadedPerson);
     assertThat(sessionInfos.updateSubListsCalled).isTrue();
     assertThat(sessionInfos.personsSeenDuringRefresh).containsExactly(loadedPerson);
+  }
+
+  @Test
+  void applyLoadedPersons_RemovesExactDuplicatesFromTheLoadedFile() {
+    PersonManager personManager = PersonManager.getInstance();
+    personManager.getPersons().clear();
+
+    RecordingSessionInfos sessionInfos = new RecordingSessionInfos();
+    personManager.setSessionInfos(sessionInfos);
+    sessionInfos.reset();
+
+    Person duplicateBirthday = new Person("Walter", "Stefan", null, LocalDate.of(1964, 4, 16));
+    Person sameBirthdayAgain = new Person("Walter", "Stefan", null, LocalDate.of(1964, 4, 16));
+    Person uniqueBirthday = new Person("Meyer", "Markus", null, LocalDate.of(1962, 4, 18));
+    LoadPersonsTask.Result result =
+        new LoadPersonsTask.Result(
+            List.of(duplicateBirthday, sameBirthdayAgain, uniqueBirthday), List.of());
+
+    MainController.applyLoadedPersons(result);
+
+    assertThat(personManager.getPersons()).containsExactly(duplicateBirthday, uniqueBirthday);
+    assertThat(sessionInfos.personsSeenDuringRefresh)
+        .containsExactly(duplicateBirthday, uniqueBirthday);
   }
 }

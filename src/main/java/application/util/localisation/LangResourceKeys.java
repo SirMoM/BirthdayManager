@@ -31,6 +31,7 @@ public enum LangResourceKeys {
   deleteBirthdays_MenuItem,
 
   help_menu,
+  shortcuts,
 
   fileChooserCaption,
 
@@ -120,7 +121,16 @@ public enum LangResourceKeys {
   appName_Label,
   version_Label,
   createdBy_Label,
+  changelog_Label,
   visitWebsite,
   visitGithub,
-  checkForUpdates;
+  checkForUpdates,
+  showShortcuts_Button,
+  back_Button,
+  shortcut_Column,
+  action_Column,
+  shortcut_openFile,
+  shortcut_saveFile,
+  shortcut_newBirthday,
+  shortcut_deleteBirthdays;
 }
