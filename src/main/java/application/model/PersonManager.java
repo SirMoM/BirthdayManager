@@ -2,7 +2,9 @@
 package application.model;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -71,7 +73,14 @@ public class PersonManager {
    * @param personDB the personDB to set
    */
   public void setPersonDB(final List<Person> personDB) {
-    this.personDB = personDB;
+    this.personDB = distinctPersons(personDB);
+    updateSessionInfosIfPossible();
+  }
+
+  public void mergePersons(final List<Person> persons) {
+    final List<Person> mergedPersons = new ArrayList<>(this.personDB);
+    mergedPersons.addAll(persons);
+    this.personDB = distinctPersons(mergedPersons);
     updateSessionInfosIfPossible();
   }
 
@@ -85,5 +94,35 @@ public class PersonManager {
     personToUpdate.setSurname(updatedPerson.getSurname());
     personToUpdate.setMisc(updatedPerson.getMisc());
     updateSessionInfosIfPossible();
+  }
+
+  private static List<Person> distinctPersons(final List<Person> persons) {
+    final Map<String, Person> uniquePersons = new LinkedHashMap<>();
+
+    for (Person person : persons) {
+      uniquePersons.putIfAbsent(buildIdentity(person), person);
+    }
+
+    final int removedDuplicates = persons.size() - uniquePersons.size();
+    if (removedDuplicates > 0) {
+      LOG.info(
+          "Removed {} duplicate birthdays while normalizing the person list.", removedDuplicates);
+    }
+
+    return new ArrayList<>(uniquePersons.values());
+  }
+
+  private static String buildIdentity(final Person person) {
+    return nullToEmpty(person.getSurname())
+        + "\u0000"
+        + nullToEmpty(person.getName())
+        + "\u0000"
+        + nullToEmpty(person.getMisc())
+        + "\u0000"
+        + (person.getBirthday() == null ? "" : person.getBirthday());
+  }
+
+  private static String nullToEmpty(final String value) {
+    return value == null ? "" : value;
   }
 }

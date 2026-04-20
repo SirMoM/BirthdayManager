@@ -91,8 +91,7 @@ public class BirthdaysOverviewController extends Controller {
               WorkerStateEvent.WORKER_STATE_SUCCEEDED,
               workerStateEvent -> {
                 LoadPersonsTask.Result result = loadPersonsTask.getValue();
-                PersonManager.getInstance().getPersons().addAll(result.getPersons());
-                getMainController().getSessionInfos().updateSubLists();
+                PersonManager.getInstance().mergePersons(result.getPersons());
 
                 for (Person.PersonCouldNotBeParsedException error : result.getErrors()) {
                   logAndAlertParsingError(error);
