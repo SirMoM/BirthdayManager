@@ -108,15 +108,20 @@ public class AboutViewController extends Controller {
   }
 
   private void checkVersionAndAlert() {
+    final LangResourceManager lrm = new LangResourceManager();
     CheckForUpdatesTask checkForUpdatesTask = new CheckForUpdatesTask();
     checkForUpdatesTask.addEventHandler(
         WorkerStateEvent.WORKER_STATE_SUCCEEDED,
         event -> {
-          String msg = checkForUpdatesTask.getValue();
-          if (msg != null) {
+          String latestVersion = checkForUpdatesTask.getValue();
+          if (latestVersion != null) {
             final Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("New version!");
-            Button button = new Button("Open Download page!");
+            String msg =
+                String.format(
+                    lrm.getLocaleString(LangResourceKeys.updateAvailable_Message), latestVersion);
+            alert.setTitle(lrm.getLocaleString(LangResourceKeys.updateAvailable_Title));
+            Button button =
+                new Button(lrm.getLocaleString(LangResourceKeys.openDownloadPage_Button));
             button.setOnAction(
                 actionEvent -> {
                   String url = "https://github.com/SirMoM/BirthdayManager/packages";
@@ -130,7 +135,8 @@ public class AboutViewController extends Controller {
                     }
                   }
                 });
-            CheckBox checkBox = new CheckBox("Don't remind me again");
+            CheckBox checkBox =
+                new CheckBox(lrm.getLocaleString(LangResourceKeys.dontRemindAgain_CheckBox));
             GridPane gridPane = new GridPane();
             gridPane.setMaxWidth(Double.MAX_VALUE);
             gridPane.add(button, 1, 0);
@@ -153,8 +159,8 @@ public class AboutViewController extends Controller {
 
           } else {
             final Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("No new version found!");
-            alert.setHeaderText("No new version found!");
+            alert.setTitle(lrm.getLocaleString(LangResourceKeys.noNewVersionFound_Title));
+            alert.setHeaderText(lrm.getLocaleString(LangResourceKeys.noNewVersionFound_Title));
             alert.showAndWait();
           }
         });

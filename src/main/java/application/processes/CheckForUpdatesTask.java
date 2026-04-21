@@ -25,7 +25,7 @@ public class CheckForUpdatesTask extends Task<String> {
 
     if (!currentVersion.equals(latestVersion)) {
       LOG.info("Newer Version of the Software is available! New version {}", latestVersion);
-      return "A new version is available " + latestVersion;
+      return latestVersion;
     } else {
       return null;
     }

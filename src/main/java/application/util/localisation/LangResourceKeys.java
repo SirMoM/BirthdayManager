@@ -26,14 +26,19 @@ public enum LangResourceKeys {
   edit_menu,
   showNextBirthdays_MenuItem,
   showLastBirthdays_MenuItem,
+  searchBirthday_MenuItem,
   newBirthday_MenuItem,
   importBirthdays_MenuItem,
   deleteBirthdays_MenuItem,
 
   help_menu,
+  openFileExternal_MenuItem,
+  refresh_MenuItem,
   shortcuts,
 
   fileChooserCaption,
+  mainWindow_Title,
+  csvFiles_Filter,
 
   // List menu
   openBirthday_MenuItem,
@@ -98,6 +103,17 @@ public enum LangResourceKeys {
   save_before_exit,
   person_not_valid_warning,
   save_before_exit_question,
+  updateAvailable_Title,
+  updateAvailable_Message,
+  openDownloadPage_Button,
+  dontRemindAgain_CheckBox,
+  noNewVersionFound_Title,
+  parseError_Title,
+  parseError_Message,
+  parseErrorField_wholeLine,
+  parseErrorField_birthday,
+  parseErrorField_fullName,
+  parseErrorField_misc,
 
   // Miscellaneous
   yes,

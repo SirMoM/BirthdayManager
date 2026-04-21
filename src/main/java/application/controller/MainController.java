@@ -440,7 +440,8 @@ public class MainController {
     try {
       this.replaceSceneContent(
           "/application/view/BirthdaysOverview.fxml", this.getActiveController());
-      this.stage.setTitle("Birthday Manager");
+      this.stage.setTitle(
+          new LangResourceManager().getLocaleString(LangResourceKeys.mainWindow_Title));
     } catch (final Exception exception) {
       LOG.catching(Level.ERROR, exception);
     }
@@ -725,15 +726,20 @@ public class MainController {
       LOG.debug("Don't check for new version!");
       return;
     }
+    final LangResourceManager lrm = new LangResourceManager();
     CheckForUpdatesTask checkForUpdatesTask = new CheckForUpdatesTask();
     checkForUpdatesTask.addEventHandler(
         WorkerStateEvent.WORKER_STATE_SUCCEEDED,
         event -> {
-          String msg = checkForUpdatesTask.getValue();
-          if (msg != null) {
+          String latestVersion = checkForUpdatesTask.getValue();
+          if (latestVersion != null) {
             final Alert alert = new Alert(AlertType.INFORMATION);
-            alert.setTitle("New version!");
-            Button button = new Button("Open Download page!");
+            String msg =
+                String.format(
+                    lrm.getLocaleString(LangResourceKeys.updateAvailable_Message), latestVersion);
+            alert.setTitle(lrm.getLocaleString(LangResourceKeys.updateAvailable_Title));
+            Button button =
+                new Button(lrm.getLocaleString(LangResourceKeys.openDownloadPage_Button));
             button.setOnAction(
                 actionEvent -> {
                   String url = "https://github.com/SirMoM/BirthdayManager/packages";
@@ -747,7 +753,8 @@ public class MainController {
                     }
                   }
                 });
-            CheckBox checkBox = new CheckBox("Don't remind me again");
+            CheckBox checkBox =
+                new CheckBox(lrm.getLocaleString(LangResourceKeys.dontRemindAgain_CheckBox));
             GridPane gridPane = new GridPane();
             gridPane.setMaxWidth(Double.MAX_VALUE);
             gridPane.add(button, 1, 0);
@@ -775,10 +782,30 @@ public class MainController {
   private void logAndAlertParsingError(
       Person.PersonCouldNotBeParsedException personCouldNotBeParsedException) {
     LOG.warn(personCouldNotBeParsedException);
+    final LangResourceManager resourceManager = new LangResourceManager();
     final Alert alert = new Alert(Alert.AlertType.WARNING);
-    alert.setTitle("ERROR: Parsing failed");
-    alert.setContentText(personCouldNotBeParsedException.getMessage());
+    alert.setTitle(resourceManager.getLocaleString(LangResourceKeys.parseError_Title));
+    alert.setContentText(
+        String.format(
+            resourceManager.getLocaleString(LangResourceKeys.parseError_Message),
+            personCouldNotBeParsedException.getLineNumber(),
+            localizeParseErrorField(resourceManager, personCouldNotBeParsedException),
+            personCouldNotBeParsedException.getLine()));
     alert.showAndWait();
+  }
+
+  private String localizeParseErrorField(
+      final LangResourceManager resourceManager,
+      final Person.PersonCouldNotBeParsedException personCouldNotBeParsedException) {
+    return switch (personCouldNotBeParsedException.getWhatCouldNotBeParsed()) {
+      case "the whole line" ->
+          resourceManager.getLocaleString(LangResourceKeys.parseErrorField_wholeLine);
+      case "birthday" -> resourceManager.getLocaleString(LangResourceKeys.parseErrorField_birthday);
+      case "full name" ->
+          resourceManager.getLocaleString(LangResourceKeys.parseErrorField_fullName);
+      case "misc" -> resourceManager.getLocaleString(LangResourceKeys.parseErrorField_misc);
+      default -> personCouldNotBeParsedException.getWhatCouldNotBeParsed();
+    };
   }
 
   private class SceneAndController {

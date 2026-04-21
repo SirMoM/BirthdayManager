@@ -7,6 +7,7 @@ import application.model.PersonsInAWeek;
 import application.model.RecentItems;
 import application.processes.LoadPersonsTask;
 import application.processes.SaveBirthdaysToFileTask;
+import application.util.BirthdayContextMenuFactory;
 import application.util.BirthdayUtils;
 import application.util.MonthTableCallback;
 import application.util.MonthTableCellFactory;
@@ -193,9 +194,7 @@ public class BirthdaysOverviewController extends Controller {
         final ObservableList<Person> selectedItems =
             BirthdaysOverviewController.this.nextBdaysList.getSelectionModel().getSelectedItems();
         if (!selectedItems.isEmpty()) {
-          BirthdaysOverviewController.this
-              .getMainController()
-              .goToEditBirthdayView(selectedItems.get(0));
+          BirthdaysOverviewController.this.openBirthday(selectedItems.get(0));
         }
       };
   final EventHandler<ActionEvent> showRecentBirthdaysHandler =
@@ -452,12 +451,19 @@ public class BirthdaysOverviewController extends Controller {
     this.week_tableView.setItems(
         this.getMainController().getSessionInfos().getPersonsInAWeekList());
     this.monday_column1.setCellValueFactory(new WeekTableCallback(DayOfWeek.MONDAY));
+    this.monday_column1.setCellFactory(this.createWeekCellFactory(DayOfWeek.MONDAY));
     this.tuesday_column1.setCellValueFactory(new WeekTableCallback(DayOfWeek.TUESDAY));
+    this.tuesday_column1.setCellFactory(this.createWeekCellFactory(DayOfWeek.TUESDAY));
     this.wednesday_column1.setCellValueFactory(new WeekTableCallback(DayOfWeek.WEDNESDAY));
+    this.wednesday_column1.setCellFactory(this.createWeekCellFactory(DayOfWeek.WEDNESDAY));
     this.thursday_column1.setCellValueFactory(new WeekTableCallback(DayOfWeek.THURSDAY));
+    this.thursday_column1.setCellFactory(this.createWeekCellFactory(DayOfWeek.THURSDAY));
     this.friday_column1.setCellValueFactory(new WeekTableCallback(DayOfWeek.FRIDAY));
+    this.friday_column1.setCellFactory(this.createWeekCellFactory(DayOfWeek.FRIDAY));
     this.saturday_column1.setCellValueFactory(new WeekTableCallback(DayOfWeek.SATURDAY));
+    this.saturday_column1.setCellFactory(this.createWeekCellFactory(DayOfWeek.SATURDAY));
     this.sunday_column1.setCellValueFactory(new WeekTableCallback(DayOfWeek.SUNDAY));
+    this.sunday_column1.setCellFactory(this.createWeekCellFactory(DayOfWeek.SUNDAY));
 
     this.month_tableView.setItems(
         this.getMainController().getSessionInfos().getPersonsInAMonthList());
@@ -466,19 +472,33 @@ public class BirthdaysOverviewController extends Controller {
         .addListener(
             (ListChangeListener<PersonsInAMonthWeek>) change -> this.selectCurrentMonthWeekLater());
     this.monday_column2.setCellValueFactory(new MonthTableCallback(DayOfWeek.MONDAY));
-    this.monday_column2.setCellFactory(new MonthTableCellFactory(DayOfWeek.MONDAY));
+    this.monday_column2.setCellFactory(
+        new MonthTableCellFactory(
+            DayOfWeek.MONDAY, this::getOpenBirthdayLabel, this::openBirthday));
     this.tuesday_column2.setCellValueFactory(new MonthTableCallback(DayOfWeek.TUESDAY));
-    this.tuesday_column2.setCellFactory(new MonthTableCellFactory(DayOfWeek.TUESDAY));
+    this.tuesday_column2.setCellFactory(
+        new MonthTableCellFactory(
+            DayOfWeek.TUESDAY, this::getOpenBirthdayLabel, this::openBirthday));
     this.wednesday_column2.setCellValueFactory(new MonthTableCallback(DayOfWeek.WEDNESDAY));
-    this.wednesday_column2.setCellFactory(new MonthTableCellFactory(DayOfWeek.WEDNESDAY));
+    this.wednesday_column2.setCellFactory(
+        new MonthTableCellFactory(
+            DayOfWeek.WEDNESDAY, this::getOpenBirthdayLabel, this::openBirthday));
     this.thursday_column2.setCellValueFactory(new MonthTableCallback(DayOfWeek.THURSDAY));
-    this.thursday_column2.setCellFactory(new MonthTableCellFactory(DayOfWeek.THURSDAY));
+    this.thursday_column2.setCellFactory(
+        new MonthTableCellFactory(
+            DayOfWeek.THURSDAY, this::getOpenBirthdayLabel, this::openBirthday));
     this.friday_column2.setCellValueFactory(new MonthTableCallback(DayOfWeek.FRIDAY));
-    this.friday_column2.setCellFactory(new MonthTableCellFactory(DayOfWeek.FRIDAY));
+    this.friday_column2.setCellFactory(
+        new MonthTableCellFactory(
+            DayOfWeek.FRIDAY, this::getOpenBirthdayLabel, this::openBirthday));
     this.saturday_column2.setCellValueFactory(new MonthTableCallback(DayOfWeek.SATURDAY));
-    this.saturday_column2.setCellFactory(new MonthTableCellFactory(DayOfWeek.SATURDAY));
+    this.saturday_column2.setCellFactory(
+        new MonthTableCellFactory(
+            DayOfWeek.SATURDAY, this::getOpenBirthdayLabel, this::openBirthday));
     this.sunday_column2.setCellValueFactory(new MonthTableCallback(DayOfWeek.SUNDAY));
-    this.sunday_column2.setCellFactory(new MonthTableCellFactory(DayOfWeek.SUNDAY));
+    this.sunday_column2.setCellFactory(
+        new MonthTableCellFactory(
+            DayOfWeek.SUNDAY, this::getOpenBirthdayLabel, this::openBirthday));
     this.month_tap
         .selectedProperty()
         .addListener(
@@ -535,6 +555,61 @@ public class BirthdaysOverviewController extends Controller {
             });
 
     about.addEventHandler(ActionEvent.ANY, actionEvent -> getMainController().goToAboutView());
+  }
+
+  private Callback<TableColumn<PersonsInAWeek, String>, TableCell<PersonsInAWeek, String>>
+      createWeekCellFactory(final DayOfWeek dayOfWeek) {
+    return column ->
+        new TableCell<>() {
+          @Override
+          protected void updateItem(final String item, final boolean empty) {
+            super.updateItem(item, empty);
+
+            if (empty) {
+              this.setText(null);
+              this.setContextMenu(null);
+              return;
+            }
+
+            final PersonsInAWeek week =
+                this.getTableRow() == null ? null : this.getTableRow().getItem();
+            final Person person = getPersonForDay(week, dayOfWeek);
+
+            this.setText(item);
+            this.setContextMenu(
+                BirthdayContextMenuFactory.createContextMenu(
+                    person == null ? List.of() : List.of(person),
+                    getOpenBirthdayLabel(),
+                    BirthdaysOverviewController.this::openBirthday));
+          }
+        };
+  }
+
+  private Person getPersonForDay(final PersonsInAWeek week, final DayOfWeek dayOfWeek) {
+    if (week == null) {
+      return null;
+    }
+
+    return switch (dayOfWeek) {
+      case MONDAY -> week.getMondayPerson();
+      case TUESDAY -> week.getTuesdayPerson();
+      case WEDNESDAY -> week.getWednesdayPerson();
+      case THURSDAY -> week.getThursdayPerson();
+      case FRIDAY -> week.getFridayPerson();
+      case SATURDAY -> week.getSaturdayPerson();
+      case SUNDAY -> week.getSundayPerson();
+    };
+  }
+
+  private String getOpenBirthdayLabel() {
+    return new LangResourceManager().getLocaleString(LangResourceKeys.openBirthday_MenuItem);
+  }
+
+  private void openBirthday(final Person person) {
+    if (person == null) {
+      return;
+    }
+    this.getMainController().goToEditBirthdayView(person);
   }
 
   private void applySharedShortcutAccelerators() {
@@ -674,6 +749,8 @@ public class BirthdaysOverviewController extends Controller {
         resourceManager.getLocaleString(LangResourceKeys.showNextBirthdays_MenuItem));
     this.showLastBirthdays_MenuItem.setText(
         resourceManager.getLocaleString(LangResourceKeys.showLastBirthdays_MenuItem));
+    this.searchBirthdayMenuItem.setText(
+        resourceManager.getLocaleString(LangResourceKeys.searchBirthday_MenuItem));
     this.newBirthday_MenuItem.setText(
         resourceManager.getLocaleString(LangResourceKeys.newBirthday_MenuItem));
     this.importBirthdays_MenuItem.setText(
@@ -683,6 +760,10 @@ public class BirthdaysOverviewController extends Controller {
 
     this.help_menu.setText(resourceManager.getLocaleString(LangResourceKeys.help_menu));
     this.about.setText(resourceManager.getLocaleString(LangResourceKeys.about));
+    this.openFileExternal_Button.setText(
+        resourceManager.getLocaleString(LangResourceKeys.openFileExternal_MenuItem));
+    this.refresh_MenuItem.setText(
+        resourceManager.getLocaleString(LangResourceKeys.refresh_MenuItem));
     this.debug.setText(resourceManager.getLocaleString(LangResourceKeys.shortcuts));
     // List menu
     this.openBirthday_MenuItem.setText(
@@ -744,10 +825,30 @@ public class BirthdaysOverviewController extends Controller {
   private void logAndAlertParsingError(
       Person.PersonCouldNotBeParsedException personCouldNotBeParsedException) {
     LOG.warn(personCouldNotBeParsedException);
+    final LangResourceManager resourceManager = new LangResourceManager();
     final Alert alert = new Alert(Alert.AlertType.WARNING);
-    alert.setTitle("ERROR: Parsing failed");
-    alert.setContentText(personCouldNotBeParsedException.getMessage());
+    alert.setTitle(resourceManager.getLocaleString(LangResourceKeys.parseError_Title));
+    alert.setContentText(
+        String.format(
+            resourceManager.getLocaleString(LangResourceKeys.parseError_Message),
+            personCouldNotBeParsedException.getLineNumber(),
+            localizeParseErrorField(resourceManager, personCouldNotBeParsedException),
+            personCouldNotBeParsedException.getLine()));
     alert.showAndWait();
+  }
+
+  private String localizeParseErrorField(
+      final LangResourceManager resourceManager,
+      final Person.PersonCouldNotBeParsedException personCouldNotBeParsedException) {
+    return switch (personCouldNotBeParsedException.getWhatCouldNotBeParsed()) {
+      case "the whole line" ->
+          resourceManager.getLocaleString(LangResourceKeys.parseErrorField_wholeLine);
+      case "birthday" -> resourceManager.getLocaleString(LangResourceKeys.parseErrorField_birthday);
+      case "full name" ->
+          resourceManager.getLocaleString(LangResourceKeys.parseErrorField_fullName);
+      case "misc" -> resourceManager.getLocaleString(LangResourceKeys.parseErrorField_misc);
+      default -> personCouldNotBeParsedException.getWhatCouldNotBeParsed();
+    };
   }
 
   private class RecentFileEventHandler implements EventHandler<ActionEvent> {

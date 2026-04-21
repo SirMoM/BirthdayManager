@@ -1,9 +1,13 @@
 package application.util;
 
+import application.model.Person;
 import application.model.PersonsInAMonthWeek;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import javafx.geometry.Pos;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.TableCell;
@@ -18,9 +22,16 @@ public class MonthTableCellFactory
 
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd");
   private final DayOfWeek forWhichDay;
+  private final Supplier<String> openLabelSupplier;
+  private final Consumer<Person> openBirthdayAction;
 
-  public MonthTableCellFactory(final DayOfWeek forWhichDay) {
+  public MonthTableCellFactory(
+      final DayOfWeek forWhichDay,
+      final Supplier<String> openLabelSupplier,
+      final Consumer<Person> openBirthdayAction) {
     this.forWhichDay = forWhichDay;
+    this.openLabelSupplier = openLabelSupplier;
+    this.openBirthdayAction = openBirthdayAction;
   }
 
   @Override
@@ -45,10 +56,15 @@ public class MonthTableCellFactory
             this.getTableRow() == null ? null : this.getTableRow().getItem();
         final LocalDate date =
             monthWeek == null ? null : monthWeek.getDateFor(MonthTableCellFactory.this.forWhichDay);
+        final List<Person> persons =
+            monthWeek == null
+                ? List.of()
+                : monthWeek.getPersonsFor(MonthTableCellFactory.this.forWhichDay);
 
         if (empty || date == null) {
           this.setText(null);
           this.setGraphic(null);
+          this.setContextMenu(null);
           return;
         }
 
@@ -61,6 +77,11 @@ public class MonthTableCellFactory
 
         this.setText(null);
         this.setGraphic(this.graphic);
+        this.setContextMenu(
+            BirthdayContextMenuFactory.createContextMenu(
+                persons,
+                MonthTableCellFactory.this.openLabelSupplier.get(),
+                MonthTableCellFactory.this.openBirthdayAction));
       }
     };
   }

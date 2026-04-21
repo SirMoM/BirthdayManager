@@ -351,6 +351,18 @@ public class Person {
       this.whatCouldNotBeParsed = whatCouldNotBeParsed;
     }
 
+    public int getLineNumber() {
+      return lineNumber;
+    }
+
+    public String getWhatCouldNotBeParsed() {
+      return whatCouldNotBeParsed;
+    }
+
+    public String getLine() {
+      return line;
+    }
+
     @Override
     public String getMessage() {
       return "Could not parse Person from line: "

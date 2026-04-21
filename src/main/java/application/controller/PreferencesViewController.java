@@ -89,7 +89,12 @@ public class PreferencesViewController extends Controller {
         } catch (final NullPointerException nullPointerException) {
           fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
         }
-        fileChooser.getExtensionFilters().addAll(new ExtensionFilter("CSV Files", "*.csv"));
+        fileChooser
+            .getExtensionFilters()
+            .addAll(
+                new ExtensionFilter(
+                    new LangResourceManager().getLocaleString(LangResourceKeys.csvFiles_Filter),
+                    "*.csv"));
 
         final File saveFile =
             fileChooser.showOpenDialog(
