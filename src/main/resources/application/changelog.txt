@@ -1,6 +1,10 @@
 BirthdayManager Changelog
 =========================
 
+0.7.1
+- Localize remaining runtime dialogs, alerts, and labels.
+- Fix and localize the week and month overview context menus.
+
 0.7.0
 - Add a shortcuts view that can be opened from About and Preferences.
 - Show the bundled changelog directly in the About window.
