@@ -20,7 +20,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
@@ -78,23 +77,8 @@ public class PreferencesViewController extends Controller {
       };
   private final EventHandler<ActionEvent> chooseFileHandler =
       event -> {
-        final FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle(
-            new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
-
-        try {
-          PropertyManager.getInstance();
-          fileChooser.setInitialDirectory(
-              new File(PropertyManager.getProperty(PropertyFields.LAST_OPENED)).getParentFile());
-        } catch (final NullPointerException nullPointerException) {
-          fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        }
-        fileChooser
-            .getExtensionFilters()
-            .addAll(
-                new ExtensionFilter(
-                    new LangResourceManager().getLocaleString(LangResourceKeys.csvFiles_Filter),
-                    "*.csv"));
+        final FileChooser fileChooser =
+            PreferencesViewController.this.getMainController().createCsvFileChooser();
 
         final File saveFile =
             fileChooser.showOpenDialog(

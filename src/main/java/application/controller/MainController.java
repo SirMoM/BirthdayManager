@@ -83,23 +83,12 @@ public class MainController {
   private final Stage stage;
   final EventHandler<ActionEvent> exportToFileHandler =
       event -> {
-        final FileChooser fileChooser = new FileChooser();
+        final FileChooser fileChooser = createCsvFileChooser();
         LangResourceManager lrm = new LangResourceManager();
-        fileChooser.setTitle(lrm.getLocaleString(LangResourceKeys.fileChooserCaption));
-
-        try {
-          fileChooser.setInitialDirectory(
-              new File(PropertyManager.getProperty(PropertyFields.LAST_OPENED)).getParentFile());
-        } catch (final NullPointerException nullPointerException) {
-          fileChooser.setInitialDirectory(new File(System.getProperty(USER_HOME)));
-        }
         fileChooser.setInitialFileName(lrm.getLocaleString(LangResourceKeys.birthday_Label));
         fileChooser
             .getExtensionFilters()
-            .addAll(
-                new ExtensionFilter(
-                    lrm.getLocaleString(LangResourceKeys.csv_file), CSV_FILE_EXTENSION),
-                new ExtensionFilter(lrm.getLocaleString(LangResourceKeys.all_files), "*.*"));
+            .add(new ExtensionFilter(lrm.getLocaleString(LangResourceKeys.all_files), "*.*"));
 
         final File saveFile =
             fileChooser.showSaveDialog(MainController.this.getStage().getScene().getWindow());
@@ -128,6 +117,19 @@ public class MainController {
     return isSelected;
   }
 
+  static File resolveCsvChooserInitialDirectory(
+      final String lastOpenedPath, final String userHomePath) {
+    if (lastOpenedPath == null) {
+      return new File(userHomePath);
+    }
+
+    final File parentDirectory = new File(lastOpenedPath).getParentFile();
+    if (parentDirectory == null) {
+      return new File(userHomePath);
+    }
+    return parentDirectory;
+  }
+
   static double retainPopupDimension(
       final double previousDimension, final double preferredDimension) {
     if (previousDimension <= 0) {
@@ -138,6 +140,23 @@ public class MainController {
 
   static void applyLoadedPersons(final LoadPersonsTask.Result result) {
     PersonManager.getInstance().setPersonDB(result.getPersons());
+  }
+
+  FileChooser createCsvFileChooser() {
+    final LangResourceManager langResourceManager = new LangResourceManager();
+    final FileChooser fileChooser = new FileChooser();
+    fileChooser.setTitle(langResourceManager.getLocaleString(LangResourceKeys.fileChooserCaption));
+    fileChooser
+        .getExtensionFilters()
+        .add(
+            new ExtensionFilter(
+                langResourceManager.getLocaleString(LangResourceKeys.csv_file),
+                CSV_FILE_EXTENSION));
+    fileChooser.setInitialDirectory(
+        resolveCsvChooserInitialDirectory(
+            PropertyManager.getProperty(PropertyFields.LAST_OPENED),
+            System.getProperty(USER_HOME)));
+    return fileChooser;
   }
 
   private void closeApp() {
@@ -192,25 +211,7 @@ public class MainController {
                     new Thread(saveBirthdaysToFileTask).start();
                   }
                   case ASK_FOR_SAVE_FILE -> {
-                    final FileChooser fileChooser = new FileChooser();
-                    fileChooser.setTitle(
-                        new LangResourceManager()
-                            .getLocaleString(LangResourceKeys.fileChooserCaption));
-                    fileChooser
-                        .getExtensionFilters()
-                        .add(
-                            new ExtensionFilter(
-                                new LangResourceManager()
-                                    .getLocaleString(LangResourceKeys.csv_file),
-                                CSV_FILE_EXTENSION));
-
-                    try {
-                      fileChooser.setInitialDirectory(
-                          new File(PropertyManager.getProperty(PropertyFields.LAST_OPENED))
-                              .getParentFile());
-                    } catch (final NullPointerException nullPointerException) {
-                      fileChooser.setInitialDirectory(new File(System.getProperty(USER_HOME)));
-                    }
+                    final FileChooser fileChooser = createCsvFileChooser();
 
                     final File selectedFile =
                         fileChooser.showSaveDialog(
@@ -248,21 +249,7 @@ public class MainController {
   final EventHandler<ActionEvent> saveToFileHandler =
       event -> {
         if (MainController.this.getSessionInfos().getSaveFile() == null) {
-          final FileChooser fileChooser = new FileChooser();
-          fileChooser.setTitle(
-              new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
-          fileChooser
-              .getExtensionFilters()
-              .add(
-                  new ExtensionFilter(
-                      new LangResourceManager().getLocaleString(LangResourceKeys.csv_file),
-                      CSV_FILE_EXTENSION));
-          try {
-            fileChooser.setInitialDirectory(
-                new File(PropertyManager.getProperty(PropertyFields.LAST_OPENED)).getParentFile());
-          } catch (final NullPointerException nullPointerException) {
-            fileChooser.setInitialDirectory(new File(System.getProperty(USER_HOME)));
-          }
+          final FileChooser fileChooser = createCsvFileChooser();
 
           // if the chooser is "x'ed" the file is null
           final File selectedFile =
@@ -303,22 +290,7 @@ public class MainController {
       };
   final EventHandler<ActionEvent> openFromFileChooserHandler =
       event -> {
-        final FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle(
-            new LangResourceManager().getLocaleString(LangResourceKeys.fileChooserCaption));
-        fileChooser
-            .getExtensionFilters()
-            .add(
-                new ExtensionFilter(
-                    new LangResourceManager().getLocaleString(LangResourceKeys.csv_file),
-                    CSV_FILE_EXTENSION));
-
-        try {
-          fileChooser.setInitialDirectory(
-              new File(PropertyManager.getProperty(PropertyFields.LAST_OPENED)).getParentFile());
-        } catch (final NullPointerException nullPointerException) {
-          fileChooser.setInitialDirectory(new File(System.getProperty(USER_HOME)));
-        }
+        final FileChooser fileChooser = createCsvFileChooser();
 
         // if the chooser is "x'ed" the file is null
         final File selectedFile =

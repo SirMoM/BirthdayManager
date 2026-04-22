@@ -6,6 +6,7 @@ import application.model.Person;
 import application.model.PersonManager;
 import application.model.SessionInfos;
 import application.processes.LoadPersonsTask;
+import java.io.File;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +57,20 @@ class MainControllerTest {
   void shouldPersistUpdateReminder_UsesTheFinalCheckboxState() {
     assertThat(MainController.shouldPersistUpdateReminder(true)).isTrue();
     assertThat(MainController.shouldPersistUpdateReminder(false)).isFalse();
+  }
+
+  @Test
+  void resolveCsvChooserInitialDirectory_UsesTheParentOfTheLastOpenedFile() {
+    assertThat(
+            MainController.resolveCsvChooserInitialDirectory(
+                "/tmp/birthdays/current.csv", "/tmp/home"))
+        .isEqualTo(new File("/tmp/birthdays"));
+  }
+
+  @Test
+  void resolveCsvChooserInitialDirectory_FallsBackToTheUserHomeDirectory() {
+    assertThat(MainController.resolveCsvChooserInitialDirectory(null, "/tmp/home"))
+        .isEqualTo(new File("/tmp/home"));
   }
 
   @Test
