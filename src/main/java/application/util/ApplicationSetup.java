@@ -36,7 +36,10 @@ public class ApplicationSetup {
         properties.load(fis);
         PropertyManager.getInstance().storeProperties("Load from previous version!");
       } catch (IOException ioException) {
-        LOG.catching(ioException);
+        LOG.warn(
+            "Could not migrate legacy properties file {}.",
+            propertiesFile.getAbsolutePath(),
+            ioException);
         return;
       }
 
@@ -56,7 +59,8 @@ public class ApplicationSetup {
     if (onStartFile == null) return;
     File file = new File(onStartFile);
     if (!file.exists() || !file.isFile() || !onStartFile.endsWith(".csv")) {
-      LOG.info("On start file is not valid {} and will be cleansed", onStartFile);
+      LOG.info(
+          "Startup file {} is invalid. Clearing {}.", onStartFile, PropertyFields.FILE_ON_START);
       PropertyManager.getInstance().getProperties().setProperty(PropertyFields.FILE_ON_START, "");
     }
   }

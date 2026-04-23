@@ -20,7 +20,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -233,15 +232,14 @@ public class NewBirthdayViewController extends Controller {
 
     this.openFile_MenuItem.addEventHandler(
         ActionEvent.ANY, this.getMainController().openFromFileChooserHandler);
-    try {
-      MenuItem recentFiles_MenuItem =
-          new MenuItem(new File(PropertyManager.getProperty(PropertyFields.LAST_OPENED)).getName());
+    String lastOpenedFile = PropertyManager.getProperty(PropertyFields.LAST_OPENED);
+    if (lastOpenedFile != null) {
+      MenuItem recentFiles_MenuItem = new MenuItem(new File(lastOpenedFile).getName());
       recentFiles_MenuItem.addEventHandler(
           ActionEvent.ANY, this.getMainController().openFromRecentHandler);
       this.openRecent_MenuItem.getItems().add(recentFiles_MenuItem);
-    } catch (NullPointerException nullPointerException) {
-      LOG.catching(Level.INFO, nullPointerException);
-      LOG.info("No recent File opened ?");
+    } else {
+      LOG.debug("No recent file available for new birthday view.");
     }
     this.save_Button.setText(resourceManager.getLocaleString(LangResourceKeys.save_button));
     this.cancel_Button.setText(resourceManager.getLocaleString(LangResourceKeys.cancel_button));

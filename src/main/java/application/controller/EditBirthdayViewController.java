@@ -20,7 +20,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -227,11 +226,10 @@ public class EditBirthdayViewController extends Controller {
     this.name_TextField.setText(this.personToEdit.getName());
     this.surname_TextField.setText(this.personToEdit.getSurname());
     this.middleName_TextField.setText(this.personToEdit.getMisc());
-    try {
+    if (this.personToEdit.getBirthday() != null) {
       this.birthday_DatePicker.setValue(this.personToEdit.getBirthday());
-    } catch (final NullPointerException nullPointerException) {
-      LOG.catching(Level.DEBUG, nullPointerException);
-      LOG.debug("New Person creating ? IF not we have a problem!");
+    } else {
+      LOG.debug("Edit birthday view opened without birthday value for {}.", this.personToEdit);
     }
   }
 

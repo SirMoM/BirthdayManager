@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Properties;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -40,7 +39,10 @@ public class PropertyManager {
         LOG.info("Loaded properties");
       }
     } catch (final IOException ioException) {
-      LOG.catching(Level.FATAL, ioException);
+      LOG.fatal(
+          "Could not initialize properties file {}.",
+          this.propertiesFile.getAbsolutePath(),
+          ioException);
     }
   }
 
@@ -64,7 +66,7 @@ public class PropertyManager {
     try {
       return getInstance().properties.get(key).toString();
     } catch (NullPointerException nullPointerException) {
-      LogManager.getLogger(PropertyManager.class.getName()).warn("Could not get property {}", key);
+      LOG.warn("Could not get property {}.", key);
     }
     return null;
   }
@@ -74,7 +76,8 @@ public class PropertyManager {
    * @return a property as String
    */
   public static String getProperty(final String key, final String defaultValue) {
-    return getProperty(key) == null ? defaultValue : getProperty(key);
+    final String value = getProperty(key);
+    return value == null ? defaultValue : value;
   }
 
   /**
@@ -136,7 +139,10 @@ public class PropertyManager {
     try {
       this.storeProperties("Default properties stored");
     } catch (final IOException ioException) {
-      LOG.catching(Level.WARN, ioException);
+      LOG.warn(
+          "Could not store default properties in {}.",
+          this.propertiesFile.getAbsolutePath(),
+          ioException);
     }
   }
 

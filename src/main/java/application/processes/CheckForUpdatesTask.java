@@ -19,7 +19,13 @@ public class CheckForUpdatesTask extends Task<String> {
   @Override
   protected String call() throws Exception {
     String currentVersion = getCurrentVersion();
-    String latestVersion = getLatestVersion();
+    String latestVersion;
+    try {
+      latestVersion = getLatestVersion();
+    } catch (IOException ioException) {
+      LOG.warn("Could not check latest version from {}.", URL, ioException);
+      throw ioException;
+    }
 
     LOG.info("This version {} upstream version {}", currentVersion, latestVersion);
 
@@ -38,9 +44,10 @@ public class CheckForUpdatesTask extends Task<String> {
     conn.setRequestMethod("GET");
 
     // Read result
-    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-    String output = in.readLine();
-    in.close();
+    String output;
+    try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+      output = in.readLine();
+    }
 
     // Parse result and return version
     return output.split("=")[1];
@@ -52,7 +59,7 @@ public class CheckForUpdatesTask extends Task<String> {
       try (BufferedReader reader = new BufferedReader(new FileReader("gradle.properties"))) {
         version = reader.readLine().split("=")[1];
       } catch (IOException ioException) {
-        LOG.catching(ioException);
+        LOG.warn("Could not read current version from gradle.properties.", ioException);
       }
     }
     return version;

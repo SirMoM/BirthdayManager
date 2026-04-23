@@ -27,7 +27,6 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TextArea;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -247,13 +246,19 @@ public class SessionInfos {
                         lRM.getLocaleString(LangResourceKeys.missedBirthdaysMsg), days, age);
                 stringBuilder.append(missedBirthdaysMessage);
               } catch (IllegalFormatException illegalFormatException) {
-                LOG.catching(Level.WARN, illegalFormatException);
                 LOG.warn(
-                    "Could not generate Missing-Text for {} based on {} and {}", person, days, age);
+                    "Could not format missed birthday message for {} with days={} and age={}.",
+                    person,
+                    days,
+                    age,
+                    illegalFormatException);
               } catch (NullPointerException nullPointerException) {
-                LOG.catching(Level.WARN, nullPointerException);
                 LOG.warn(
-                    "Could not generate Missing-Text for {} based on {} and {}", person, days, age);
+                    "Could not build missed birthday message for {} with days={} and age={}.",
+                    person,
+                    days,
+                    age,
+                    nullPointerException);
               }
               stringBuilder.append("\n");
 

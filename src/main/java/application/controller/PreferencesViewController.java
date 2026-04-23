@@ -23,7 +23,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -149,8 +148,9 @@ public class PreferencesViewController extends Controller {
                 PreferencesViewController.this.startupFile_textField.getText());
           }
         } catch (final NullPointerException nullPointerException) {
-          LOG.catching(Level.INFO, nullPointerException);
-          LOG.info("startupFile_textField was not properly set ?");
+          LOG.info(
+              "Could not persist startup file preference because startup file field was unavailable.",
+              nullPointerException);
         }
         properties.setProperty(
             PropertyFields.FIRST_HIGHLIGHT_COLOR,
@@ -180,10 +180,11 @@ public class PreferencesViewController extends Controller {
           PropertyManager.getInstance().storeProperties("Saved properties" + LocalDateTime.now());
           PreferencesViewController.this.updateLocalisation();
         } catch (final IOException ioException) {
-          LOG.catching(ioException);
+          LOG.error("Failed to store preferences.", ioException);
         } catch (final NullPointerException nullPointerException) {
-          LOG.catching(Level.INFO, nullPointerException);
-          LOG.info("A field was not properly set ?");
+          LOG.info(
+              "Could not apply preferences because one or more fields were unavailable.",
+              nullPointerException);
         }
         PreferencesViewController.this.getMainController().settingsChanged();
         ((Stage) save_button.getScene().getWindow()).close();
@@ -348,10 +349,9 @@ public class PreferencesViewController extends Controller {
         Boolean.parseBoolean(PropertyManager.getProperty(PropertyFields.OPEN_FILE_ON_START));
 
     this.openFileOnStart_Checkbox.selectedProperty().set(openFileOnStart);
-    try {
-      this.startupFile_textField.setText(PropertyManager.getProperty(PropertyFields.LAST_OPENED));
-    } catch (final NullPointerException nullPointerException) {
-      LOG.catching(Level.INFO, nullPointerException);
+    final String lastOpenedFile = PropertyManager.getProperty(PropertyFields.LAST_OPENED);
+    if (lastOpenedFile != null) {
+      this.startupFile_textField.setText(lastOpenedFile);
     }
     if (openFileOnStart && PropertyManager.getProperty(PropertyFields.FILE_ON_START) != null) {
       if (PropertyManager.getProperty(PropertyFields.FILE_ON_START).endsWith(".csv")) {

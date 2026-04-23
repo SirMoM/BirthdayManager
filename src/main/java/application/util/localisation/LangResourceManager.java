@@ -25,10 +25,14 @@ public class LangResourceManager {
     try {
       this.langResourceBundle = ResourceBundle.getBundle(LANG_BUNDLE_BASE_NAME, locale);
     } catch (final MissingResourceException missingResourceException) {
-      LOG.catching(missingResourceException);
+      LOG.error(
+          "Could not load language bundle {} for locale {}.",
+          LANG_BUNDLE_BASE_NAME,
+          locale,
+          missingResourceException);
     }
     if (this.langResourceBundle == null) {
-      LOG.error("Could not get a langResourceBundle");
+      LOG.error("Language bundle {} unavailable for locale {}.", LANG_BUNDLE_BASE_NAME, locale);
     }
   }
 
@@ -39,10 +43,14 @@ public class LangResourceManager {
     try {
       this.langResourceBundle = ResourceBundle.getBundle(LANG_BUNDLE_BASE_NAME, locale);
     } catch (final MissingResourceException missingResourceException) {
-      LOG.catching(missingResourceException);
+      LOG.error(
+          "Could not switch language bundle {} to locale {}.",
+          LANG_BUNDLE_BASE_NAME,
+          locale,
+          missingResourceException);
     }
     if (this.langResourceBundle == null) {
-      LOG.error("Could not get a langResourceBundle");
+      LOG.error("Language bundle {} unavailable for locale {}.", LANG_BUNDLE_BASE_NAME, locale);
     }
   }
 

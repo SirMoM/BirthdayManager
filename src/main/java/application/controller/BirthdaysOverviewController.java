@@ -40,7 +40,6 @@ import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.Callback;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -101,7 +100,8 @@ public class BirthdaysOverviewController extends Controller {
               });
           new Thread(loadPersonsTask).start();
         } catch (IOException ioException) {
-          LOG.catching(Level.ERROR, ioException);
+          LOG.error(
+              "Failed to import birthdays from {}.", selectedFile.getAbsolutePath(), ioException);
         }
       };
   protected boolean showNextBirthdays;
@@ -824,7 +824,7 @@ public class BirthdaysOverviewController extends Controller {
 
   private void logAndAlertParsingError(
       Person.PersonCouldNotBeParsedException personCouldNotBeParsedException) {
-    LOG.warn(personCouldNotBeParsedException);
+    LOG.warn("Failed to parse imported birthday entry.", personCouldNotBeParsedException);
     final LangResourceManager resourceManager = new LangResourceManager();
     final Alert alert = new Alert(Alert.AlertType.WARNING);
     alert.setTitle(resourceManager.getLocaleString(LangResourceKeys.parseError_Title));
@@ -863,7 +863,7 @@ public class BirthdaysOverviewController extends Controller {
       try {
         BirthdaysOverviewController.this.getMainController().openFile(fileToOpen);
       } catch (IOException ioException) {
-        LOG.catching(Level.DEBUG, ioException);
+        LOG.warn("Failed to open recent file {} from birthdays overview.", fileToOpen, ioException);
       }
     }
   }

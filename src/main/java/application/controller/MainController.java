@@ -301,7 +301,10 @@ public class MainController {
         try {
           MainController.this.openFile(selectedFile);
         } catch (final IOException ioException) {
-          LOG.catching(ioException);
+          LOG.error(
+              "Failed to open birthdays file {} from file chooser.",
+              selectedFile.getAbsolutePath(),
+              ioException);
         }
       };
   final EventHandler<ActionEvent> openFromRecentHandler =
@@ -312,7 +315,7 @@ public class MainController {
         try {
           MainController.this.openFile(birthdayFile);
         } catch (final IOException ioException) {
-          LOG.catching(ioException);
+          LOG.error("Failed to open recent birthdays file {}.", lastUsedFilePath, ioException);
         }
       };
   private final Stack<SceneAndController> lastScenes;
@@ -359,7 +362,8 @@ public class MainController {
                 .bind(exportToCalenderTask.workDoneProperty());
           }
         } catch (final IOException ioException) {
-          LOG.catching(Level.ERROR, ioException);
+          LOG.error(
+              "Failed to prepare calendar export for {}.", saveFile.getAbsolutePath(), ioException);
         }
         if (exportToCalenderTask != null) {
           new Thread(exportToCalenderTask).start();
@@ -415,7 +419,7 @@ public class MainController {
       this.stage.setTitle(
           new LangResourceManager().getLocaleString(LangResourceKeys.mainWindow_Title));
     } catch (final Exception exception) {
-      LOG.catching(Level.ERROR, exception);
+      LOG.error("Failed to open birthdays overview view.", exception);
     }
     getActiveController().placeFocus();
   }
@@ -432,7 +436,7 @@ public class MainController {
       this.replaceSceneContent(
           "/application/view/EditBirthdayView.fxml", this.getActiveController());
     } catch (final Exception exception) {
-      LOG.catching(Level.ERROR, exception);
+      LOG.error("Failed to open new birthday view.", exception);
     }
     getActiveController().placeFocus();
   }
@@ -456,7 +460,7 @@ public class MainController {
           "/application/view/EditBirthdayView.fxml", this.getActiveController());
 
     } catch (final Exception exception) {
-      LOG.catching(Level.ERROR, exception);
+      LOG.error("Failed to open edit birthday view for {}.", person, exception);
     }
     getActiveController().placeFocus();
   }
@@ -471,7 +475,7 @@ public class MainController {
     try {
       this.replaceSceneContent("/application/view/SearchView.fxml", this.getActiveController());
     } catch (final Exception exception) {
-      LOG.catching(Level.ERROR, exception);
+      LOG.error("Failed to open search view.", exception);
     }
     getActiveController().placeFocus();
   }
@@ -508,7 +512,10 @@ public class MainController {
     try {
       PropertyManager.getInstance().storeProperties("Saved recent file.");
     } catch (final IOException ioException) {
-      LOG.catching(Level.ERROR, ioException);
+      LOG.warn(
+          "Failed to store recent file path {}.",
+          getSessionInfos().getSaveFile().getAbsolutePath(),
+          ioException);
     }
   }
 
@@ -665,7 +672,7 @@ public class MainController {
         }
       }
     } catch (final Exception exception) {
-      LOG.catching(Level.ERROR, exception);
+      LOG.error("Failed to start birthdays overview scene.", exception);
     }
     getActiveController().placeFocus();
     checkVersionAndAlert();
@@ -720,8 +727,7 @@ public class MainController {
                     try {
                       Desktop.getDesktop().browse(new URI(url));
                     } catch (IOException | URISyntaxException exception) {
-                      LOG.catching(Level.DEBUG, exception);
-                      LOG.debug("Could not open url {}", url);
+                      LOG.warn("Could not open update URL {} in browser.", url, exception);
                     }
                   }
                 });
@@ -743,7 +749,7 @@ public class MainController {
               try {
                 PropertyManager.getInstance().storeProperties("");
               } catch (IOException e) {
-                LOG.catching(e);
+                LOG.warn("Failed to persist update reminder preference.", e);
               }
             }
           }
@@ -753,7 +759,8 @@ public class MainController {
 
   private void logAndAlertParsingError(
       Person.PersonCouldNotBeParsedException personCouldNotBeParsedException) {
-    LOG.warn(personCouldNotBeParsedException);
+    LOG.warn(
+        "Failed to parse birthday entry while loading birthdays.", personCouldNotBeParsedException);
     final LangResourceManager resourceManager = new LangResourceManager();
     final Alert alert = new Alert(Alert.AlertType.WARNING);
     alert.setTitle(resourceManager.getLocaleString(LangResourceKeys.parseError_Title));

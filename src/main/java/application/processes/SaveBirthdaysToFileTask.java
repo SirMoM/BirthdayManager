@@ -69,7 +69,7 @@ public class SaveBirthdaysToFileTask extends Task<Boolean> {
       }
       return true;
     } catch (IOException ioException) {
-      LOG.catching(ioException);
+      LOG.error("Failed to save birthdays to {}.", this.saveFile.getAbsolutePath(), ioException);
       return false;
     } finally {
       LOG.debug("ENDED {}", this.getClass().getName());

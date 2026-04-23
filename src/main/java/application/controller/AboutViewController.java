@@ -32,7 +32,7 @@ import org.apache.logging.log4j.Logger;
 
 public class AboutViewController extends Controller {
 
-  private static final Logger LOG = LogManager.getLogger(CheckForUpdatesTask.class.getName());
+  private static final Logger LOG = LogManager.getLogger(AboutViewController.class.getName());
   private static final String githubURL = "https://github.com/SirMoM/BirthdayManager";
   private static final String websiteURL = "https://sirmom.github.io/BirthdayManagerWebsite/";
   @FXML private ResourceBundle resources;
@@ -130,8 +130,7 @@ public class AboutViewController extends Controller {
                     try {
                       Desktop.getDesktop().browse(new URI(url));
                     } catch (IOException | URISyntaxException exception) {
-                      LOG.catching(Level.DEBUG, exception);
-                      LOG.debug("Could not open url {}", url);
+                      LOG.warn("Could not open update URL {} in browser.", url, exception);
                     }
                   }
                 });
@@ -153,7 +152,7 @@ public class AboutViewController extends Controller {
               try {
                 PropertyManager.getInstance().storeProperties("");
               } catch (IOException e) {
-                LOG.catching(e);
+                LOG.warn("Failed to persist update reminder preference from about view.", e);
               }
             }
 
@@ -174,7 +173,7 @@ public class AboutViewController extends Controller {
         Desktop desktop = Desktop.getDesktop();
         desktop.browse(website);
       } catch (URISyntaxException | IOException exception) {
-        LOG.catching(exception);
+        LOG.warn("Could not open website URL {}.", url, exception);
       }
     }
   }

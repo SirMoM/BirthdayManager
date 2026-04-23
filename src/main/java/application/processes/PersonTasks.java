@@ -4,7 +4,6 @@ import application.model.Person;
 import application.model.PersonManager;
 import java.util.List;
 import javafx.concurrent.Task;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -30,7 +29,7 @@ public abstract class PersonTasks<G> extends Task<G> {
         //noinspection BusyWait
         Thread.sleep(timeToWait);
       } catch (InterruptedException interruptedException) {
-        LOG.catching(Level.WARN, interruptedException);
+        LOG.warn("Interrupted while waiting for person database to load.", interruptedException);
         Thread.currentThread().interrupt();
       }
 
