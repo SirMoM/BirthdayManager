@@ -1,6 +1,10 @@
 BirthdayManager Changelog
 =========================
 
+0.7.2
+- Extract shared CSV file chooser defaults for open and save flows.
+- Improve error logging context across controllers, tasks, and utilities.
+
 0.7.1
 - Localize remaining runtime dialogs, alerts, and labels.
 - Fix and localize the week and month overview context menus.
